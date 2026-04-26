@@ -26,7 +26,7 @@ Target audience: regulated-fintech engineering leads and compliance leads who ne
 
 **Minimum (v0.1):** Node.js 20+, npm 10+, a git repo.
 
-**Recommended (full stack):** Claude Max plan (~$200/mo) for v0.2 LLM agents, gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows.
+**Recommended (full stack):** **Claude Max 5x (~$100/mo)** with **Opus 4.7 (extra-high effort)** as primary + **Sonnet** as subagent for v0.2 LLM agents. Plus gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows. Realistic burn: ~1-2 hours of focused work to consume the 5-hour quota window — see [docs/costs.md](docs/costs.md).
 
 See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testnux doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
 
@@ -292,7 +292,7 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 ## FAQ
 
 **Does TestNUX cost anything?**  
-The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately $0.30–$0.50 per page for a full AI pass. Heavy multi-agent dispatch (8 parallel agents) can burn ~5 sessions of Claude Max quota per hour. See [docs/costs.md](docs/costs.md) for the full breakdown and recommended working patterns.
+The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately **$0.30–$0.50 per page** for a full AI pass (Sonnet-class). On a Claude Max subscription (recommended: **5x tier ~$100/mo** with Opus 4.7 + Sonnet subagents), heavy multi-agent dispatch consumes a fresh 5-hour quota window in **~1-2 hours of focused work**. Plan two 5-hour blocks per day max. See [docs/costs.md](docs/costs.md) for the empirical burn rates + recommended working patterns.
 
 OSS = self-serve via markdown docs. Premium tier (v0.4+) = white-glove onboarding + consulting + auditor facilitation. See [docs/adoption-checklist.md](docs/adoption-checklist.md) for what's included.
 
