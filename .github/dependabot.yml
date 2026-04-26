@@ -1,0 +1,44 @@
+# Dependabot config for TestNUX
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # npm production + dev deps
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kuala_Lumpur"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "StillNotBald"
+    labels:
+      - "dependencies"
+      - "needs-review"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      # Group dev-only updates to reduce PR noise
+      dev-dependencies:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+      # Group test-tooling
+      test-tooling:
+        patterns: ["vitest", "@vitest/*", "@playwright/*"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "StillNotBald"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"

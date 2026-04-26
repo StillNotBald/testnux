@@ -1,0 +1,36 @@
+# CODEOWNERS for TestNUX
+#
+# Code owners are automatically requested for review on PRs that touch
+# their owned paths. This is the first line of defense against malicious
+# PRs to security-critical files.
+#
+# Rules: last matching pattern wins. Owner = @StillNotBald (Chu Ling)
+# until the project has co-maintainers.
+
+# Default — everything not otherwise covered
+*                                                @StillNotBald
+
+# Security-critical: HMAC chain, OSCAL emit, parser, graph
+/src/lib/uat-log.mjs                              @StillNotBald
+/src/lib/oscal.mjs                                @StillNotBald
+/src/lib/parser.mjs                               @StillNotBald
+/src/lib/graph.mjs                                @StillNotBald
+/test/uat-log.test.mjs                            @StillNotBald
+/test/oscal.test.mjs                              @StillNotBald
+
+# Templates that get scaffolded into every user's project — high blast radius
+/templates/                                       @StillNotBald
+/scripts/lint-templates.mjs                       @StillNotBald
+
+# Industry-standards content: misleading control descriptions could deceive auditors
+/src/config/industry-standards/                   @StillNotBald
+
+# CI + security configs
+/.github/                                         @StillNotBald
+/SECURITY.md                                      @StillNotBald
+/LICENSE                                          @StillNotBald
+/NOTICE                                           @StillNotBald
+
+# CLI dispatch + commands — moderate blast radius
+/bin/                                             @StillNotBald
+/src/commands/                                    @StillNotBald
