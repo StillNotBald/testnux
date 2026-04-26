@@ -32,23 +32,34 @@ See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide incl
 
 ---
 
+## Install
+
+```bash
+npm install -g testnux
+testnux --version    # 0.1.0
+```
+
+Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/testnux). One-shot via `npx testnux <command>` works too — no install needed.
+
+---
+
 ## 60-second quickstart
 
 ```bash
 # Scaffold a new test pass
-npx testnux init demo-login --industry general
+testnux init demo-login --industry general
 
 # Run TestNUX's own demo (no setup required)
-npx testnux demo
+testnux demo
 
 # Check your environment
-npx testnux doctor
+testnux doctor
 
 # After filling test-plan.md and running your Playwright spec:
-npx testnux report demo-login
+testnux report demo-login
 
 # Validate a folder before reporting
-npx testnux validate demo-login
+testnux validate demo-login
 ```
 
 The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and opens both in your browser — then deletes the fixture. Fastest path to the "aha."

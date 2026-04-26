@@ -15,20 +15,29 @@
 ## Step 1 — Install
 
 ```bash
-# Until v0.1.0 hits npm, install from source:
-git clone https://github.com/StillNotBald/testnux.git
-cd testnux
-npm install
-npm link    # makes `testnux` command available globally
+npm install -g testnux
 testnux --version    # verify
 ```
 
-Once we publish v0.1.0 to npm (target: post-validation), this becomes `npm install -g testnux`.
-
-Expected output from `testnux --version`:
+Expected output:
 
 ```
-testnux 0.0.1
+0.1.0
+```
+
+That's it. The package is on npm — `npm install -g testnux` works on any machine with Node 20+.
+
+**Alternative — install from GitHub** (for unreleased commits / contributors):
+
+```bash
+npm install -g github:StillNotBald/testnux
+```
+
+**Alternative — clone for development:**
+
+```bash
+git clone https://github.com/StillNotBald/testnux.git
+cd testnux && npm install && npm link
 ```
 
 ---
