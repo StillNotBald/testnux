@@ -4,14 +4,14 @@
 /**
  * src/commands/visual.mjs
  *
- * Implements `testing-hub visual` — visual regression testing.
+ * Implements `testnux visual` — visual regression testing.
  *
  * Sub-commands:
- *   testing-hub visual baseline <slug>
+ *   testnux visual baseline <slug>
  *     Capture full-page screenshots for all TCs in <slug>/ as baseline images.
  *     Stored at: <slug>/visual-baseline/<TC-ID>.png
  *
- *   testing-hub visual compare <slug>
+ *   testnux visual compare <slug>
  *     Capture current screenshots, diff against baseline using pixelmatch.
  *     Diffs stored at: <slug>/visual-diff/<TC-ID>-diff.png
  *     Flags TCs where pixel diff exceeds the configured threshold.
@@ -24,7 +24,7 @@
  *   and exits gracefully (no crash). v0.3 stub — full Playwright integration
  *   arrives in the v0.3 release cycle.
  *
- * Configuration (testing-hub.config.mjs):
+ * Configuration (testnux.config.mjs):
  *   export default {
  *     visual: {
  *       diffThreshold: 0.05,   // 5% — fraction of pixels allowed to differ
@@ -42,7 +42,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// Default visual configuration — overridable via testing-hub.config.mjs
+// Default visual configuration — overridable via testnux.config.mjs
 const DEFAULT_VISUAL_CONFIG = {
   diffThreshold: 0.05,
   maskSelectors: [],
@@ -94,13 +94,13 @@ export async function runVisualBaseline(slug, opts = {}) {
     'VISUAL REGRESSION — v0.3 STUB',
     '',
     'Full screenshot capture requires:',
-    '  1. A running application URL (configure in testing-hub.config.mjs → visual.baseUrl)',
+    '  1. A running application URL (configure in testnux.config.mjs → visual.baseUrl)',
     '  2. Playwright to be installed (npm install @playwright/test)',
     '  3. Run: npx playwright test --project=visual-baseline',
     '',
     'This directory is ready for baselines. Once pixelmatch + pngjs are installed:',
     '  npm install pixelmatch pngjs',
-    'Rerun `testing-hub visual baseline ' + slug + '` to capture live screenshots.',
+    'Rerun `testnux visual baseline ' + slug + '` to capture live screenshots.',
   ].join('\n');
 
   const stubPath = path.join(baselineDir, '_STUB.txt');
@@ -143,7 +143,7 @@ export async function runVisualCompare(slug, opts = {}) {
   const diffDir = path.join(slugDir, 'visual-diff');
 
   if (!fs.existsSync(baselineDir)) {
-    const msg = `No baseline found at ${baselineDir}. Run \`testing-hub visual baseline ${slug}\` first.`;
+    const msg = `No baseline found at ${baselineDir}. Run \`testnux visual baseline ${slug}\` first.`;
     log(json, { event: 'visual.compare.error', error: msg });
     if (!json) console.log(`[visual compare] ${msg}`);
     return;
@@ -276,12 +276,12 @@ function readTcIds(slugDir) {
 }
 
 /**
- * Load visual config from testing-hub.config.mjs if it exists.
+ * Load visual config from testnux.config.mjs if it exists.
  * Returns merged config with defaults.
  */
 async function loadVisualConfig(outDir) {
-  const configPath = path.resolve(outDir, '..', 'testing-hub.config.mjs');
-  const altConfigPath = path.resolve(process.cwd(), 'testing-hub.config.mjs');
+  const configPath = path.resolve(outDir, '..', 'testnux.config.mjs');
+  const altConfigPath = path.resolve(process.cwd(), 'testnux.config.mjs');
 
   for (const cfgPath of [configPath, altConfigPath]) {
     if (fs.existsSync(cfgPath)) {
@@ -326,10 +326,10 @@ function printPixelmatchNotice() {
   console.log('');
   console.log('  To enable visual regression comparison, install:');
   console.log('    npm install pixelmatch pngjs');
-  console.log('  Then rerun: testing-hub visual compare <slug>');
+  console.log('  Then rerun: testnux visual compare <slug>');
   console.log('');
   console.log('  pixelmatch is MIT licensed and has zero runtime dependencies.');
-  console.log('  It is an optional peer dependency of testing-hub.');
+  console.log('  It is an optional peer dependency of testnux.');
 }
 
 function escapeRegex(str) {

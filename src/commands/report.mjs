@@ -4,7 +4,7 @@
 /**
  * src/commands/report.mjs
  *
- * Implements `testing-hub report <folder>`.
+ * Implements `testnux report <folder>`.
  *
  * v0.1 STUB — the full generator has been proven in production on 33+ page test
  * plans. Port the proven generator implementation.
@@ -36,7 +36,7 @@
  *   [ ] Respect --open: use `open` (npm) or `start`/`xdg-open` to open HTML
  *   [ ] Emit exit code 4 on render failure
  *
- * See also: testing-hub-launch-plan.md § Phase 2 + § v0.2 for full roadmap.
+ * See also: testnux-launch-plan.md § Phase 2 + § v0.2 for full roadmap.
  *
  * v0.1 placeholder — see launch plan v0.2 for completion.
  */
@@ -63,7 +63,7 @@ export async function runReport(folder, opts = {}) {
     );
   } else {
     console.log('');
-    console.log('⚠️  testing-hub report — v0.1 stub');
+    console.log('⚠️  testnux report — v0.1 stub');
     console.log('');
     console.log('   The report generator has been proven in production but is not yet');
     console.log('   ported to the OSS package. Expected in v0.2.');

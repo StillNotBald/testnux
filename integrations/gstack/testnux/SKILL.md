@@ -1,15 +1,15 @@
 ---
-name: testing-hub
+name: testnux
 version: 0.3.0
 description: |
   Per-page test documentation workflow with AI-vs-human dual execution. Use when
   the user wants to scaffold test plans, run a structured test pass, generate XLSX
   + HTML audit reports, validate traceability, produce SCAs, or sign off UAT.
   Covers the full 8-step regulator-evidence chain: requirements → sprint log →
-  testing log → RTM → SCA → UAT sign-off. (testing-hub)
+  testing log → RTM → SCA → UAT sign-off. (testnux)
 model: claude-sonnet-4-6
 triggers:
-  - testing-hub
+  - testnux
   - scaffold a test plan
   - generate test report
   - run test pass
@@ -18,21 +18,21 @@ triggers:
   - run SCA
   - sign off UAT
   - init test suite
-  - testing-hub init
-  - testing-hub report
-  - testing-hub validate
-  - testing-hub doctor
-  - testing-hub rtm
-  - testing-hub sca
-  - testing-hub discover
-  - testing-hub plan
-  - testing-hub codify
-  - testing-hub enrich
-  - testing-hub batch-plan
-  - testing-hub br
-  - testing-hub sign
-  - testing-hub env
-  - testing-hub visual
+  - testnux init
+  - testnux report
+  - testnux validate
+  - testnux doctor
+  - testnux rtm
+  - testnux sca
+  - testnux discover
+  - testnux plan
+  - testnux codify
+  - testnux enrich
+  - testnux batch-plan
+  - testnux br
+  - testnux sign
+  - testnux env
+  - testnux visual
 allowed-tools:
   - Bash
   - Read
@@ -43,9 +43,9 @@ allowed-tools:
 
 ---
 
-# testing-hub skill
+# testnux skill
 
-This skill drives the `testing-hub` CLI. It coordinates structured test-pass
+This skill drives the `testnux` CLI. It coordinates structured test-pass
 documentation across three discipline tracks — requirements, sprint log, and
 testing log — and produces auditor-ready evidence artifacts.
 
@@ -54,11 +54,11 @@ testing log — and produces auditor-ready evidence artifacts.
 Before any command, confirm the CLI is reachable:
 
 ```bash
-npx testing-hub --version 2>/dev/null || (echo "NOT_INSTALLED" && which node)
+npx testnux --version 2>/dev/null || (echo "NOT_INSTALLED" && which node)
 ```
 
-If `NOT_INSTALLED`: tell the user to run `npm install -g testing-hub` or use
-`npx testing-hub <command>` directly. Do not proceed until the CLI is reachable.
+If `NOT_INSTALLED`: tell the user to run `npm install -g testnux` or use
+`npx testnux <command>` directly. Do not proceed until the CLI is reachable.
 
 ---
 
@@ -70,7 +70,7 @@ If `NOT_INSTALLED`: tell the user to run `npm install -g testing-hub` or use
 happen before `report` or `validate`.
 
 ```bash
-npx testing-hub init <slug> [--industry general|fintech|healthcare|gov] [--out ./testing-log]
+npx testnux init <slug> [--industry general|fintech|healthcare|gov] [--out ./testing-log]
 ```
 
 **What it creates:**
@@ -91,7 +91,7 @@ exist, prompt the user to supply them before proceeding.
 artifact. Requires a completed `execution-log.md` alongside `test-plan.md`.
 
 ```bash
-npx testing-hub report <folder> [--plan-only] [--open]
+npx testnux report <folder> [--plan-only] [--open]
 ```
 
 - `--plan-only`: render without execution results (shows "PLAN ONLY" badge)
@@ -112,7 +112,7 @@ renders correctly before handing to an auditor.
 references, invalid TC-ID formats, status taxonomy errors.
 
 ```bash
-npx testing-hub validate <folder> [--strict]
+npx testnux validate <folder> [--strict]
 ```
 
 - `--strict`: treat warnings as errors (recommended for CI gates)
@@ -123,11 +123,11 @@ npx testing-hub validate <folder> [--strict]
 
 ### `demo` — First-time orientation
 
-**When to use:** User is new to testing-hub and wants to see the full pipeline
+**When to use:** User is new to testnux and wants to see the full pipeline
 in < 90 seconds.
 
 ```bash
-npx testing-hub demo
+npx testnux demo
 ```
 
 Runs bundled fixture through `init → report → open`. Opens `report.html` in
@@ -140,7 +140,7 @@ the default browser. No config required.
 **When to use:** Something is broken, or before starting a new project.
 
 ```bash
-npx testing-hub doctor [--check node|playwright|env|supabase] [--project-ref <ref>]
+npx testnux doctor [--check node|playwright|env|supabase] [--project-ref <ref>]
 ```
 
 Checks: Node >= 20, Playwright browsers installed, `.env.local` vars, dev-vs-prod
@@ -155,7 +155,7 @@ not the dev server — see `feedback_e2e_prod_build_required` memory).
 Maps every `R-XX` identifier to sprint folder, code files, and test files.
 
 ```bash
-npx testing-hub rtm [--out requirements/TRACEABILITY.md]
+npx testnux rtm [--out requirements/TRACEABILITY.md]
 ```
 
 Requires `requirements/REQUIREMENTS.md` to be present. Reads sprint-log/ and
@@ -174,13 +174,13 @@ not trust `DONE` status without verifying the code file column is populated
 
 ```bash
 # Scaffold a new SCA for a surface (e.g. "login", "data-room")
-npx testing-hub sca init <surface>
+npx testnux sca init <surface>
 
 # Auto-fill evidence rows from current test results
-npx testing-hub sca generate <surface>
+npx testnux sca generate <surface>
 
 # Render to PDF (headless Chromium)
-npx testing-hub sca pdf <surface>
+npx testnux sca pdf <surface>
 ```
 
 SCA documents follow the 8-section template: Overview, Scope, Controls, Test
@@ -194,7 +194,7 @@ Results, Evidence References, Gap Analysis, Remediation Plan, Sign-Off.
 the full test plan.
 
 ```bash
-npx testing-hub discover <url> [--out <folder>]
+npx testnux discover <url> [--out <folder>]
 ```
 
 Browses the target page, identifies interactive elements, infers user flows,
@@ -209,7 +209,7 @@ All LLM-generated rows are marked `[VERIFY]` until human-attested.
 and wants a full `test-plan.md` with TC frontmatter.
 
 ```bash
-npx testing-hub plan <slug> [--industry general] [--max-spend 2.00]
+npx testnux plan <slug> [--industry general] [--max-spend 2.00]
 ```
 
 Requires `CLAUDE_API_KEY`. Converts scenarios + DOM context into structured
@@ -223,7 +223,7 @@ test cases. Use `--dry-run` to preview LLM calls before spending.
 `spec.ts` generated from it.
 
 ```bash
-npx testing-hub codify <slug>
+npx testnux codify <slug>
 ```
 
 Generates Playwright `test()` blocks for each TC row. Always review the
@@ -238,7 +238,7 @@ AI-generated assertions with `// [VERIFY]` comments.
 with a11y, exploratory, and structural-context TCs.
 
 ```bash
-npx testing-hub enrich <slug> [--append-only]
+npx testnux enrich <slug> [--append-only]
 ```
 
 Append-only: never modifies existing TCs. Adds a `## Enriched TCs` section
@@ -251,7 +251,7 @@ at the bottom. Requires `CLAUDE_API_KEY`.
 **When to use:** User wants to generate test plans for many pages at once.
 
 ```bash
-npx testing-hub batch-plan --urls urls.txt [--industry general] [--max-spend 10.00]
+npx testnux batch-plan --urls urls.txt [--industry general] [--max-spend 10.00]
 ```
 
 Spawns parallel LLM agents (one per URL). Requires `CLAUDE_API_KEY`. Rate-limited
@@ -265,8 +265,8 @@ automatically. Combine with `--max-spend` to avoid runaway costs.
 Enables UAT stakeholder sign-off tracked by business outcome, not engineering spec.
 
 ```bash
-npx testing-hub br init <slug>
-npx testing-hub br report <slug>
+npx testnux br init <slug>
+npx testnux br report <slug>
 ```
 
 Generates a Business Requirements tab in the HTML report. RTM gains a `BR-XX`
@@ -280,7 +280,7 @@ column. Maps: BR-XX → R-XX → TC-XX → evidence.
 an HMAC-signed audit record in `uat-log.jsonl`.
 
 ```bash
-npx testing-hub sign <folder> --name "Jane Smith" --email "jane@example.com" --status accepted
+npx testnux sign <folder> --name "Jane Smith" --email "jane@example.com" --status accepted
 ```
 
 Status options: `accepted`, `rejected`, `needs-rework`. Writes a hash-chained
@@ -294,8 +294,8 @@ or a GRC platform upload.
 **When to use:** User wants to run the same test plan against staging vs production.
 
 ```bash
-npx testing-hub env run <slug> --env staging
-npx testing-hub env compare <slug> staging prod
+npx testnux env run <slug> --env staging
+npx testnux env compare <slug> staging prod
 ```
 
 `compare` produces a cross-environment diff report highlighting TCs that pass
@@ -309,8 +309,8 @@ in staging but fail in production (or vice versa).
 of the same TC.
 
 ```bash
-npx testing-hub visual baseline <folder>
-npx testing-hub visual diff <folder>
+npx testnux visual baseline <folder>
+npx testnux visual diff <folder>
 ```
 
 Stores per-TC baseline screenshots in `evidence/baselines/`. `diff` compares
@@ -323,7 +323,7 @@ where pixel difference exceeds the threshold.
 
 ### Three-track discipline
 
-Testing Hub enforces three separate tracks. Do not conflate them:
+TestNUX enforces three separate tracks. Do not conflate them:
 
 | Track | Folder | What it contains | Date-prefixed? |
 |-------|--------|------------------|----------------|
@@ -384,7 +384,7 @@ documented test artifact that will land in `testing-log/`.
 After any command, report:
 
 ```
-COMMAND: testing-hub <verb> <args>
+COMMAND: testnux <verb> <args>
 STATUS: DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
 OUTPUT: <files written, paths>
 NEXT: <recommended follow-on action>

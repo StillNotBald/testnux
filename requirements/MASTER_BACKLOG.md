@@ -4,9 +4,9 @@ status: ACTIVE
 last_updated: 2026-04-26
 ---
 
-# Testing Hub — Master Backlog
+# TestNUX — Master Backlog
 
-Open work queue for testing-hub itself, maintained in the same format that a testing-hub user
+Open work queue for testnux itself, maintained in the same format that a testnux user
 would maintain their own application's backlog. Items are grouped by tier, then section. Each
 item links to its R-ID(s) and carries an effort estimate on both the human and Claude Code (CC)
 scale.
@@ -24,7 +24,7 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-03
 - **Effort:** L (human) / M (CC — known reference implementation exists)
 - **Acceptance criteria:**
-  - `testing-hub report <folder>` produces `report.html` (self-contained, no CDN) and `report.xlsx` from `test-plan.md` + `execution-log-auto.md`
+  - `testnux report <folder>` produces `report.html` (self-contained, no CDN) and `report.xlsx` from `test-plan.md` + `execution-log-auto.md`
   - HTML: tabbed view (All TCs / PASS / FAIL / BLOCKED / SKIPPED); per-TC cards with base64-inlined evidence screenshots; anchor IDs only in "All TCs" tab (no duplicate-DOM-ID bug)
   - XLSX: one sheet per status tab; Pass/Fail dropdown per TC row
   - `--plan-only` flag suppresses Result column and adds "PLAN ONLY" badge
@@ -38,7 +38,7 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-05
 - **Effort:** M (human) / S (CC — fixture content already present at examples/demo-dashboard/)
 - **Acceptance criteria:**
-  - `testing-hub demo` runs `npx playwright test examples/demo-dashboard/spec.ts`
+  - `testnux demo` runs `npx playwright test examples/demo-dashboard/spec.ts`
   - On success: calls `runReport()` then opens the HTML in the default browser
   - On failure: prints the failing TC(s) and exits 1
   - `--no-open` flag suppresses browser launch (CI-safe)
@@ -51,7 +51,7 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-18, R-22, R-29
 - **Effort:** L (human) / M (CC)
 - **Acceptance criteria:**
-  - `testing-hub sca generate <surface>` calls `claude-sonnet-4-6` (or configurable model) for cells currently left as `[VERIFY]`
+  - `testnux sca generate <surface>` calls `claude-sonnet-4-6` (or configurable model) for cells currently left as `[VERIFY]`
   - All LLM-generated cells retain `[VERIFY]` marker in output until a human reviewer removes it
   - `--max-spend <dollars>` flag aborts before any LLM call if estimated cost exceeds the limit
   - `CLAUDE_API_KEY` env var required; friendly error if absent
@@ -68,10 +68,10 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-22, R-23, R-24, R-25
 - **Effort:** XL (human) / L (CC)
 - **Acceptance criteria:**
-  - `testing-hub discover <url>`: launches headless Playwright, serializes DOM + ARIA tree, sends to Claude with embedded prompt template, streams response to `scenarios.md`; all generated scenarios carry `[VERIFY]`
-  - `testing-hub plan <slug>`: reads `scenarios.md` (+ optional DOM snapshot with `--url`), produces structured `test-plan.md` with `[VERIFY]` markers on all LLM cells
-  - `testing-hub codify <slug>`: reads `test-plan.md` TC sections, produces typed `spec.ts` with `[VERIFY]` comment on every generated assertion
-  - `testing-hub enrich <slug>`: three parallel enrichment passes (design, QA structural, graph context); append-only below `<!-- testing-hub:enrich:start -->` marker
+  - `testnux discover <url>`: launches headless Playwright, serializes DOM + ARIA tree, sends to Claude with embedded prompt template, streams response to `scenarios.md`; all generated scenarios carry `[VERIFY]`
+  - `testnux plan <slug>`: reads `scenarios.md` (+ optional DOM snapshot with `--url`), produces structured `test-plan.md` with `[VERIFY]` markers on all LLM cells
+  - `testnux codify <slug>`: reads `test-plan.md` TC sections, produces typed `spec.ts` with `[VERIFY]` comment on every generated assertion
+  - `testnux enrich <slug>`: three parallel enrichment passes (design, QA structural, graph context); append-only below `<!-- testnux:enrich:start -->` marker
   - All four commands respect `CLAUDE_API_KEY` + `--max-spend` guardrail
   - Cost estimates printed before each API call
 
@@ -82,7 +82,7 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-26
 - **Effort:** L (human) / M (CC)
 - **Acceptance criteria:**
-  - `testing-hub batch-plan --pages "login,register,dashboard"` dispatches one sub-agent per batch of pages (configurable with `--pages-per-agent`, default 3)
+  - `testnux batch-plan --pages "login,register,dashboard"` dispatches one sub-agent per batch of pages (configurable with `--pages-per-agent`, default 3)
   - Uses replacement-agent pattern: each sub-agent runs discover → plan → codify → enrich on its batch, then exits; a fresh agent picks up the next batch
   - `--max-spend <dollars>` guardrail: aborts before any LLM call if estimated total cost exceeds the limit; prints a cost breakdown
   - `--dry-run` prints the cost estimate and planned batches without making API calls
@@ -113,8 +113,8 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-37
 - **Effort:** M (human) / S (CC)
 - **Acceptance criteria:**
-  - `testing-hub visual compare <slug>` loads `pixelmatch` + `pngjs` dynamically; graceful no-op + install notice if absent
-  - Diff threshold configurable in `testing-hub.config.mjs` (`visual.diffThreshold`, default 0.05)
+  - `testnux visual compare <slug>` loads `pixelmatch` + `pngjs` dynamically; graceful no-op + install notice if absent
+  - Diff threshold configurable in `testnux.config.mjs` (`visual.diffThreshold`, default 0.05)
   - Diff images saved to `<slug>/visual-diff/<TC-ID>-diff.png`
   - TCs exceeding the threshold are listed in a summary table in `visual-diff/summary.md`
   - CI strategy documented: baseline committed to git; compare runs against the checked-in baseline in CI
@@ -133,14 +133,14 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 
 ---
 
-**MB-09 — `testing-hub rtm --strict` CI gate**
+**MB-09 — `testnux rtm --strict` CI gate**
 - **Tier:** MEDIUM
 - **R-ID:** R-16
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
-  - `testing-hub rtm --strict` exits 1 if any R-ID has no code annotation AND no test evidence
+  - `testnux rtm --strict` exits 1 if any R-ID has no code annotation AND no test evidence
   - Error message lists the R-IDs that failed, with a suggestion to add `// R-XX` inline comments to the relevant source files
-  - Suitable for use as a CI step: `testing-hub rtm --strict || exit 1`
+  - Suitable for use as a CI step: `testnux rtm --strict || exit 1`
 
 ---
 
@@ -149,8 +149,8 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-31, R-32
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
-  - `testing-hub br init <id>` exits 1 with a clear error if `<id>` already exists in `BUSINESS_REQUIREMENTS.md`
-  - `testing-hub br rtm` warns (but does not fail) if a BR-XX has no linked R-IDs
+  - `testnux br init <id>` exits 1 with a clear error if `<id>` already exists in `BUSINESS_REQUIREMENTS.md`
+  - `testnux br rtm` warns (but does not fail) if a BR-XX has no linked R-IDs
   - Error messages include the offending file path and line number
 
 ---
@@ -160,10 +160,10 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-33, R-34
 - **Effort:** M (human) / S (CC)
 - **Acceptance criteria:**
-  - `testing-hub sign` detects when a TC-ID being signed has previously been rejected in the same uat-log.jsonl chain
+  - `testnux sign` detects when a TC-ID being signed has previously been rejected in the same uat-log.jsonl chain
   - Emits a clear warning: "TC-XX was previously rejected by <reviewer> on <date>. Proceed? [y/N]"
   - `--force` flag bypasses the prompt (audit trail records the override)
-  - `testing-hub br rtm` marks TCs with stale-acceptance as `NEEDS_REVIEW` in the UAT_TRACEABILITY table
+  - `testnux br rtm` marks TCs with stale-acceptance as `NEEDS_REVIEW` in the UAT_TRACEABILITY table
 
 ---
 
@@ -172,20 +172,20 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** R-18
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
-  - `testing-hub sca pdf <surface>` renders the latest SCA markdown to PDF using `puppeteer-core` + a Chromium install
+  - `testnux sca pdf <surface>` renders the latest SCA markdown to PDF using `puppeteer-core` + a Chromium install
   - If `puppeteer-core` is not installed, prints `npm install puppeteer-core` and exits 0 (no crash)
   - PDF output filename: `requirements/validations/<surface>/v<X.Y>.pdf`
   - PDF respects the canonical SCA section structure; `[VERIFY]` cells rendered with a yellow highlight box
 
 ---
 
-**MB-13 — `testing-hub doctor` checks for requirements/ structure**
+**MB-13 — `testnux doctor` checks for requirements/ structure**
 - **Tier:** MEDIUM
 - **R-ID:** R-06
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
-  - `testing-hub doctor` check #6 (conventions) additionally verifies that `requirements/REQUIREMENTS.md` exists
-  - If absent: ⚠️ warning with message "Run `testing-hub rtm` or create requirements/REQUIREMENTS.md to unlock traceability features"
+  - `testnux doctor` check #6 (conventions) additionally verifies that `requirements/REQUIREMENTS.md` exists
+  - If absent: ⚠️ warning with message "Run `testnux rtm` or create requirements/REQUIREMENTS.md to unlock traceability features"
   - If present but has zero R-IDs: ❌ error "REQUIREMENTS.md exists but contains no R-XX headings"
 
 ---
@@ -199,9 +199,9 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** — (new v0.4 feature)
 - **Effort:** L (human) / M (CC)
 - **Acceptance criteria:**
-  - `testing-hub init --runner cypress <slug>` scaffolds `cypress/e2e/<slug>/` with a `spec.cy.ts` template that mirrors the Playwright template patterns (XFF isolation, evidence capture, afterAll log writer)
-  - `testing-hub report` accepts a Cypress JSON reporter output as an alternative to `execution-log-auto.md`
-  - `testing-hub validate` accepts Cypress `spec.cy.ts` files alongside `.spec.ts`
+  - `testnux init --runner cypress <slug>` scaffolds `cypress/e2e/<slug>/` with a `spec.cy.ts` template that mirrors the Playwright template patterns (XFF isolation, evidence capture, afterAll log writer)
+  - `testnux report` accepts a Cypress JSON reporter output as an alternative to `execution-log-auto.md`
+  - `testnux validate` accepts Cypress `spec.cy.ts` files alongside `.spec.ts`
 
 ---
 
@@ -210,8 +210,8 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **R-ID:** — (new v0.4 feature)
 - **Effort:** M (human) / S (CC)
 - **Acceptance criteria:**
-  - `integrations/continue/` ships a Continue extension config that exposes testing-hub commands as slash commands
-  - `integrations/cursor/` ships a `.cursorrules` fragment that teaches Cursor the Testing Hub conventions (R-ID inline comment, `[VERIFY]` discipline, folder structure)
+  - `integrations/continue/` ships a Continue extension config that exposes testnux commands as slash commands
+  - `integrations/cursor/` ships a `.cursorrules` fragment that teaches Cursor the TestNUX conventions (R-ID inline comment, `[VERIFY]` discipline, folder structure)
   - Both adapters documented in `docs/integrations.md`
 
 ---
@@ -228,12 +228,12 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 
 ---
 
-**MB-17 — `testing-hub rtm --format json` machine-readable output**
+**MB-17 — `testnux rtm --format json` machine-readable output**
 - **Tier:** LOW
 - **R-ID:** R-16
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
-  - `testing-hub rtm --format json` writes `requirements/traceability.json` alongside the markdown file
+  - `testnux rtm --format json` writes `requirements/traceability.json` alongside the markdown file
   - JSON schema mirrors the markdown table columns: `{ id, title, status, sprint[], code[], tests[], backlog[], notes }`
   - Suitable for ingestion by GRC platforms (Vanta, Drata, ServiceNow) without markdown parsing
 
@@ -268,5 +268,5 @@ Effort key: **S** = hours | **M** = 1–2 days | **L** = 3–5 days | **XL** = 1
 - **Effort:** S (human + CC)
 - **Acceptance criteria:**
   - `CHANGELOG.md` follows Keep a Changelog format; every PR that changes a command updates the `[Unreleased]` section
-  - `npm run release` script (or `testing-hub ship` wrapper): bumps `package.json` version, moves `[Unreleased]` to `[x.y.z]`, commits, tags
-  - `testing-hub doctor` checks that `package.json#version` matches the latest non-Unreleased CHANGELOG entry; warns if they diverge
+  - `npm run release` script (or `testnux ship` wrapper): bumps `package.json` version, moves `[Unreleased]` to `[x.y.z]`, commits, tags
+  - `testnux doctor` checks that `package.json#version` matches the latest non-Unreleased CHANGELOG entry; warns if they diverge

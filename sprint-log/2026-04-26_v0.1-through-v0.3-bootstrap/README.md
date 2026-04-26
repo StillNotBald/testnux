@@ -3,13 +3,13 @@
 **Date:** 2026-04-26
 **Duration:** ~2 hours of focused multi-agent dispatch
 **Branch:** main
-**Repo:** StillNotBald/testing-hub (private at time of writing; flip to public at v0.1 launch)
+**Repo:** StillNotBald/testnux (private at time of writing; flip to public at v0.1 launch)
 
 ---
 
 ## Outcome
 
-Testing Hub went from an empty GitHub repo to a fully scaffolded CLI package in a single
+TestNUX went from an empty GitHub repo to a fully scaffolded CLI package in a single
 session. All three version surfaces (v0.1, v0.2, v0.3) are present in the codebase:
 
 - **v0.1** — deterministic commands are real implementations (init, report, validate, demo,
@@ -36,7 +36,7 @@ Stats at close of session: **74 files**, **~6,500 LOC**, **17 top-level CLI comm
 
 ## Discipline note
 
-This folder is testing-hub eating its own dog food. The sprint-log/ + testing-log/
-discipline defined for users of testing-hub is applied here to testing-hub's own
+This folder is testnux eating its own dog food. The sprint-log/ + testing-log/
+discipline defined for users of testnux is applied here to testnux's own
 development. The self-test pass lives at
 [testing-log/2026-04-26_self-test/](../../testing-log/2026-04-26_self-test/).

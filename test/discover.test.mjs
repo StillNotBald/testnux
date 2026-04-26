@@ -1,10 +1,10 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
  * test/discover.test.mjs
  *
- * Unit tests for `testing-hub discover` (src/commands/discover.mjs).
+ * Unit tests for `testnux discover` (src/commands/discover.mjs).
  *
  * All Anthropic API calls are mocked via vi.mock — no real API key required.
  * All file system side-effects write to a temp directory per test.
@@ -84,7 +84,7 @@ function makeMockScenarios(tcCount = 3) {
   const frontmatter = `---
 slug: login
 url: https://example.com/login
-generated_by: testing-hub discover v0.2
+generated_by: testnux discover v0.2
 generated_at: 2026-04-26T12:00:00.000Z
 tc_count: ${tcCount}
 review_required: true
@@ -189,7 +189,7 @@ describe('discover — missing CLAUDE_API_KEY', () => {
 describe('discover — missing @anthropic-ai/sdk guard (source inspection)', () => {
   it('source code contains ERR_MODULE_NOT_FOUND guard', () => {
     // Verify the guard exists without actually uninstalling the package.
-    // When a user runs `testing-hub discover` without `npm install @anthropic-ai/sdk`,
+    // When a user runs `testnux discover` without `npm install @anthropic-ai/sdk`,
     // the dynamic import throws ERR_MODULE_NOT_FOUND and the command gracefully exits 1.
     const src = fs.readFileSync(
       path.join(__dirname, '../src/commands/discover.mjs'),
@@ -298,7 +298,7 @@ describe('discover — mock API success', () => {
 
     const content = fs.readFileSync(outFile, 'utf-8');
     expect(content).toContain('slug: login');
-    expect(content).toContain('generated_by: testing-hub discover v0.2');
+    expect(content).toContain('generated_by: testnux discover v0.2');
     expect(content).toContain('## TC-01');
   });
 

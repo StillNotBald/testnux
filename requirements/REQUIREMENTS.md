@@ -4,15 +4,15 @@ status: ACTIVE
 last_updated: 2026-04-26
 ---
 
-# Testing Hub — Requirements Ledger
+# TestNUX — Requirements Ledger
 
-This file is the authoritative requirements ledger for **testing-hub itself**, dogfooding the
+This file is the authoritative requirements ledger for **testnux itself**, dogfooding the
 three-track discipline (requirements → sprint log → testing log → RTM → UAT) that the tool
-produces for its users. Every R-ID here is the same kind of artifact that a `testing-hub init`
+produces for its users. Every R-ID here is the same kind of artifact that a `testnux init`
 user would maintain for their own application.
 
-**Why dogfood?** Testing Hub can only credibly teach the discipline by living it. This file is
-parsed by `testing-hub rtm` to generate `requirements/TRACEABILITY.md`. Human-edited Notes in
+**Why dogfood?** TestNUX can only credibly teach the discipline by living it. This file is
+parsed by `testnux rtm` to generate `requirements/TRACEABILITY.md`. Human-edited Notes in
 that file survive regeneration via the marker convention defined in `src/commands/rtm.mjs`.
 
 ---
@@ -28,9 +28,9 @@ validator, a single industry-standards bundle, and the Apache 2.0 license notice
 
 **Status:** DONE
 
-The `bin/testing-hub.mjs` entry point wires up the Commander.js program with the five v0.1
+The `bin/testnux.mjs` entry point wires up the Commander.js program with the five v0.1
 commands: `init`, `report`, `validate`, `demo`, and `doctor`. The binary is declared in
-`package.json#bin` and published as the `testing-hub` npm package.
+`package.json#bin` and published as the `testnux` npm package.
 
 ---
 
@@ -38,7 +38,7 @@ commands: `init`, `report`, `validate`, `demo`, and `doctor`. The binary is decl
 
 **Status:** DONE
 
-`testing-hub init <slug>` copies the `templates/` directory into a date-prefixed folder under
+`testnux init <slug>` copies the `templates/` directory into a date-prefixed folder under
 `testing-log/` (e.g. `testing-log/2026-04-26_login/`), substituting all `{{placeholder}}`
 tokens. Idempotent: re-running on the same slug+date skips files that already exist, preserving
 hand-edited content.
@@ -49,7 +49,7 @@ hand-edited content.
 
 **Status:** STUB
 
-`testing-hub report <folder>` is currently a documented stub. The proven reference implementation
+`testnux report <folder>` is currently a documented stub. The proven reference implementation
 (33+ page test plans, self-contained HTML, multi-tab XLSX) must be ported into
 `src/commands/report.mjs`. The stub documents the port checklist inline so no context is lost.
 
@@ -59,10 +59,10 @@ hand-edited content.
 
 **Status:** DONE
 
-`testing-hub validate <folder>` walks all `.md` files, extracts YAML frontmatter via gray-matter,
+`testnux validate <folder>` walks all `.md` files, extracts YAML frontmatter via gray-matter,
 and validates against `schemas/test-plan-frontmatter.schema.json`. Required fields: `status`,
 `industry`, `r_ids`, `tc_prefix`. Emits structured lint errors with file+line references. Smoke
-test: `testing-hub validate examples/demo-dashboard/` passes with zero errors.
+test: `testnux validate examples/demo-dashboard/` passes with zero errors.
 
 ---
 
@@ -70,7 +70,7 @@ test: `testing-hub validate examples/demo-dashboard/` passes with zero errors.
 
 **Status:** STUB
 
-`testing-hub demo` is a documented stub. The `examples/demo-dashboard/` fixture exists (README,
+`testnux demo` is a documented stub. The `examples/demo-dashboard/` fixture exists (README,
 output artifacts, screenshots) but the live Playwright runner is not yet wired to the demo
 command. The stub prints the manual equivalent steps so first-time users are not blocked.
 
@@ -80,7 +80,7 @@ command. The stub prints the manual equivalent steps so first-time users are not
 
 **Status:** DONE
 
-`testing-hub doctor` runs six checks: Node 20+ version gate, Playwright browser installation,
+`testnux doctor` runs six checks: Node 20+ version gate, Playwright browser installation,
 `.env.local` variable presence (SITE_GATE_PIN, SUPABASE_URL without SERVICE_ROLE_KEY leak
 warning), Supabase MFA enroll-vs-verify toggle mismatch detection (requires
 SUPABASE_MANAGEMENT_TOKEN + `--project-ref`), dev-vs-prod build detection (port 3000 warning),
@@ -94,7 +94,7 @@ and folder conventions (requires `testing-log/` and `requirements/` in cwd).
 
 `templates/` ships three files: `test-plan.md` (YAML frontmatter + TC section skeleton),
 `spec.ts` (Playwright TypeScript spec with all v0.1 patterns inlined), and `README.md`
-(test-pass folder orientation). All three are substituted by `testing-hub init`.
+(test-pass folder orientation). All three are substituted by `testnux init`.
 
 ---
 
@@ -138,7 +138,7 @@ saving `evidence/<TC-ID>.png`. A note explains that tests using a custom browser
 
 The `spec.ts` template includes an `afterAll` hook that writes `execution-log-auto.md` with
 per-TC results, timestamps, and failure messages collected during the run. This file is the
-fallback input for `testing-hub report` when a manual `execution-log.md` is absent.
+fallback input for `testnux report` when a manual `execution-log.md` is absent.
 
 ---
 
@@ -160,7 +160,7 @@ returning a fresh code, eliminating the race without arbitrary `sleep` calls.
 `schemas/test-plan-frontmatter.schema.json` (JSON Schema draft-07) defines required fields,
 format patterns (`r_ids` items: `/^R-\d+$/`, `tc_prefix`: `/^[A-Z0-9-]{1,12}$/`), and
 optional fields (`_review_required`, `uat_status`, `industry_standards`). Referenced by
-`testing-hub validate` and published in the npm package via `files[]`.
+`testnux validate` and published in the npm package via `files[]`.
 
 ---
 
@@ -170,15 +170,15 @@ optional fields (`_review_required`, `uat_status`, `industry_standards`). Refere
 
 The `general` industry bundle ships 22 controls drawn from OWASP ASVS 4.0 and WCAG 2.2 AA. It
 is the only bundle required at v0.1 (per the roadmap in `docs/concepts.md`). The bundle is
-consumed by `testing-hub init --industry general` and embedded in the SCA template header.
+consumed by `testnux init --industry general` and embedded in the SCA template header.
 
 ---
 
-## R-15 — Apache 2.0 license + Testing Hub trademark notice
+## R-15 — Apache 2.0 license + TestNUX trademark notice
 
 **Status:** DONE
 
-`LICENSE` contains the Apache 2.0 full text. `NOTICE` contains the Testing Hub copyright and
+`LICENSE` contains the Apache 2.0 full text. `NOTICE` contains the TestNUX copyright and
 trademark attribution. Every source file in `src/` and `bin/` carries an SPDX header
 (`// SPDX-License-Identifier: Apache-2.0`). Markdown files do not carry SPDX comments per
 project convention.
@@ -193,11 +193,11 @@ industry bundles (fintech, healthcare, and three others), and the in-memory enti
 
 ---
 
-## R-16 — RTM generator (`testing-hub rtm`)
+## R-16 — RTM generator (`testnux rtm`)
 
 **Status:** DONE
 
-`testing-hub rtm` generates `requirements/TRACEABILITY.md` by: (1) parsing R-IDs from
+`testnux rtm` generates `requirements/TRACEABILITY.md` by: (1) parsing R-IDs from
 `requirements/REQUIREMENTS.md`; (2) walking `sprint-log/**/SPRINT_SUMMARY.md`; (3) grepping
 `src/**` for `// R-XX` inline comments; (4) grepping test files for R-ID references; (5) reading
 `requirements/MASTER_BACKLOG.md` for open items; (6) writing the traceability table with marker
@@ -212,22 +212,22 @@ pairs so human Notes survive regeneration.
 Row markers wrap each TRACEABILITY.md table row:
 
 ```
-<!-- testing-hub:row R-01 begin -->
+<!-- testnux:row R-01 begin -->
 | R-01 | ... |
-<!-- testing-hub:row R-01 end -->
+<!-- testnux:row R-01 end -->
 ```
 
 The `_extractNotes` function reads existing Notes cells before regeneration; `_render` re-inserts
-them. Human edits to the Notes column are idempotent across `testing-hub rtm` runs.
+them. Human edits to the Notes column are idempotent across `testnux rtm` runs.
 
 ---
 
-## R-18 — SCA generator (`testing-hub sca init/generate/pdf`)
+## R-18 — SCA generator (`testnux sca init/generate/pdf`)
 
 **Status:** PARTIAL
 
-`testing-hub sca init <surface>` scaffolds the canonical 8-section SCA template at
-`requirements/validations/<surface>/v1.0_<DATE>.md`. `testing-hub sca generate <surface>` fills
+`testnux sca init <surface>` scaffolds the canonical 8-section SCA template at
+`requirements/validations/<surface>/v1.0_<DATE>.md`. `testnux sca generate <surface>` fills
 per-control evidence rows from test results; cells requiring LLM judgment are stubbed with
 `[VERIFY]` markers. The `pdf` sub-command detects whether `puppeteer-core` is installed and
 informs the user gracefully if not. LLM-powered `generate` cells remain `[VERIFY]`-stubbed
@@ -256,18 +256,18 @@ Compliance Trestle and FedRAMP RFC-0024 toolchains. No file I/O; callers own rea
 
 ---
 
-## R-21 — OSCAL validation (`testing-hub sca oscal --validate`)
+## R-21 — OSCAL validation (`testnux sca oscal --validate`)
 
 **Status:** DONE
 
 `src/lib/oscal.mjs` exports `validateOSCAL(doc)` — a minimal schema check that throws
-`OscalValidationError` on structural violations. `testing-hub sca oscal <surface> --validate`
+`OscalValidationError` on structural violations. `testnux sca oscal <surface> --validate`
 calls this after emit and exits 1 on failure. The `--dry-run` flag parses and validates without
 writing the output file.
 
 ---
 
-## R-22 — LLM discover agent (`testing-hub discover <url>`)
+## R-22 — LLM discover agent (`testnux discover <url>`)
 
 **Status:** STUB
 
@@ -278,7 +278,7 @@ Chromium, serialize the full DOM + ARIA tree + computed styles, send to Claude
 
 ---
 
-## R-23 — LLM plan agent (`testing-hub plan <slug>`)
+## R-23 — LLM plan agent (`testnux plan <slug>`)
 
 **Status:** STUB
 
@@ -289,7 +289,7 @@ a fully structured `test-plan.md` to the testing-log folder. All LLM-generated c
 
 ---
 
-## R-24 — LLM codify agent (`testing-hub codify <slug>`)
+## R-24 — LLM codify agent (`testnux codify <slug>`)
 
 **Status:** STUB
 
@@ -299,18 +299,18 @@ generated assertion gets a `[VERIFY]` comment. Cost estimate: ~$0.20–$0.60 per
 
 ---
 
-## R-25 — LLM enrich agent (`testing-hub enrich <slug>`)
+## R-25 — LLM enrich agent (`testnux enrich <slug>`)
 
 **Status:** STUB
 
 `src/commands/enrich.mjs` is a documented stub. The v0.2 implementation runs three parallel
 enrichment passes (design review, QA structural, graph context cross-surface dependencies)
 and appends suggested TCs using append-only discipline below the
-`<!-- testing-hub:enrich:start -->` marker — never touching content above it.
+`<!-- testnux:enrich:start -->` marker — never touching content above it.
 
 ---
 
-## R-26 — batch-plan multi-agent dispatcher (`testing-hub batch-plan`)
+## R-26 — batch-plan multi-agent dispatcher (`testnux batch-plan`)
 
 **Status:** STUB
 
@@ -326,7 +326,7 @@ call and aborts if `estimated_cost > --max-spend`.
 **Status:** DONE
 
 The fintech bundle ships NIST 800-63B, NYDFS 23 NYCRR 500, PCI DSS, PSD2, FFIEC, and OWASP
-ASVS controls. Loaded with `testing-hub init --industry fintech`. Available from v0.2.
+ASVS controls. Loaded with `testnux init --industry fintech`. Available from v0.2.
 
 ---
 
@@ -335,7 +335,7 @@ ASVS controls. Loaded with `testing-hub init --industry fintech`. Available from
 **Status:** DONE
 
 The healthcare bundle ships HIPAA Security Rule, HITECH, NIST 800-66, and 21 CFR Part 11
-controls. Loaded with `testing-hub init --industry healthcare`. Available from v0.2.
+controls. Loaded with `testnux init --industry healthcare`. Available from v0.2.
 
 ---
 
@@ -373,17 +373,17 @@ additional industry bundles, and the gstack + Claude Code MCP integrations.
 
 **Status:** DONE
 
-`testing-hub br init <id>` scaffolds a `BR-XX` section in
+`testnux br init <id>` scaffolds a `BR-XX` section in
 `requirements/BUSINESS_REQUIREMENTS.md`. BR-XX sits above R-XX in the hierarchy: a BR-XX
 defines the business outcome (intent); R-XX defines the functional requirement (implementation).
 
 ---
 
-## R-32 — BR → R → TC linkage (`testing-hub br link`)
+## R-32 — BR → R → TC linkage (`testnux br link`)
 
 **Status:** DONE
 
-`testing-hub br link <BR-id> <R-id1,...>` appends a `Links:` list to the BR-XX section,
+`testnux br link <BR-id> <R-id1,...>` appends a `Links:` list to the BR-XX section,
 recording which functional requirements implement the business requirement. The `br rtm`
 sub-command reads these links to render `requirements/UAT_TRACEABILITY.md` with the BR layer
 as the top-level grouping.
@@ -394,7 +394,7 @@ as the top-level grouping.
 
 **Status:** DONE
 
-`testing-hub br rtm` generates `requirements/UAT_TRACEABILITY.md` — a three-level traceability
+`testnux br rtm` generates `requirements/UAT_TRACEABILITY.md` — a three-level traceability
 table (BR-XX → R-XX → TC-XX). This is the artifact UAT reviewers and business owners sign off
 on during the stakeholder acceptance phase (step 6 of the 8-step regulator-evidence chain).
 
@@ -411,23 +411,23 @@ read from `UAT_SECRET` in the environment (never committed to version control).
 
 ---
 
-## R-35 — `testing-hub sign` interactive workflow
+## R-35 — `testnux sign` interactive workflow
 
 **Status:** DONE
 
-`testing-hub sign <surface>` presents an interactive prompt (reviewer name, role, TC-ID, status,
+`testnux sign <surface>` presents an interactive prompt (reviewer name, role, TC-ID, status,
 justification) and appends the signed record to `uat-log.jsonl` via `src/lib/uat-log.mjs`.
-`testing-hub sign <surface> --reject <TC-ID>` batch-rejects a TC with the same interactive
+`testnux sign <surface> --reject <TC-ID>` batch-rejects a TC with the same interactive
 prompts minus the status selection.
 
 ---
 
-## R-36 — per-environment test passes (`testing-hub env run / env compare`)
+## R-36 — per-environment test passes (`testnux env run / env compare`)
 
 **Status:** DONE
 
-`testing-hub env run <slug> --env staging|prod|local` wraps `testing-hub init` with an env
-suffix (e.g. `testing-log/2026-04-26_login_staging/`). `testing-hub env compare <slug> <env-a>
+`testnux env run <slug> --env staging|prod|local` wraps `testnux init` with an env
+suffix (e.g. `testing-log/2026-04-26_login_staging/`). `testnux env compare <slug> <env-a>
 <env-b>` diffs TC results between two env passes and outputs a markdown table with a delta
 column. The compare sub-command stub-renders when a pass has no execution log.
 
@@ -437,7 +437,7 @@ column. The compare sub-command stub-renders when a pass has no execution log.
 
 **Status:** STUB
 
-`testing-hub visual baseline <slug>` and `testing-hub visual compare <slug>` are implemented in
+`testnux visual baseline <slug>` and `testnux visual compare <slug>` are implemented in
 `src/commands/visual.mjs` but require `pixelmatch` + `pngjs` as optional dependencies. If
 `pixelmatch` is not installed, the compare command prints an install notice and exits gracefully.
 Full Playwright integration and CI baseline strategy are deferred to the v0.3 release cycle.
@@ -457,8 +457,8 @@ Three additional industry bundles ship in v0.3: `gov` (FedRAMP, FISMA, NIST 800-
 
 **Status:** DONE
 
-`integrations/gstack/testing-hub/` ships an `install.sh` and `SKILL.md` that integrate
-testing-hub into the gstack skill runner. The `SKILL.md` describes the `/testing-hub` skill
+`integrations/gstack/testnux/` ships an `install.sh` and `SKILL.md` that integrate
+testnux into the gstack skill runner. The `SKILL.md` describes the `/testnux` skill
 invocation for Claude Code sessions.
 
 ---
@@ -468,8 +468,8 @@ invocation for Claude Code sessions.
 **Status:** DONE
 
 `integrations/claude-code-mcp/server.mjs` implements a Model Context Protocol (MCP) server that
-exposes testing-hub's core commands as MCP tools. `integrations/claude-code-mcp/manifest.json`
-declares the tool manifest. Claude Code sessions can invoke `testing-hub rtm`, `sca`, `sign`,
+exposes testnux's core commands as MCP tools. `integrations/claude-code-mcp/manifest.json`
+declares the tool manifest. Claude Code sessions can invoke `testnux rtm`, `sca`, `sign`,
 and `br rtm` via MCP without leaving the editor.
 
 ---

@@ -4,11 +4,11 @@
 /**
  * src/commands/demo.mjs
  *
- * Implements `testing-hub demo`.
+ * Implements `testnux demo`.
  *
  * The demo command is the "aha moment" for first-time users:
  *   1. Run npx playwright test against examples/demo-dashboard/spec.ts
- *   2. Call `testing-hub report` on the resulting folder
+ *   2. Call `testnux report` on the resulting folder
  *   3. Open the generated HTML in the default browser
  *
  * v0.1 STUB — demo-dashboard content ships in the next agent run.
@@ -44,21 +44,21 @@ export async function runDemo(opts = {}) {
     );
   } else {
     console.log('');
-    console.log('🚀  Testing Hub — Demo');
+    console.log('🚀  TestNUX — Demo');
     console.log('');
     console.log('   v0.1 demo target is coming in the next release.');
     console.log('');
-    console.log('   When ready, `testing-hub demo` will:');
+    console.log('   When ready, `testnux demo` will:');
     console.log('     1. Spin up the bundled widgetly demo app');
     console.log('     2. Run the full Playwright test suite (examples/demo-dashboard/spec.ts)');
     console.log('     3. Generate XLSX + HTML report automatically');
     console.log('     4. Open the HTML report in your default browser');
     console.log('');
     console.log('   In the meantime, try the manual quickstart:');
-    console.log('     testing-hub init my-first-page --industry general');
+    console.log('     testnux init my-first-page --industry general');
     console.log('     # edit test-plan.md + spec.ts');
     console.log('     npx playwright test');
-    console.log('     testing-hub report testing-log/<date>_my-first-page/');
+    console.log('     testnux report testing-log/<date>_my-first-page/');
     console.log('');
   }
 

@@ -8,9 +8,9 @@ environment: local
 node_version: ">=20.0.0 required"
 ---
 
-# Execution Log — testing-hub self-test pass
+# Execution Log — testnux self-test pass
 
-**Target:** `bin/testing-hub.mjs`
+**Target:** `bin/testnux.mjs`
 **Date run:** 2026-04-26
 **Status:** EXPECTED RESULTS (actual CLI run pending; file-existence TCs verified by inspection)
 
@@ -20,8 +20,8 @@ node_version: ">=20.0.0 required"
 
 | TC-ID | Description | Expected Status | Notes |
 |---|---|---|---|
-| SELF-01 | `--version` outputs version | PASS | `package.json` version `0.0.1` is present; `bin/testing-hub.mjs` reads it via `readFileSync(pkgPath)` |
-| SELF-02 | `--help` lists all commands | PASS | All 17+ commands are registered via Commander in `bin/testing-hub.mjs`; `--help` is built into Commander |
+| SELF-01 | `--version` outputs version | PASS | `package.json` version `0.0.1` is present; `bin/testnux.mjs` reads it via `readFileSync(pkgPath)` |
+| SELF-02 | `--help` lists all commands | PASS | All 17+ commands are registered via Commander in `bin/testnux.mjs`; `--help` is built into Commander |
 | SELF-03 | `init` creates folder | PASS | `src/commands/init.mjs` exists and implements `runInit`; template substitution logic is real (not stub) |
 | SELF-04 | `validate` returns 0 on empty plan | PASS | `src/commands/validate.mjs` implements real frontmatter validation; exits 0 if no errors found |
 | SELF-05 | `doctor` returns checks summary | PASS | `src/commands/doctor.mjs` implements all 6 checks; `conventions` check will WARN (testing-log/ not present before SELF-03) |
@@ -33,7 +33,7 @@ node_version: ">=20.0.0 required"
 | SELF-11 | LICENSE is Apache 2.0 | PASS | `LICENSE` file is present; begins with `Apache License\nVersion 2.0` confirmed by inspection |
 | SELF-12 | `src/commands/rtm.mjs` exists | PASS | File present and non-empty confirmed by inspection |
 | SELF-13 | `src/lib/oscal.mjs` exports `toOSCAL` | PASS | File contains `export` + `toOSCAL` confirmed by inspection (`src/lib/oscal.mjs` line ~30: `export const OSCAL_VERSION`) |
-| SELF-14 | `integrations/gstack/testing-hub/SKILL.md` exists | PASS | File present at expected path confirmed by inspection |
+| SELF-14 | `integrations/gstack/testnux/SKILL.md` exists | PASS | File present at expected path confirmed by inspection |
 
 ---
 
@@ -64,7 +64,7 @@ test pass (future sprint) can validate stub UX.
    modification. No special-casing for the tool's own tests.
 
 2. **The artifacts are the same shape a user would produce.** If a user ran
-   `testing-hub init self-test --industry general` and filled in TCs for their own CLI tool,
+   `testnux init self-test --industry general` and filled in TCs for their own CLI tool,
    the result would look identical to this folder. The self-test is a worked example.
 
 3. **File-existence checks are a valid first-pass quality gate.** Many compliance audits
@@ -88,5 +88,5 @@ test pass (future sprint) can validate stub UX.
       and update this log with actual stdout snippets
 - [ ] Confirm `doctor --check conventions` produces a clean pass once `testing-log/`
       and `requirements/` folders exist in the repo root
-- [ ] Create `requirements/REQUIREMENTS.md` for testing-hub itself so R-IDs referenced
+- [ ] Create `requirements/REQUIREMENTS.md` for testnux itself so R-IDs referenced
       in this plan are canonical (currently defined only in sprint-log/SPRINT_SUMMARY.md)

@@ -1,10 +1,10 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
  * src/commands/enrich.mjs
  *
- * Implements `testing-hub enrich <slug>`.
+ * Implements `testnux enrich <slug>`.
  *
  * v0.1 STUB — describes what the v0.2 LLM agent will do and prints the
  * append-only section template. No LLM calls are made.
@@ -17,21 +17,21 @@
  *      c. Graph context: cross-surface dependency TCs (e.g. login TC needed for
  *         checkout surface)
  *   3. Each pass appends suggested TCs to the plan using append-only discipline:
- *      - NEVER modifies content above the <!-- testing-hub:enrich:start --> marker
- *      - Appends inside <!-- testing-hub:enrich:start / end --> section
+ *      - NEVER modifies content above the <!-- testnux:enrich:start --> marker
+ *      - Appends inside <!-- testnux:enrich:start / end --> section
  *      - All appended TCs carry [VERIFY] markers
  *   4. Cost: ~$0.40–$1.20 per enrichment pass (3 passes). Requires CLAUDE_API_KEY.
  *
  * APPEND-ONLY DISCIPLINE:
  *   The enrich agent operates in append-only mode. It NEVER modifies content
- *   above the <!-- testing-hub:enrich:start --> marker. This preserves all
+ *   above the <!-- testnux:enrich:start --> marker. This preserves all
  *   human-curated test plans from accidental overwrite.
  *
  *   Append section markers (added to test-plan.md by `enrich`):
- *     <!-- testing-hub:enrich:start -->
+ *     <!-- testnux:enrich:start -->
  *     <!-- DO NOT MODIFY ABOVE THIS LINE — human-curated content -->
  *     [suggested TCs appended here]
- *     <!-- testing-hub:enrich:end -->
+ *     <!-- testnux:enrich:end -->
  *
  * =============================================================================
  * V0.2 PROMPT TEMPLATE — DESIGN REVIEW PASS (for implementers):
@@ -149,9 +149,9 @@ import fs from 'fs';
 
 // ── Section markers ──────────────────────────────────────────────────────────
 
-export const ENRICH_START_MARKER = '<!-- testing-hub:enrich:start -->';
+export const ENRICH_START_MARKER = '<!-- testnux:enrich:start -->';
 export const ENRICH_GUARD_MARKER = '<!-- DO NOT MODIFY ABOVE THIS LINE — human-curated content -->';
-export const ENRICH_END_MARKER   = '<!-- testing-hub:enrich:end -->';
+export const ENRICH_END_MARKER   = '<!-- testnux:enrich:end -->';
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
@@ -178,7 +178,7 @@ export async function runEnrich(slug, opts = {}) {
 
   if (!json) {
     console.log('');
-    console.log('  testing-hub enrich — v0.1 stub');
+    console.log('  testnux enrich — v0.1 stub');
     console.log('  ─────────────────────────────────────────────────────────');
     console.log(`  Slug   : ${slug}`);
     console.log(`  Passes : ${passes.join(', ')}`);
@@ -225,7 +225,7 @@ export async function runEnrich(slug, opts = {}) {
       addEnrichMarkersIfMissing(testPlanFile, json);
     } else {
       console.log(`  No test plan found for slug "${slug}".`);
-      console.log(`  Run: testing-hub plan ${slug}  (or init ${slug} to scaffold)`);
+      console.log(`  Run: testnux plan ${slug}  (or init ${slug} to scaffold)`);
     }
 
     console.log('');
@@ -266,7 +266,7 @@ function addEnrichMarkersIfMissing(testPlanFile, json) {
       ENRICH_START_MARKER,
       ENRICH_GUARD_MARKER,
       '',
-      '<!-- Suggested TCs will be appended here by `testing-hub enrich`. -->',
+      '<!-- Suggested TCs will be appended here by `testnux enrich`. -->',
       '<!-- In v0.1, add them manually. Use TC-A01/TC-E01/TC-I01 prefixes. -->',
       '',
       ENRICH_END_MARKER,

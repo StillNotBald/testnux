@@ -9,7 +9,7 @@ Format: Date / Context / Options / Chosen path / Rationale / Consequences.
 
 **Date:** 2026-04-26 ~18:00
 
-**Context:** Two possible positionings for testing-hub: (a) developer productivity tool
+**Context:** Two possible positionings for testnux: (a) developer productivity tool
 ("generate Playwright tests faster"), or (b) compliance evidence tool ("produce artifacts
 that survive auditor scrutiny"). The two require different output formats, different
 success metrics, and different buyer personas.
@@ -21,7 +21,7 @@ success metrics, and different buyer personas.
 **Chosen path:** Option 2 — compliance evidence / audit-defensibility.
 
 **Rationale:** Compliance buyers are under-served by existing test tooling. A developer
-can write Playwright tests without testing-hub; a compliance officer cannot produce a
+can write Playwright tests without testnux; a compliance officer cannot produce a
 hash-chained audit trail without significant bespoke work. The moat is in the regulated
 buyer, not the developer.
 
@@ -122,17 +122,17 @@ separate install flows, dependency management, and onboarding docs that are not 
 **Chosen path:** Option 2.
 
 **Rationale:** The MCP server shell exists (integrations/claude-code-mcp/) and the gstack
-SKILL.md is present (integrations/gstack/testing-hub/). Neither is announced in v0.1 docs.
+SKILL.md is present (integrations/gstack/testnux/). Neither is announced in v0.1 docs.
 The `mcp` CLI command passes through to the server but is not in the v0.1 getting-started
 guide. This lets v0.2 flip a switch rather than build from scratch.
 
-**Consequences:** integrations/ folder exists and is wired but not marketed. `testing-hub mcp`
+**Consequences:** integrations/ folder exists and is wired but not marketed. `testnux mcp`
 works if `@modelcontextprotocol/sdk` is installed separately; the CLI prints clear install
 instructions if it is not.
 
 ---
 
-## D6 — Repo: StillNotBald/testing-hub PRIVATE first; flip at v0.1 launch
+## D6 — Repo: StillNotBald/testnux PRIVATE first; flip at v0.1 launch
 
 **Date:** 2026-04-26 ~17:45
 
@@ -155,7 +155,7 @@ CONTRIBUTING.md, SECURITY.md, and CODE_OF_CONDUCT content must be polished befor
 
 ---
 
-## D7 — Apache 2.0 license + Testing Hub trademark in NOTICE
+## D7 — Apache 2.0 license + TestNUX trademark in NOTICE
 
 **Date:** 2026-04-26 ~17:50
 
@@ -172,12 +172,12 @@ expectations. Trademark placement affects brand protection.
 
 **Rationale:** Apache 2.0 provides patent protection (important for compliance tooling
 where patent trolls are a real risk) and allows commercial use without copyleft. The
-NOTICE file carries the "Testing Hub" trademark reservation separately from the Apache
+NOTICE file carries the "TestNUX" trademark reservation separately from the Apache
 grant so it survives downstream redistribution.
 
-**Consequences:** Commercial users can embed testing-hub without open-sourcing their
+**Consequences:** Commercial users can embed testnux without open-sourcing their
 own code. The trademark reservation in NOTICE means third parties cannot ship a product
-called "Testing Hub" without a licence.
+called "TestNUX" without a licence.
 
 ---
 
@@ -211,7 +211,7 @@ than unilateral move (acceptable trade-off at this stage).
 **Date:** 2026-04-26 ~19:00
 
 **Context:** The CEO ceremony mentioned "widgetly" as a possible demo target — a fictional
-SaaS product built from scratch to show testing-hub against. Building widgetly requires
+SaaS product built from scratch to show testnux against. Building widgetly requires
 significant additional scope.
 
 **Options considered:**
@@ -220,14 +220,14 @@ significant additional scope.
 3. Use a purely fictional markdown-only scenario — no real app, no browser tests
 
 **Chosen path:** Option 2 — examples/demo-dashboard/ contains output artifacts from
-running testing-hub against an existing dashboard app. No source code for the demo app
+running testnux against an existing dashboard app. No source code for the demo app
 is included.
 
-**Rationale:** The demo value is in the testing-hub output artifacts (HTML report, SCA,
+**Rationale:** The demo value is in the testnux output artifacts (HTML report, SCA,
 execution log), not in the demo app itself. Shipping a full demo app doubles scope.
 
 **Consequences:** examples/demo-dashboard/ has output/ + screenshots/ only. The README
-explains users should point testing-hub at their own app. No source code from the demo
+explains users should point testnux at their own app. No source code from the demo
 target is committed (avoids licence entanglement).
 
 ---
@@ -279,7 +279,7 @@ large explanatory comment. Users inherit this pattern by default.
 
 ---
 
-## D12 — Marker convention `<!-- testing-hub:row begin/end -->` for human-edit survival
+## D12 — Marker convention `<!-- testnux:row begin/end -->` for human-edit survival
 
 **Date:** 2026-04-26 ~19:30
 
@@ -289,7 +289,7 @@ tables. Human-edited notes in those rows must survive regeneration.
 **Options considered:**
 1. Regenerate the entire file every time — human edits lost
 2. Use YAML frontmatter to track human-edited cells — fragile, non-standard
-3. Use HTML comment markers `<!-- testing-hub:row begin -->` / `<!-- testing-hub:row end -->`
+3. Use HTML comment markers `<!-- testnux:row begin -->` / `<!-- testnux:row end -->`
    — human edits inside markers survive; everything outside is regenerated
 
 **Chosen path:** Option 3 — marker convention.
@@ -360,7 +360,7 @@ sole evidence in litigation.
 
 **Date:** 2026-04-26 ~20:10
 
-**Context:** Testing Hub ships with 6 industry bundles (general, fintech, healthcare, gov,
+**Context:** TestNUX ships with 6 industry bundles (general, fintech, healthcare, gov,
 edu, ecommerce). New industries should be addable by contributors without touching core code.
 
 **Options considered:**

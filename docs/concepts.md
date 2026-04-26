@@ -1,6 +1,6 @@
 # Concepts
 
-This page defines the vocabulary Testing Hub uses. Compliance buyers and engineers use different words for the same ideas — this glossary bridges both worlds.
+This page defines the vocabulary TestNUX uses. Compliance buyers and engineers use different words for the same ideas — this glossary bridges both worlds.
 
 ---
 
@@ -8,7 +8,7 @@ This page defines the vocabulary Testing Hub uses. Compliance buyers and enginee
 
 > **Discipline only delivers consistency if your team adopts it.** The templates, CLI, and conventions in this document are tools — not outcomes. See [adoption-checklist.md](adoption-checklist.md) for the 4 must-do adoption tasks: originating R-IDs, adopting the status taxonomy, setting up UAT sign-off, and validating your SCA shape with an auditor. The checklist includes time estimates and exit criteria so you can plan a real onboarding.
 
-Testing Hub is built around a git-native, three-track structure. Each track answers a different question:
+TestNUX is built around a git-native, three-track structure. Each track answers a different question:
 
 | Track | Folder | Answers |
 |-------|--------|---------|
@@ -16,7 +16,7 @@ Testing Hub is built around a git-native, three-track structure. Each track answ
 | **Sprint log** | `sprint-log/<date>_<feature>/` | What was built, and when? |
 | **Testing log** | `testing-log/<date>_<page>/` | What was tested, and what happened? |
 
-These three tracks are the input and output of Testing Hub. The CLI reads from all three and writes into the testing log. v0.2's RTM generator reads all three to produce the traceability matrix.
+These three tracks are the input and output of TestNUX. The CLI reads from all three and writes into the testing log. v0.2's RTM generator reads all three to produce the traceability matrix.
 
 **Why date-prefixed folders?** Each test-pass folder is a point-in-time snapshot. When an auditor asks "what was tested on May 1, 2026 against version 2.3?", the answer is a single folder: `testing-log/2026-05-01_login/`. No search required.
 
@@ -34,7 +34,7 @@ Example:
 R-42: Users must be able to authenticate using TOTP (time-based one-time password).
 ```
 
-Requirements are **inputs** to Testing Hub. The parser extracts R-IDs from:
+Requirements are **inputs** to TestNUX. The parser extracts R-IDs from:
 - `## R-42` headings in `requirements/REQUIREMENTS.md`
 - `describe('R-42', ...)` blocks in Playwright specs
 - `// R-42` inline comments in source code (optional, enriches the RTM)
@@ -47,7 +47,7 @@ A requirement is not a test case. A single requirement may map to many test case
 
 A test case is a single, executable scenario. It lives in `testing-log/<date>_<page>/test-plan.md`.
 
-Format: `LOGIN-01`, `REG-04`, `DASH-12` — the prefix is derived from the page slug you pass to `testing-hub init`. Each TC must have:
+Format: `LOGIN-01`, `REG-04`, `DASH-12` — the prefix is derived from the page slug you pass to `testnux init`. Each TC must have:
 
 - A unique ID within the test pass
 - A priority (`P1` through `P4`)
@@ -95,7 +95,7 @@ Every test case and requirement carries a status. Use the right status — it si
 
 ## The 8-step regulator-evidence chain
 
-Most engineering teams live in steps 1–2. Most compliance tools live in steps 6–8. Testing Hub owns steps 3–5.
+Most engineering teams live in steps 1–2. Most compliance tools live in steps 6–8. TestNUX owns steps 3–5.
 
 ```
 1. Requirements (R-XX)
@@ -104,16 +104,16 @@ Most engineering teams live in steps 1–2. Most compliance tools live in steps 
 2. Sprint log (build)
    └── "sprint-log/<date>_<feature>/" — git + sprint summaries
          │
-3. Testing log ◄─── Testing Hub v0.1
+3. Testing log ◄─── TestNUX v0.1
    └── test plans, Playwright specs, evidence screenshots
          │
-4. Traceability matrix (RTM) ◄─── Testing Hub v0.2
+4. Traceability matrix (RTM) ◄─── TestNUX v0.2
    └── R-XX → sprint → code → test → backlog — one row per requirement
          │
-5. Security Control Assessment (SCA) ◄─── Testing Hub v0.2
+5. Security Control Assessment (SCA) ◄─── TestNUX v0.2
    └── per-surface evidence binder — what auditors actually read
          │
-6. UAT sign-off ◄─── Testing Hub v0.3
+6. UAT sign-off ◄─── TestNUX v0.3
    └── stakeholder review, e-signature, uat-log.jsonl audit trail
          │
 7. External audit / pen test
@@ -123,13 +123,13 @@ Most engineering teams live in steps 1–2. Most compliance tools live in steps 
    └── deploy owns
 ```
 
-Testing Hub does not replace a GRC platform (Vanta, Drata, ServiceNow GRC). It produces the artifacts those platforms import. The positioning is **"OSS evidence layer in your repo → feeds your GRC platform"**, not "replace your GRC platform."
+TestNUX does not replace a GRC platform (Vanta, Drata, ServiceNow GRC). It produces the artifacts those platforms import. The positioning is **"OSS evidence layer in your repo → feeds your GRC platform"**, not "replace your GRC platform."
 
 ---
 
 ## The traceability matrix (RTM)
 
-The Requirements Traceability Matrix maps every R-XX to its sprint, code, test, and backlog state. At v0.1 this is a hand-maintained `requirements/TRACEABILITY.md`. At v0.2, `testing-hub rtm` generates it automatically.
+The Requirements Traceability Matrix maps every R-XX to its sprint, code, test, and backlog state. At v0.1 this is a hand-maintained `requirements/TRACEABILITY.md`. At v0.2, `testnux rtm` generates it automatically.
 
 Columns: `Status | Sprint | Code file(s) | Test case(s) | Backlog items | Notes`
 
@@ -150,7 +150,7 @@ An SCA is a per-surface document that maps every applicable security control to 
 7. Open Items
 8. Sign-Off
 
-The SCA is what external auditors (KPMG, Schellman, A-LIGN, and similar firms) look at in the first week of an engagement. Testing Hub v0.2 generates the SCA from test results. v0.1 ships a template and a complete worked example (see `examples/demo-dashboard/output/login-sca-v0.1.md`).
+The SCA is what external auditors (KPMG, Schellman, A-LIGN, and similar firms) look at in the first week of an engagement. TestNUX v0.2 generates the SCA from test results. v0.1 ships a template and a complete worked example (see `examples/demo-dashboard/output/login-sca-v0.1.md`).
 
 **`[VERIFY]` markers:** any cell in the SCA that was generated by an LLM — rather than authored or reviewed by a human — renders with a `[VERIFY]` tag in the final PDF. This is non-negotiable for audit defensibility. An examiner who catches one wrong citation can invalidate the entire SCA; the `[VERIFY]` marker ensures human attestation before submission.
 
@@ -165,7 +165,7 @@ The `--industry general` flag loads:
 
 These two standards cover the foundational controls for authentication, session management, input validation, error handling, and accessibility that apply to every web application regardless of industry.
 
-**Why only `general` at v0.1?** Per-industry libraries require regulatory-content work, not code work. NIST 800-63B (fintech MFA) cites ~80 controls; NYDFS 23 NYCRR 500 adds another ~40. Shipping empty templates is worse than not shipping them. Testing Hub ships `general` with substance and expands to `fintech` and `healthcare` in v0.2 once the OSCAL integration (which gives access to machine-readable NIST catalogs) is resolved.
+**Why only `general` at v0.1?** Per-industry libraries require regulatory-content work, not code work. NIST 800-63B (fintech MFA) cites ~80 controls; NYDFS 23 NYCRR 500 adds another ~40. Shipping empty templates is worse than not shipping them. TestNUX ships `general` with substance and expands to `fintech` and `healthcare` in v0.2 once the OSCAL integration (which gives access to machine-readable NIST catalogs) is resolved.
 
 **Roadmap:**
 
@@ -176,7 +176,7 @@ These two standards cover the foundational controls for authentication, session 
 | v0.2 | `healthcare` | + HIPAA Security Rule, HITECH, NIST 800-66 |
 | v0.3 | `gov` | + FedRAMP, FISMA, NIST 800-53 |
 
-v0.2 also emits **OSCAL JSON** alongside markdown, making Testing Hub compatible with FedRAMP RFC-0024 (machine-readable control packages, mandatory September 2026). The OSCAL integration uses IBM Compliance Trestle as the serialiser; Testing Hub provides the UX.
+v0.2 also emits **OSCAL JSON** alongside markdown, making TestNUX compatible with FedRAMP RFC-0024 (machine-readable control packages, mandatory September 2026). The OSCAL integration uses IBM Compliance Trestle as the serialiser; TestNUX provides the UX.
 
 ---
 
@@ -190,7 +190,7 @@ The spec template provides a `captureEvidence(page, tcId)` helper. Tests that cr
 
 ## The self-contained HTML report
 
-The output of `testing-hub report` is a single `.html` file. "Self-contained" means:
+The output of `testnux report` is a single `.html` file. "Self-contained" means:
 
 - No CDN dependencies — the CSS, JS, and screenshots are all inlined
 - Opens in any browser without a web server
@@ -203,6 +203,6 @@ The report structure: a summary header, then tabs — All TCs, Pass, Fail, Skip,
 
 ## OSCAL (v0.2)
 
-OSCAL (Open Security Controls Assessment Language) is NIST's machine-readable format for control assessments. FedRAMP RFC-0024 mandates machine-readable OSCAL packages by September 2026. Testing Hub v0.2 emits OSCAL JSON alongside its markdown SCA output, using IBM Compliance Trestle as the serialiser.
+OSCAL (Open Security Controls Assessment Language) is NIST's machine-readable format for control assessments. FedRAMP RFC-0024 mandates machine-readable OSCAL packages by September 2026. TestNUX v0.2 emits OSCAL JSON alongside its markdown SCA output, using IBM Compliance Trestle as the serialiser.
 
-Positioning: Testing Hub is "OSCAL with a UX" — not an alternative to OSCAL, but a developer-workflow-native authoring layer that produces OSCAL-compatible output.
+Positioning: TestNUX is "OSCAL with a UX" — not an alternative to OSCAL, but a developer-workflow-native authoring layer that produces OSCAL-compatible output.

@@ -1,12 +1,12 @@
 # Costs
 
-An honest breakdown of what Testing Hub costs to run.
+An honest breakdown of what TestNUX costs to run.
 
 ---
 
-## Testing Hub CLI: free
+## TestNUX CLI: free
 
-Testing Hub is Apache 2.0 open-source software. The CLI has:
+TestNUX is Apache 2.0 open-source software. The CLI has:
 
 - No license fee
 - No telemetry
@@ -19,7 +19,7 @@ It runs entirely on your local machine. Output lives in your repo. Nothing is se
 
 ## Claude API cost (v0.2 LLM agents)
 
-The v0.1 core (`testing-hub report`, `validate`, `init`, `demo`) has **zero API cost**. It's deterministic — markdown in, HTML + XLSX out.
+The v0.1 core (`testnux report`, `validate`, `init`, `demo`) has **zero API cost**. It's deterministic — markdown in, HTML + XLSX out.
 
 The v0.2 LLM agents (discover, plan, codify, enrich, batch) call Claude's API. Here's an honest per-page estimate using Sonnet-class models:
 
@@ -75,7 +75,7 @@ What that means in practice:
 
 ## gstack: free
 
-gstack (https://github.com/garrytan/gstack) is OSS with no cost. There is no commercial gstack license required to use Testing Hub.
+gstack (https://github.com/garrytan/gstack) is OSS with no cost. There is no commercial gstack license required to use TestNUX.
 
 ---
 
@@ -84,7 +84,7 @@ gstack (https://github.com/garrytan/gstack) is OSS with no cost. There is no com
 Both MCP servers are free and run locally:
 
 - **claude-in-chrome MCP** — runs in your local browser. No cost.
-- **testing-hub-mcp** (planned v0.3) — local MCP server. No cost.
+- **testnux-mcp** (planned v0.3) — local MCP server. No cost.
 
 ---
 
@@ -124,8 +124,8 @@ The question isn't "is AI-accelerated testing free?" — it's "what's the altern
 | Method | Time per page | Direct cost |
 |---|---|---|
 | Fully manual (no AI) | 4–8 hours | $0 API, ~$200–800 labor |
-| Testing Hub v0.1 (no AI) | 1–2 hours | $0 |
-| Testing Hub v0.2 (AI agents) | 15–30 min | $0.30 – $0.50 API |
+| TestNUX v0.1 (no AI) | 1–2 hours | $0 |
+| TestNUX v0.2 (AI agents) | 15–30 min | $0.30 – $0.50 API |
 
 At $0.50/page and 30 pages, you're spending $15 in API costs to save 60–180 hours of manual work. For regulated environments where evidence packages are mandatory, that math is straightforward.
 
@@ -135,7 +135,7 @@ At $0.50/page and 30 pages, you're spending $15 in API costs to save 60–180 ho
 
 | Cost item | Amount |
 |---|---|
-| Testing Hub CLI | Free |
+| TestNUX CLI | Free |
 | Playwright | Free |
 | gstack | Free |
 | claude-in-chrome MCP | Free |

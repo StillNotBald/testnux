@@ -36,7 +36,7 @@ Thumbs.db
 *.swp
 *.swo
 
-# Testing Hub — sensitive seed data (never commit real test users)
+# TestNUX — sensitive seed data (never commit real test users)
 *.fixtures/test-users.json
 
 # Test artifacts that may leak to repo root from discover.mjs tests

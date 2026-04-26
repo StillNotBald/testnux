@@ -1,6 +1,6 @@
-# Sample output: Testing Hub run against Demo Dashboard
+# Sample output: TestNUX run against Demo Dashboard
 
-This folder shows what Testing Hub **PRODUCES** when run against a real codebase (demo-dashboard, a public Next.js admin app). The source code being tested is NOT in this repo — only the outputs. To reproduce, fork demo-dashboard separately and run `testing-hub init demo-dashboard-login --industry general` against it.
+This folder shows what TestNUX **PRODUCES** when run against a real codebase (demo-dashboard, a public Next.js admin app). The source code being tested is NOT in this repo — only the outputs. To reproduce, fork demo-dashboard separately and run `testnux init demo-dashboard-login --industry general` against it.
 
 ---
 
@@ -22,20 +22,20 @@ This folder shows what Testing Hub **PRODUCES** when run against a real codebase
 Clone demo-dashboard into a sibling directory and start it:
 
 ```bash
-git clone https://github.com/testing-hub-oss/demo-dashboard.git
+git clone https://github.com/testnux-oss/demo-dashboard.git
 cd demo-dashboard
 npm install
 npm run build
 npm start          # starts on http://localhost:3737 by default
 ```
 
-Keep the server running. Open a second terminal for Testing Hub commands.
+Keep the server running. Open a second terminal for TestNUX commands.
 
 ### Init a new test pass
 
 ```bash
-# From the testing-hub directory:
-testing-hub init demo-dashboard-login --industry general --target-url http://localhost:3737/login
+# From the testnux directory:
+testnux init demo-dashboard-login --industry general --target-url http://localhost:3737/login
 ```
 
 This scaffolds:
@@ -70,7 +70,7 @@ Screenshots land in `testing-log/<date>_demo-dashboard-login/evidence/`.
 ### Generate the report
 
 ```bash
-testing-hub report demo-dashboard-login
+testnux report demo-dashboard-login
 ```
 
 The generated HTML and XLSX open automatically in your browser.
@@ -100,8 +100,8 @@ These patterns come from real-world first-pass experience and are baked into the
 - **Rate-limit tests last** — LOGIN-15 (6 wrong-password attempts) is the last test in the spec so it does not exhaust the rate-limit bucket for subsequent tests
 - **Production build required** — tests run against `npm run build && npm start`, not `npm run dev`
 - **Inline `captureEvidence` for custom contexts** — any TC that opens its own browser context calls `captureEvidence(page, tcId)` inline before closing the context
-- **`PLAN ONLY` mode** — run `testing-hub report demo-dashboard-login --plan-only` before execution to give stakeholders a pre-review XLSX
+- **`PLAN ONLY` mode** — run `testnux report demo-dashboard-login --plan-only` before execution to give stakeholders a pre-review XLSX
 
 ---
 
-Want to use Testing Hub on YOUR codebase? → see [docs/getting-started.md](../../docs/getting-started.md)
+Want to use TestNUX on YOUR codebase? → see [docs/getting-started.md](../../docs/getting-started.md)

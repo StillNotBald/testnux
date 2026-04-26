@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/StillNotBald/testing-hub/schemas/test-plan-frontmatter.schema.json",
-  "title": "Testing Hub — test-plan.md Frontmatter",
-  "description": "JSON Schema (draft-07) for the YAML frontmatter block at the top of every test-plan.md file. Used by `testing-hub validate` to lint test-pass folders.",
+  "$id": "https://github.com/StillNotBald/testnux/schemas/test-plan-frontmatter.schema.json",
+  "title": "TestNUX — test-plan.md Frontmatter",
+  "description": "JSON Schema (draft-07) for the YAML frontmatter block at the top of every test-plan.md file. Used by `testnux validate` to lint test-pass folders.",
   "type": "object",
   "required": ["status", "industry", "r_ids", "tc_prefix"],
   "additionalProperties": true,

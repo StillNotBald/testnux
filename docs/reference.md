@@ -1,6 +1,6 @@
 # CLI Reference
 
-All commands follow the pattern: `testing-hub <command> [arguments] [flags]`
+All commands follow the pattern: `testnux <command> [arguments] [flags]`
 
 ---
 
@@ -12,19 +12,19 @@ These flags work on every command.
 |------|------|---------|-------------|
 | `--json` | boolean | false | Emit all output as newline-delimited JSON. Useful for CI/CD pipelines and tool integrations. Exit codes are unchanged. |
 | `--dry-run` | boolean | false | Print the actions that would be taken without executing them. Especially important for commands that call paid LLM APIs (v0.2+). |
-| `--version` | boolean | — | Print the Testing Hub version and exit. |
+| `--version` | boolean | — | Print the TestNUX version and exit. |
 | `--help` | boolean | — | Print command help and exit. |
 
 ---
 
-## `testing-hub init`
+## `testnux init`
 
 Scaffold a new test-pass folder.
 
 ### Synopsis
 
 ```
-testing-hub init <slug> [--industry <industry>] [--target-url <url>] [--out <dir>]
+testnux init <slug> [--industry <industry>] [--target-url <url>] [--out <dir>]
 ```
 
 ### Arguments
@@ -66,36 +66,36 @@ testing-log/<date>_<slug>/
 
 ```bash
 # Scaffold a login test pass with general industry standards
-testing-hub init login --industry general
+testnux init login --industry general
 
 # Target a specific URL and output to a custom directory
-testing-hub init dashboard --target-url http://localhost:3737/dashboard --out qa/passes
+testnux init dashboard --target-url http://localhost:3737/dashboard --out qa/passes
 
 # JSON output for CI (parses the created path)
-testing-hub init checkout --json
+testnux init checkout --json
 # → {"slug":"checkout","path":"testing-log/2026-05-01_checkout","industry":"general"}
 
 # Dry run — see what would be created without creating it
-testing-hub init login --dry-run
+testnux init login --dry-run
 ```
 
 ---
 
-## `testing-hub report`
+## `testnux report`
 
 Generate XLSX and self-contained HTML from a test-pass folder.
 
 ### Synopsis
 
 ```
-testing-hub report <folder> [--open] [--plan-only] [--out <dir>]
+testnux report <folder> [--open] [--plan-only] [--out <dir>]
 ```
 
 ### Arguments
 
 | Argument | Required | Description |
 |----------|----------|-------------|
-| `folder` | yes | Path to the test-pass folder, or just the slug if the folder is under the default `testing-log/` root. Both `testing-hub report login` and `testing-hub report testing-log/2026-05-01_login` are accepted. |
+| `folder` | yes | Path to the test-pass folder, or just the slug if the folder is under the default `testing-log/` root. Both `testnux report login` and `testnux report testing-log/2026-05-01_login` are accepted. |
 
 ### Flags
 
@@ -112,7 +112,7 @@ testing-hub report <folder> [--open] [--plan-only] [--out <dir>]
 |------|---------|
 | `0` | Report generated successfully |
 | `2` | Folder not found or contains no `test-plan.md` |
-| `3` | `test-plan.md` parse error — run `testing-hub validate <folder>` first |
+| `3` | `test-plan.md` parse error — run `testnux validate <folder>` first |
 | `4` | Render failed — run with `--json` for structured error details |
 
 ### Output
@@ -129,32 +129,32 @@ Generated files are written into the test-pass folder (or `--out` if specified):
 
 ```bash
 # Generate report (opens browser automatically)
-testing-hub report login
+testnux report login
 
 # Generate without opening the browser (CI mode)
-testing-hub report login --no-open
+testnux report login --no-open
 
 # Generate from a plan with no execution log yet
-testing-hub report login --plan-only
+testnux report login --plan-only
 
 # JSON output for CI pipeline integration
-testing-hub report login --json --no-open
+testnux report login --json --no-open
 # → {"pass":"PARTIAL","total":15,"pass_count":12,"fail_count":2,"skip_count":1,"blocked_count":0,"html":"testing-log/2026-05-01_login/login-execution-report.html"}
 
 # Write outputs to a separate artifacts directory
-testing-hub report login --out artifacts/login
+testnux report login --out artifacts/login
 ```
 
 ---
 
-## `testing-hub validate`
+## `testnux validate`
 
 Lint a test-pass folder against the JSON Schema and structural rules.
 
 ### Synopsis
 
 ```
-testing-hub validate <folder> [--strict] [--fix]
+testnux validate <folder> [--strict] [--fix]
 ```
 
 ### Arguments
@@ -195,29 +195,29 @@ testing-hub validate <folder> [--strict] [--fix]
 
 ```bash
 # Validate a folder before reporting
-testing-hub validate login
+testnux validate login
 
 # Strict mode — fail on any finding (recommended in CI)
-testing-hub validate login --strict
+testnux validate login --strict
 
 # Auto-fix trivial issues, then validate
-testing-hub validate login --fix
+testnux validate login --fix
 
 # JSON output (one finding object per line)
-testing-hub validate login --json
+testnux validate login --json
 # → {"level":"error","rule":"tc-id-format","tc":"LOGIN-1","message":"TC ID must be zero-padded: LOGIN-01"}
 ```
 
 ---
 
-## `testing-hub demo`
+## `testnux demo`
 
 Run the bundled demo-dashboard fixture and open the generated report.
 
 ### Synopsis
 
 ```
-testing-hub demo [--keep] [--no-open]
+testnux demo [--keep] [--no-open]
 ```
 
 ### Flags
@@ -249,25 +249,25 @@ The demo uses a pre-recorded fixture so it does not require a running server. To
 
 ```bash
 # Run the demo (fastest path to seeing a report)
-testing-hub demo
+testnux demo
 
 # Keep the files so you can inspect them
-testing-hub demo --keep
+testnux demo --keep
 
 # CI mode — generate without opening browser
-testing-hub demo --no-open --keep
+testnux demo --no-open --keep
 ```
 
 ---
 
-## `testing-hub doctor`
+## `testnux doctor`
 
 Run preflight checks and report on environment health.
 
 ### Synopsis
 
 ```
-testing-hub doctor [--fix]
+testnux doctor [--fix]
 ```
 
 ### Flags
@@ -284,7 +284,7 @@ testing-hub doctor [--fix]
 | Playwright chromium | Yes (`--fix`) | Downloads browsers if missing |
 | `CLAUDE_API_KEY` | No | Warns if absent (required for v0.2 LLM features, not for v0.1 core) |
 | Prod-build detection | No | Warns if a dev server (`npm run dev`) is running on the target port; tests should run against `npm run build && npm start` |
-| Config discovery | No | Reports which `testing-hub.config.mjs` (if any) will be used |
+| Config discovery | No | Reports which `testnux.config.mjs` (if any) will be used |
 | Git hooks | No | Warns if a pre-commit hook might interfere with test artefact commits |
 | Windows line endings | No | Warns if git `core.autocrlf=true` (can corrupt evidence screenshots) |
 
@@ -299,13 +299,13 @@ testing-hub doctor [--fix]
 
 ```bash
 # Run all preflight checks
-testing-hub doctor
+testnux doctor
 
 # Run checks and attempt auto-fixes
-testing-hub doctor --fix
+testnux doctor --fix
 
 # JSON output for automated environment validation
-testing-hub doctor --json
+testnux doctor --json
 # → [{"check":"node-version","status":"pass","value":"20.11.0"},...]
 ```
 
@@ -313,16 +313,16 @@ testing-hub doctor --json
 
 ## Configuration
 
-Testing Hub looks for a config file in the following order:
+TestNUX looks for a config file in the following order:
 
-1. `testing-hub.config.mjs` in the current directory
-2. `testing-hub.config.mjs` in the git repo root
+1. `testnux.config.mjs` in the current directory
+2. `testnux.config.mjs` in the git repo root
 3. Built-in defaults
 
 Config file example:
 
 ```js
-// testing-hub.config.mjs
+// testnux.config.mjs
 export default {
   testingLogRoot: "testing-log",       // default: "testing-log"
   requirementsRoot: "requirements",    // default: "requirements"

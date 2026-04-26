@@ -1,10 +1,10 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
  * src/commands/batch.mjs
  *
- * Implements `testing-hub batch-plan --pages "login,register,dashboard,..."`.
+ * Implements `testnux batch-plan --pages "login,register,dashboard,..."`.
  *
  * v0.1 STUB — describes what the v0.2 multi-agent batch dispatcher will do.
  * No LLM calls are made; exits 0.
@@ -40,7 +40,7 @@
  *   Use --max-spend $50 as a safe default for a 20-page app.
  *
  * Output:
- *   testing-log/<date>_<slug>/  (one folder per page, same as `testing-hub init`)
+ *   testing-log/<date>_<slug>/  (one folder per page, same as `testnux init`)
  *   batch-plan-summary.md       (coordinator summary: pages done, cost, errors)
  */
 
@@ -119,7 +119,7 @@ export async function runBatchPlan(opts = {}) {
 
   if (!json) {
     console.log('');
-    console.log('  testing-hub batch-plan — v0.1 stub');
+    console.log('  testnux batch-plan — v0.1 stub');
     console.log('  ─────────────────────────────────────────────────────────');
     console.log(`  Pages          : ${pageList.length} (${pageList.join(', ')})`);
     console.log(`  Pages/agent    : ${pagesPerAgent}`);
@@ -157,7 +157,7 @@ export async function runBatchPlan(opts = {}) {
     console.log('');
     console.log('  For now, run each page manually:');
     for (const page of pageList) {
-      console.log(`    testing-hub init ${page}`);
+      console.log(`    testnux init ${page}`);
     }
     console.log('');
     console.log('  Or run the discover → plan pipeline per page when v0.2 ships.');

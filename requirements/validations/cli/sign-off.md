@@ -1,8 +1,8 @@
 # Sign-Off Log — cli
 
-<!-- testing-hub: sign-off log -->
+<!-- testnux: sign-off log -->
 
-<!-- Entries appended by `testing-hub sign`. Do not hand-edit. -->
+<!-- Entries appended by `testnux sign`. Do not hand-edit. -->
 
 ## Schema
 
@@ -23,12 +23,12 @@ that verifiers can reproduce without any prior state.
 
 ## Chain integrity
 
-Run `testing-hub sign cli --verify` to validate the hash-chain. Any tampered, removed, or
+Run `testnux sign cli --verify` to validate the hash-chain. Any tampered, removed, or
 reordered entry will cause `verifyChain()` to return `{ valid: false, brokenAt: <line> }`.
 
 ## Current state
 
-No sign-offs yet — run `testing-hub sign cli` to add an attestation entry.
+No sign-offs yet — run `testnux sign cli` to add an attestation entry.
 
 Once sign-offs are recorded they will appear below, one block per entry, appended automatically.
 

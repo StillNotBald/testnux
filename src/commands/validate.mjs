@@ -4,7 +4,7 @@
 /**
  * src/commands/validate.mjs
  *
- * Implements `testing-hub validate <folder>`.
+ * Implements `testnux validate <folder>`.
  *
  * Walks all *.md files inside <folder>, extracts YAML frontmatter (using
  * gray-matter), and validates against the rules defined in
@@ -185,7 +185,7 @@ export async function runValidate(folder, opts = {}) {
     findings.warnings.push({
       file: 'spec.ts',
       rule: 'folder.spec',
-      message: 'spec.ts not found — run `testing-hub init` to scaffold, or create manually',
+      message: 'spec.ts not found — run `testnux init` to scaffold, or create manually',
     });
   }
 

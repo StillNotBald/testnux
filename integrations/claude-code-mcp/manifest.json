@@ -1,5 +1,5 @@
 {
-  "_comment": "Add the 'testing-hub' block to the 'mcpServers' object in your Claude Code settings.",
+  "_comment": "Add the 'testnux' block to the 'mcpServers' object in your Claude Code settings.",
   "_settings_paths": {
     "global": "~/.claude/settings.json",
     "project": ".claude/settings.json"
@@ -7,27 +7,27 @@
   "_instructions": [
     "1. Open Claude Code settings: Cmd/Ctrl+Shift+P → 'Open Settings (JSON)'",
     "   OR edit ~/.claude/settings.json directly.",
-    "2. Add the 'testing-hub' entry inside the 'mcpServers' object (create it if absent).",
+    "2. Add the 'testnux' entry inside the 'mcpServers' object (create it if absent).",
     "3. Save the file and restart Claude Code.",
-    "4. Verify: Cmd/Ctrl+Shift+P → 'MCP: List Servers' — testing-hub should appear.",
+    "4. Verify: Cmd/Ctrl+Shift+P → 'MCP: List Servers' — testnux should appear.",
     "",
     "Option A — use npx (no global install required, always fetches latest):",
-    "  See 'mcpServers.testing-hub-npx' below.",
+    "  See 'mcpServers.testnux-npx' below.",
     "",
     "Option B — use a local checkout (for contributors or offline use):",
-    "  Replace <REPO_PATH> with the absolute path to your testing-hub clone.",
-    "  See 'mcpServers.testing-hub-local' below."
+    "  Replace <REPO_PATH> with the absolute path to your testnux clone.",
+    "  See 'mcpServers.testnux-local' below."
   ],
   "mcpServers": {
-    "testing-hub": {
+    "testnux": {
       "command": "npx",
-      "args": ["-y", "testing-hub", "mcp"],
-      "_description": "Option A: npx — fetches testing-hub from npm, boots the MCP server. No global install required."
+      "args": ["-y", "testnux", "mcp"],
+      "_description": "Option A: npx — fetches testnux from npm, boots the MCP server. No global install required."
     },
-    "testing-hub-local": {
+    "testnux-local": {
       "command": "node",
       "args": ["<REPO_PATH>/integrations/claude-code-mcp/server.mjs"],
-      "_description": "Option B: local checkout — replace <REPO_PATH> with the absolute path to your testing-hub repo."
+      "_description": "Option B: local checkout — replace <REPO_PATH> with the absolute path to your testnux repo."
     }
   }
 }

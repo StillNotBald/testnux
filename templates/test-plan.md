@@ -1,5 +1,5 @@
 ---
-# Testing Hub — test-plan.md template
+# TestNUX — test-plan.md template
 # Replace all {{placeholder}} values before committing.
 #
 # Status taxonomy (pick exactly one):
@@ -205,11 +205,11 @@ industry_standards:
 
 ## Structural Context
 
-<!-- Optional section — filled automatically by `testing-hub enrich` in v0.2.
+<!-- Optional section — filled automatically by `testnux enrich` in v0.2.
      Describes which source-code communities this page imports from (helps surface hidden
      coupling that should be tested). Leave blank for v0.1 and fill manually if needed. -->
 
-_Not yet populated. Run `testing-hub enrich {{slug}}` in v0.2 to auto-fill._
+_Not yet populated. Run `testnux enrich {{slug}}` in v0.2 to auto-fill._
 
 ---
 

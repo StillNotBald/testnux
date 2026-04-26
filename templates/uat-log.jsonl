@@ -1,1 +1,1 @@
-{"_schema":"testing-hub uat-log v1","required":["tc_id","status","reviewer","reviewer_role","ts","prev_hash","signature"]}
+{"_schema":"testnux uat-log v1","required":["tc_id","status","reviewer","reviewer_role","ts","prev_hash","signature"]}

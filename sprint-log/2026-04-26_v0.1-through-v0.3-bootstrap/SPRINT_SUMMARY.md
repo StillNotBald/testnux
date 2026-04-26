@@ -13,7 +13,7 @@ Requirements covered in this sprint (from requirements/REQUIREMENTS.md):
 
 | R-ID | Description | Status |
 |---|---|---|
-| R-01 | CLI entry point (`bin/testing-hub.mjs`) with `--version`, `--help`, all commands | DONE |
+| R-01 | CLI entry point (`bin/testnux.mjs`) with `--version`, `--help`, all commands | DONE |
 | R-02 | `init <slug>` scaffolds date-prefixed testing-log folder from templates | DONE |
 | R-03 | `report <folder>` generates XLSX + self-contained HTML | DONE |
 | R-04 | `validate <folder>` lints frontmatter against JSON Schema | DONE |
@@ -27,7 +27,7 @@ Requirements covered in this sprint (from requirements/REQUIREMENTS.md):
 | R-12 | `sign --verify` chain integrity check | DONE |
 | R-13 | schemas/test-plan-frontmatter.schema.json (JSON Schema draft-07) | DONE |
 | R-14 | src/config/industry-standards/*.json — 6 industry bundles with 22+ controls | DONE |
-| R-15 | LICENSE is Apache 2.0 verbatim; NOTICE carries Testing Hub trademark line | DONE |
+| R-15 | LICENSE is Apache 2.0 verbatim; NOTICE carries TestNUX trademark line | DONE |
 | R-16 | `rtm` command: cross-reference R-IDs across codebase + test plans | DONE |
 | R-17 | `sca init <surface>` scaffolds 8-section SCA template | DONE |
 | R-18 | `sca generate <surface>` fills evidence rows; [VERIFY] on LLM-needing cells | DONE |
@@ -51,7 +51,7 @@ Requirements covered in this sprint (from requirements/REQUIREMENTS.md):
 | R-36 | templates/business-requirements.md BR template | DONE |
 | R-37 | docs/ — 12 pages: getting-started, concepts, reference, roadmap, integrations, architecture, v0.2+v0.3 guides | DONE |
 | R-38 | examples/demo-dashboard/ — output/ + screenshots/ only (no demo source) | DONE |
-| R-39 | integrations/gstack/testing-hub/SKILL.md — gstack skill bundle | DONE |
+| R-39 | integrations/gstack/testnux/SKILL.md — gstack skill bundle | DONE |
 | R-40 | integrations/claude-code-mcp/ — MCP server for Claude Code integration | DONE |
 
 ---
@@ -64,7 +64,7 @@ and committed in a single scaffold commit after all agents completed.
 
 | Domain | Task | Files produced |
 |---|---|---|
-| Core CLI scaffolding | CLI entry point + repo config | bin/testing-hub.mjs, package.json, .eslintrc.json, .prettierrc.json, .editorconfig, .gitignore, .npmignore |
+| Core CLI scaffolding | CLI entry point + repo config | bin/testnux.mjs, package.json, .eslintrc.json, .prettierrc.json, .editorconfig, .gitignore, .npmignore |
 | Commands: init/validate/doctor/demo | Deterministic core commands | src/commands/init.mjs, validate.mjs, doctor.mjs, demo.mjs |
 | Commands: report/sign/run/compare | Reporting + env commands | src/commands/report.mjs, sign.mjs, env.mjs, visual.mjs |
 | Commands: rtm/br/sca | Traceability + SCA commands | src/commands/rtm.mjs, br.mjs, sca.mjs, sca-oscal.mjs |
@@ -75,7 +75,7 @@ and committed in a single scaffold commit after all agents completed.
 | Schemas | JSON Schema definitions | schemas/test-plan-frontmatter.schema.json |
 | Docs | 12 documentation pages | docs/{getting-started.md, concepts.md, reference.md, roadmap.md, integrations.md}, docs/architecture/data-model.md, docs/v0.2-*.md, docs/v0.3-*.md |
 | Examples | Demo artifact outputs | examples/demo-dashboard/{README.md, output/*, screenshots/.gitkeep} |
-| Integrations | gstack skill + MCP server | integrations/gstack/testing-hub/{SKILL.md, install.sh}, integrations/claude-code-mcp/{server.mjs, manifest.json}, integrations/README.md |
+| Integrations | gstack skill + MCP server | integrations/gstack/testnux/{SKILL.md, install.sh}, integrations/claude-code-mcp/{server.mjs, manifest.json}, integrations/README.md |
 | Repo housekeeping | OSS boilerplate | LICENSE, NOTICE, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md, README.md, .github/ |
 
 ---
@@ -84,7 +84,7 @@ and committed in a single scaffold commit after all agents completed.
 
 - **Standalone CLI only** (no MCP server / no gstack skill bundle at v0.1) — D6. MCP server
   and gstack skill exist as stubs but are not the primary delivery surface. Reduces v0.1
-  install friction to `npm install -g testing-hub`.
+  install friction to `npm install -g testnux`.
 - **OSCAL JSON emit alongside markdown in v0.2** — D4. Every SCA document will have a
   machine-readable OSCAL 1.1.2 companion; human markdown is primary, OSCAL is derived.
 - **OSS = local-everything; Paid SaaS = workflow + audit log + sign-off + liability cover** — D3.
@@ -108,7 +108,7 @@ and committed in a single scaffold commit after all agents completed.
 - Paid SaaS tier: audit-log dashboard, stakeholder sign-off UI, SOC 2 evidence bundle export
 - CI integrations: GitHub Actions, GitLab CI, Jenkins pipeline templates
 - `mcp` server production hardening (currently passes through to integrations/claude-code-mcp/)
-- gstack skill bundle (`/testing-hub`) production onboarding + install flow
+- gstack skill bundle (`/testnux`) production onboarding + install flow
 
 ---
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**

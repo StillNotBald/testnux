@@ -1,5 +1,5 @@
 {
-  "name": "testing-hub",
+  "name": "testnux",
   "version": "0.0.1",
   "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence.",
   "private": false,
@@ -7,11 +7,11 @@
   "author": "Chu Ling",
   "repository": {
     "type": "git",
-    "url": "https://github.com/StillNotBald/testing-hub.git"
+    "url": "https://github.com/StillNotBald/testnux.git"
   },
-  "homepage": "https://github.com/StillNotBald/testing-hub#readme",
+  "homepage": "https://github.com/StillNotBald/testnux#readme",
   "bugs": {
-    "url": "https://github.com/StillNotBald/testing-hub/issues"
+    "url": "https://github.com/StillNotBald/testnux/issues"
   },
   "keywords": [
     "testing",
@@ -28,7 +28,7 @@
   ],
   "type": "module",
   "bin": {
-    "testing-hub": "bin/testing-hub.mjs"
+    "testnux": "bin/testnux.mjs"
   },
   "exports": {
     ".": "./dist/index.js"

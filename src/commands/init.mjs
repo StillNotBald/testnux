@@ -4,7 +4,7 @@
 /**
  * src/commands/init.mjs
  *
- * Implements `testing-hub init <slug>`.
+ * Implements `testnux init <slug>`.
  *
  * Copies templates/* into a date-prefixed folder under the output root,
  * performing {{placeholder}} substitution throughout. Idempotent — re-running
@@ -124,7 +124,7 @@ export async function runInit(slug, opts) {
     console.log(`  2. Edit ${path.join(targetDir, 'spec.ts')} — implement the Playwright tests`);
     console.log(`  3. npm run build && npm start  # run against PROD build, not dev`);
     console.log(`  4. npx playwright test ${path.join(targetDir, 'spec.ts')}`);
-    console.log(`  5. testing-hub report ${targetDir}`);
+    console.log(`  5. testnux report ${targetDir}`);
     console.log('');
   }
 }

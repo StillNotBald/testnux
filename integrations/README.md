@@ -1,6 +1,6 @@
 # Integrations
 
-Testing Hub ships as a standalone CLI. This directory contains optional
+TestNUX ships as a standalone CLI. This directory contains optional
 integrations for editor tooling — drop-in accelerators that sit on top of
 the same CLI commands.
 
@@ -10,7 +10,7 @@ the same CLI commands.
 
 | Integration | Directory | Status | Requires |
 |-------------|-----------|--------|---------|
-| **gstack skill** | `gstack/testing-hub/` | v0.3 | gstack installed |
+| **gstack skill** | `gstack/testnux/` | v0.3 | gstack installed |
 | **Claude Code MCP server** | `claude-code-mcp/` | v0.3 | `@modelcontextprotocol/sdk` |
 | Cursor adapter | — | Planned v0.4 | — |
 | Continue adapter | — | Planned v0.4 | — |
@@ -18,9 +18,9 @@ the same CLI commands.
 
 ---
 
-## gstack skill — `gstack/testing-hub/`
+## gstack skill — `gstack/testnux/`
 
-Makes `/testing-hub` a first-class slash command in Claude Code sessions that
+Makes `/testnux` a first-class slash command in Claude Code sessions that
 have gstack installed.
 
 **Files:**
@@ -30,14 +30,14 @@ have gstack installed.
 **Install:**
 
 ```bash
-bash integrations/gstack/testing-hub/install.sh
+bash integrations/gstack/testnux/install.sh
 ```
 
 Then in Claude Code:
 
 ```
-/testing-hub init login --industry general
-/testing-hub doctor
+/testnux init login --industry general
+/testnux doctor
 ```
 
 Full documentation: `docs/v0.3-integrations.md` — Option 2.
@@ -46,7 +46,7 @@ Full documentation: `docs/v0.3-integrations.md` — Option 2.
 
 ## Claude Code MCP server — `claude-code-mcp/`
 
-Exposes testing-hub commands as tools in the Claude Code chat pane via the
+Exposes testnux commands as tools in the Claude Code chat pane via the
 Model Context Protocol (MCP).
 
 **Files:**
@@ -64,9 +64,9 @@ Add to `~/.claude/settings.json`:
 ```json
 {
   "mcpServers": {
-    "testing-hub": {
+    "testnux": {
       "command": "npx",
-      "args": ["-y", "testing-hub", "mcp"]
+      "args": ["-y", "testnux", "mcp"]
     }
   }
 }
@@ -75,7 +75,7 @@ Add to `~/.claude/settings.json`:
 Or invoke the server directly:
 
 ```bash
-npx testing-hub mcp
+npx testnux mcp
 ```
 
 Full documentation: `docs/v0.3-integrations.md` — Option 3.
@@ -116,7 +116,7 @@ Integrations follow a simple convention:
 
 **Adapter patterns to follow:**
 
-- **gstack skill:** copy the structure of `gstack/testing-hub/SKILL.md`.
+- **gstack skill:** copy the structure of `gstack/testnux/SKILL.md`.
   YAML frontmatter declares `name`, `version`, `description`, `model`,
   `triggers`, and `allowed-tools`. The body is markdown instructions.
 - **MCP server:** reuse `claude-code-mcp/server.mjs` as a template.

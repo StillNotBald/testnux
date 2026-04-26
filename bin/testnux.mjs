@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * bin/testing-hub.mjs
+ * bin/testnux.mjs
  *
- * CLI entry point for Testing Hub.
+ * CLI entry point for TestNUX.
  *
  * Verbs:
  *   init <slug>      — scaffold a per-page test-pass folder from templates
@@ -68,8 +68,8 @@ const { runBatchPlan } = await import('../src/commands/batch.mjs');
 const program = new Command();
 
 program
-  .name('testing-hub')
-  .description('Testing Hub — structured test-pass documentation for regulated web apps')
+  .name('testnux')
+  .description('TestNUX — structured test-pass documentation for regulated web apps')
   .version(version)
   .option('--json', 'emit all output as newline-delimited JSON records');
 
@@ -180,14 +180,14 @@ program
 program
   .command('mcp')
   .description(
-    'Start the Testing Hub MCP server on stdio. ' +
+    'Start the TestNUX MCP server on stdio. ' +
     'Mount this in Claude Code via .claude/settings.json mcpServers. ' +
     'Requires @modelcontextprotocol/sdk — install separately: ' +
     'npm install @modelcontextprotocol/sdk',
   )
   .action(async () => {
-    // Resolve server path relative to this file so it works whether testing-hub
-    // is invoked via `npx testing-hub mcp`, a global install, or a local clone.
+    // Resolve server path relative to this file so it works whether testnux
+    // is invoked via `npx testnux mcp`, a global install, or a local clone.
     const serverUrl = new URL(
       '../integrations/claude-code-mcp/server.mjs',
       import.meta.url,
@@ -200,7 +200,7 @@ program
         console.error(
           '\nERROR: @modelcontextprotocol/sdk is not installed.\n\n' +
             'Install it with:\n\n  npm install @modelcontextprotocol/sdk\n\n' +
-            'Then run: npx testing-hub mcp\n',
+            'Then run: npx testnux mcp\n',
         );
         process.exit(1);
       }
@@ -220,7 +220,7 @@ program
   )
   .option('--dry-run', 'print generated content to stdout without writing the file')
   .option('--strict', 'exit 1 if any R-ID has no code or test evidence')
-  .option('--config <path>', 'path to testing-hub.config.mjs for glob overrides')
+  .option('--config <path>', 'path to testnux.config.mjs for glob overrides')
   .action(async (opts, cmd) => {
     const global = cmd.parent.opts();
     try {
@@ -254,7 +254,7 @@ scaCmd
   )
   .option('--industry <industry>', 'industry standards profile (general|fintech|healthcare)', 'general')
   .option('--dry-run', 'print generated content to stdout without writing the file')
-  .option('--config <path>', 'path to testing-hub.config.mjs')
+  .option('--config <path>', 'path to testnux.config.mjs')
   .option('--standards-version <version>', 'standards snapshot version recorded in frontmatter', '1.0.0')
   .action(async (surface, opts, cmd) => {
     const global = cmd.parent.parent.opts();
@@ -280,7 +280,7 @@ scaCmd
     'test results and R-ID mappings. [VERIFY] marks cells needing human or LLM review.',
   )
   .option('--dry-run', 'print updated content to stdout without writing the file')
-  .option('--config <path>', 'path to testing-hub.config.mjs')
+  .option('--config <path>', 'path to testnux.config.mjs')
   .option('--standards-version <version>', 'standards snapshot version recorded in frontmatter', '1.0.0')
   .action(async (surface, opts, cmd) => {
     const global = cmd.parent.parent.opts();
@@ -305,7 +305,7 @@ scaCmd
     'Set CHROME_PATH env var if Chrome is not auto-detected.',
   )
   .option('--dry-run', 'show what would be rendered without writing the file')
-  .option('--config <path>', 'path to testing-hub.config.mjs')
+  .option('--config <path>', 'path to testnux.config.mjs')
   .action(async (surface, opts, cmd) => {
     const global = cmd.parent.parent.opts();
     try {
@@ -647,7 +647,7 @@ const visualCmd = program
   .description(
     'Visual regression testing. Subcommands: baseline, compare. ' +
     'Optional dep: npm install pixelmatch pngjs. ' +
-    'Configurable via testing-hub.config.mjs visual.diffThreshold (default 5%).',
+    'Configurable via testnux.config.mjs visual.diffThreshold (default 5%).',
   );
 
 visualCmd
@@ -673,7 +673,7 @@ visualCmd
   .description(
     'Compare current screenshots against baseline. ' +
     'Diffs stored at <slug>/visual-diff/<TC-ID>-diff.png. ' +
-    'Threshold configurable in testing-hub.config.mjs (default 5%).',
+    'Threshold configurable in testnux.config.mjs (default 5%).',
   )
   .option('--strict', 'exit 1 if any TC exceeds the diff threshold')
   .option('--report', 'flag-only mode — no exit code change on diff (default)')

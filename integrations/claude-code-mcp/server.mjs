@@ -4,19 +4,19 @@
 /**
  * integrations/claude-code-mcp/server.mjs
  *
- * Stdio MCP server for Testing Hub.
+ * Stdio MCP server for TestNUX.
  *
- * Exposes Testing Hub commands as Claude Code tools so users can invoke
- * testing-hub operations directly from the Claude Code editor without
+ * Exposes TestNUX commands as Claude Code tools so users can invoke
+ * testnux operations directly from the Claude Code editor without
  * switching to a terminal.
  *
  * Exposed tools:
- *   testing_hub_init      — scaffold a test-pass folder
- *   testing_hub_report    — generate XLSX + HTML report
- *   testing_hub_validate  — lint markdown frontmatter
- *   testing_hub_doctor    — preflight checks
- *   testing_hub_rtm       — generate / refresh traceability matrix
- *   testing_hub_sca       — security control assessment operations
+ *   testnux_init      — scaffold a test-pass folder
+ *   testnux_report    — generate XLSX + HTML report
+ *   testnux_validate  — lint markdown frontmatter
+ *   testnux_doctor    — preflight checks
+ *   testnux_rtm       — generate / refresh traceability matrix
+ *   testnux_sca       — security control assessment operations
  *
  * This file is intentionally a standalone ESM module with no build step.
  * The @modelcontextprotocol/sdk is an OPTIONAL peer dependency — if it is
@@ -24,8 +24,8 @@
  *
  * Usage:
  *   node integrations/claude-code-mcp/server.mjs
- *   # or, after `npm install -g testing-hub`:
- *   npx testing-hub mcp
+ *   # or, after `npm install -g testnux`:
+ *   npx testnux mcp
  */
 
 import { createRequire } from 'module';
@@ -54,7 +54,7 @@ try {
       '',
       'ERROR: @modelcontextprotocol/sdk is not installed.',
       '',
-      'The Testing Hub MCP server requires the MCP SDK as a peer dependency.',
+      'The TestNUX MCP server requires the MCP SDK as a peer dependency.',
       'Install it with:',
       '',
       '  npm install @modelcontextprotocol/sdk',
@@ -98,7 +98,7 @@ try {
 
 const TOOLS = [
   {
-    name: 'testing_hub_init',
+    name: 'testnux_init',
     description:
       'Scaffold a per-page test-pass folder under testing-log/. ' +
       'Creates test-plan.md, spec.ts, README.md, and evidence/. ' +
@@ -130,7 +130,7 @@ const TOOLS = [
   },
 
   {
-    name: 'testing_hub_report',
+    name: 'testnux_report',
     description:
       'Generate an XLSX + self-contained HTML audit report from test-plan.md ' +
       'and execution-log.md inside the given folder. ' +
@@ -156,7 +156,7 @@ const TOOLS = [
   },
 
   {
-    name: 'testing_hub_validate',
+    name: 'testnux_validate',
     description:
       'Lint markdown frontmatter in a test-pass folder. ' +
       'Checks required keys, R-XX format, TC-ID consistency, industry field, and status taxonomy. ' +
@@ -179,7 +179,7 @@ const TOOLS = [
   },
 
   {
-    name: 'testing_hub_doctor',
+    name: 'testnux_doctor',
     description:
       'Run preflight checks: Node version, Playwright browsers installed, ' +
       '.env.local variables, dev-vs-prod server detection, and testing-log/ conventions. ' +
@@ -202,7 +202,7 @@ const TOOLS = [
   },
 
   {
-    name: 'testing_hub_rtm',
+    name: 'testnux_rtm',
     description:
       'Generate or refresh requirements/TRACEABILITY.md — the Requirements ' +
       'Traceability Matrix. Maps every R-XX identifier to sprint folder, code ' +
@@ -222,7 +222,7 @@ const TOOLS = [
   },
 
   {
-    name: 'testing_hub_sca',
+    name: 'testnux_sca',
     description:
       'Security Control Assessment operations. Scaffold a per-surface SCA, ' +
       'auto-fill evidence rows, or render to PDF. ' +
@@ -295,7 +295,7 @@ function errorResult(message) {
 
 async function callTool(name, args) {
   switch (name) {
-    case 'testing_hub_init': {
+    case 'testnux_init': {
       const { slug, industry = 'general', outDir = './testing-log' } = args;
       if (!slug) return errorResult('slug is required');
       const { output, error } = await captureCommand(() =>
@@ -304,7 +304,7 @@ async function callTool(name, args) {
       return error ? errorResult(error) : successResult(output);
     }
 
-    case 'testing_hub_report': {
+    case 'testnux_report': {
       const { folder, planOnly = false } = args;
       if (!folder) return errorResult('folder is required');
       const { output, error } = await captureCommand(() =>
@@ -313,7 +313,7 @@ async function callTool(name, args) {
       return error ? errorResult(error) : successResult(output);
     }
 
-    case 'testing_hub_validate': {
+    case 'testnux_validate': {
       const { folder, strict = false } = args;
       if (!folder) return errorResult('folder is required');
       const { output, error } = await captureCommand(() =>
@@ -322,7 +322,7 @@ async function callTool(name, args) {
       return error ? errorResult(error) : successResult(output);
     }
 
-    case 'testing_hub_doctor': {
+    case 'testnux_doctor': {
       const { check, projectRef } = args;
       const { output, error } = await captureCommand(() =>
         runDoctor({ check, projectRef, json: false }),
@@ -330,13 +330,13 @@ async function callTool(name, args) {
       return error ? errorResult(error) : successResult(output);
     }
 
-    case 'testing_hub_rtm': {
+    case 'testnux_rtm': {
       const { out = 'requirements/TRACEABILITY.md' } = args;
       const { output, error } = await captureCommand(() => runRtm({ out, json: false }));
       return error ? errorResult(error) : successResult(output);
     }
 
-    case 'testing_hub_sca': {
+    case 'testnux_sca': {
       const { subcommand, surface } = args;
       if (!subcommand) return errorResult('subcommand is required');
       if (!surface) return errorResult('surface is required');
@@ -355,7 +355,7 @@ async function callTool(name, args) {
 
 const server = new Server(
   {
-    name: 'testing-hub',
+    name: 'testnux',
     version: '0.3.0',
   },
   {
@@ -391,4 +391,4 @@ process.on('SIGTERM', async () => {
 await server.connect(transport);
 
 // Emit a startup marker to stderr (not stdout — stdout is the MCP channel).
-process.stderr.write('[testing-hub MCP] server ready on stdio\n');
+process.stderr.write('[testnux MCP] server ready on stdio\n');

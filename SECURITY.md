@@ -12,7 +12,7 @@
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
 Send a report to **security@stillnotbald.com** with the subject line
-`[testing-hub] Security Vulnerability`.
+`[testnux] Security Vulnerability`.
 
 Include:
 
@@ -28,4 +28,4 @@ Include:
 - Credit will be given in the CHANGELOG and release notes unless you prefer to
   remain anonymous.
 
-Thank you for helping keep testing-hub and its users safe.
+Thank you for helping keep testnux and its users safe.

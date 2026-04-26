@@ -4,7 +4,7 @@
 
 ---
 
-## What forking testing-hub doesn't do for you
+## What forking testnux doesn't do for you
 
 The OSS ships:
 
@@ -19,7 +19,7 @@ But these 4 things are on **you** (and your team). Each has a time estimate so y
 
 ## Task 1 — Originate your R-IDs (1–3 days)
 
-**What this is:** Writing the numbered requirement statements that are the root of the entire traceability chain. Testing Hub can generate reports, RTM rows, and SCA sections — but it cannot invent what your product is supposed to do. That knowledge lives in your team's heads, your existing requirement docs, your legal/compliance obligations, and your customer contracts.
+**What this is:** Writing the numbered requirement statements that are the root of the entire traceability chain. TestNUX can generate reports, RTM rows, and SCA sections — but it cannot invent what your product is supposed to do. That knowledge lives in your team's heads, your existing requirement docs, your legal/compliance obligations, and your customer contracts.
 
 **Why it's non-negotiable:** The traceability matrix maps every R-XX to sprint → code → test → backlog. If you skip this step, you have no R-IDs, so the RTM is empty, the SCA has no per-control inventory, and the audit evidence chain has no starting node. The CLI has nothing to trace.
 
@@ -36,7 +36,7 @@ But these 4 things are on **you** (and your team). Each has a time estimate so y
 
 **Time estimate:** 1 day if your requirements are already written somewhere in rough form and you're converting them. 2–3 days if you're starting from scratch or your existing docs are inconsistent.
 
-**Exit criteria:** `requirements/REQUIREMENTS.md` exists, contains at least the R-IDs for the area you're testing first, and each R-XX is a single testable statement. Running `testing-hub validate` on a test plan that references those R-IDs produces no "unknown R-ID" warnings.
+**Exit criteria:** `requirements/REQUIREMENTS.md` exists, contains at least the R-IDs for the area you're testing first, and each R-XX is a single testable statement. Running `testnux validate` on a test plan that references those R-IDs produces no "unknown R-ID" warnings.
 
 **Common mistakes:**
 - Copying Jira ticket titles verbatim — they're usually too vague ("Improve login flow").
@@ -103,11 +103,11 @@ openssl rand -base64 32
 echo "UAT_SECRET=<your-generated-secret>" >> .env.local
 
 # 3. Verify the secret is detected
-testing-hub doctor --check uat
+testnux doctor --check uat
 # Expected: ✔ UAT_SECRET detected (32+ bytes)
 
 # 4. Run your first sign-off against a completed test pass
-testing-hub uat sign <folder> --reviewer "Jane Smith" --role "QA Lead"
+testnux uat sign <folder> --reviewer "Jane Smith" --role "QA Lead"
 # This writes a signed entry to uat-log.jsonl and updates uat_status in the XLSX
 ```
 
@@ -131,7 +131,7 @@ Answer these questions before your first real UAT cycle:
 3. **What is the turnaround SLA?** If UAT sign-off is required before a release, reviewers need to know their expected response time.
 4. **What happens if a TC is `FAIL` at sign-off?** Define the escalation path. Do not let sign-off be used to quietly flip a `FAIL` to `PASS`.
 
-**Exit criteria:** `testing-hub doctor --check uat` passes. At least one sign-off has been made in a real test pass, and the `uat-log.jsonl` entry is committed to git. The sign-off definition is written in `execution-log.md`.
+**Exit criteria:** `testnux doctor --check uat` passes. At least one sign-off has been made in a real test pass, and the `uat-log.jsonl` entry is committed to git. The sign-off definition is written in `execution-log.md`.
 
 ---
 
@@ -139,13 +139,13 @@ Answer these questions before your first real UAT cycle:
 
 **What this is:** Showing your first generated SCA (Security Control Assessment) to a qualified external auditor and getting their verbal or written confirmation that the artifact structure and content meet the bar for their engagement. This is not a full audit — it is a 30-minute Zoom where you share your screen and they tell you whether the format works for them.
 
-**Why it's non-negotiable:** Testing Hub generates SCA artifacts that follow the 8-section structure (Executive Summary → Methodology → Per-Control Inventory → Standards Alignment → Threat Coverage → Declined-by-Design → Open Items → Sign-Off). That structure is based on real SOC 2 / NYDFS / ISO 27001 engagements. But every auditor and audit firm has preferences for how evidence is formatted. Without validation, you may spend six months producing artifacts that your specific auditor won't accept in their specific form.
+**Why it's non-negotiable:** TestNUX generates SCA artifacts that follow the 8-section structure (Executive Summary → Methodology → Per-Control Inventory → Standards Alignment → Threat Coverage → Declined-by-Design → Open Items → Sign-Off). That structure is based on real SOC 2 / NYDFS / ISO 27001 engagements. But every auditor and audit firm has preferences for how evidence is formatted. Without validation, you may spend six months producing artifacts that your specific auditor won't accept in their specific form.
 
 **Thirty minutes now saves weeks later.** The most common failure mode: a team spends a sprint producing beautiful HTML reports and RTM matrices, only to find out their auditor wants everything in a GRC platform (Vanta, Drata) and doesn't accept markdown-native artifacts. Find this out before you're three sprints deep.
 
 **Steps:**
 
-1. **Generate your first SCA.** Run `testing-hub sca generate <folder>` against your first completed test pass. The output is a `login-sca-v0.1.md` (or similar) in your testing-log folder. Also open the reference example at `examples/demo-dashboard/output/login-sca-v0.1.md` — you can share this as a preview even before your first real SCA is ready.
+1. **Generate your first SCA.** Run `testnux sca generate <folder>` against your first completed test pass. The output is a `login-sca-v0.1.md` (or similar) in your testing-log folder. Also open the reference example at `examples/demo-dashboard/output/login-sca-v0.1.md` — you can share this as a preview even before your first real SCA is ready.
 
 2. **Identify who to ask.** In order of preference:
    - **Your existing auditor** — if you already have a SOC 2 / HIPAA / NYDFS engagement, ask the examiner directly. They'll tell you in one email whether the format works.
@@ -158,7 +158,7 @@ Answer these questions before your first real UAT cycle:
    >
    > Hi [Name],  
    >
-   > We're using an OSS tool called Testing Hub to generate structured test evidence packages (HTML reports, RTM, SCA) for our [SOC 2 / NYDFS / ISO 27001] audit. Before we generate a full engagement's worth of artifacts, we'd like 30 minutes to show you the format and confirm it meets your bar.  
+   > We're using an OSS tool called TestNUX to generate structured test evidence packages (HTML reports, RTM, SCA) for our [SOC 2 / NYDFS / ISO 27001] audit. Before we generate a full engagement's worth of artifacts, we'd like 30 minutes to show you the format and confirm it meets your bar.  
    >
    > I can share a sample SCA and HTML report in advance. Does [date/time] work?  
    >
@@ -169,13 +169,13 @@ Answer these questions before your first real UAT cycle:
 
 5. **Document the outcome.** If the auditor says it works, get that in writing — even an email confirmation is enough. Add a note to `requirements/TRACEABILITY.md` or a dedicated `requirements/AUDITOR_VALIDATION.md`: "Artifact format validated by [Firm, Name, Date]. Verbatim: '[quote from their email or Zoom notes].'" This quote is evidence you can use in future engagements with the same firm.
 
-6. **If they flag issues:** Testing Hub's artifact structure is configurable. Most issues are fixable by adjusting section ordering, adding a cover page, or changing the standards-alignment table format. Raise a GitHub issue with the specific ask — if it's a common request, it will be addressed in v0.2.
+6. **If they flag issues:** TestNUX's artifact structure is configurable. Most issues are fixable by adjusting section ordering, adding a cover page, or changing the standards-alignment table format. Raise a GitHub issue with the specific ask — if it's a common request, it will be addressed in v0.2.
 
 **What "validated" means:** You have a written or recorded statement from a qualified auditor at a named firm saying that the artifact structure is acceptable for a [framework] engagement. It does not mean the artifacts pass the audit — it means the format passes the auditor's intake check.
 
 **Time estimate:** 30 minutes of auditor time. 2–4 weeks of calendar time to schedule the call (auditors are busy; send the email early). 1–2 hours of your time to generate the sample SCA and prep for the call.
 
-**Exit criteria:** You have a written confirmation from an external auditor that the Testing Hub artifact format meets their requirements for your target framework. This confirmation is committed to your repo or your GRC platform.
+**Exit criteria:** You have a written confirmation from an external auditor that the TestNUX artifact format meets their requirements for your target framework. This confirmation is committed to your repo or your GRC platform.
 
 ---
 
@@ -220,18 +220,18 @@ See **[docs/premium.md](docs/premium.md)** for the full offering: hosted runs, a
 
 ## How Claude (and other AIs) should read this checklist
 
-If you're a Claude or other AI agent helping a user adopt Testing Hub, follow this sequence:
+If you're a Claude or other AI agent helping a user adopt TestNUX, follow this sequence:
 
-1. **Run `testing-hub doctor` first.** This flags missing prereqs (Node version, Playwright, UAT_SECRET, env vars). Fix anything red before continuing.
+1. **Run `testnux doctor` first.** This flags missing prereqs (Node version, Playwright, UAT_SECRET, env vars). Fix anything red before continuing.
 
-2. **Walk the user through Task 1 (R-ID origination) interactively.** Ask the user to point at their existing requirements doc — a PRD, a BRD, Jira backlog export, or even a product brief. Parse it and propose R-IDs in the Testing Hub format. Present them one at a time and ask the user to confirm, reject, or rephrase each one before writing to `requirements/REQUIREMENTS.md`. Do not batch-write without confirmation.
+2. **Walk the user through Task 1 (R-ID origination) interactively.** Ask the user to point at their existing requirements doc — a PRD, a BRD, Jira backlog export, or even a product brief. Parse it and propose R-IDs in the TestNUX format. Present them one at a time and ask the user to confirm, reject, or rephrase each one before writing to `requirements/REQUIREMENTS.md`. Do not batch-write without confirmation.
 
 3. **For Task 2 (status discipline), output a 1-page status-taxonomy cheat sheet** for the team to reference. Use the table from this document. Format it as clean markdown the team can paste into their wiki or Notion. Do not skip this — the biggest adoption failure is teams who set up the CLI but never adopt the taxonomy.
 
-4. **For Task 3 (UAT_SECRET), use `testing-hub doctor --check uat`** to validate setup. If the check fails, walk the user through the `openssl rand -base64 32` step and the environment variable setup. Do not proceed to UAT sign-off until the check passes.
+4. **For Task 3 (UAT_SECRET), use `testnux doctor --check uat`** to validate setup. If the check fails, walk the user through the `openssl rand -base64 32` step and the environment variable setup. Do not proceed to UAT sign-off until the check passes.
 
 5. **For Task 4 (auditor validation), draft the 30-minute Zoom request email** using the template in this document. Populate the user's name, target framework (SOC 2, NYDFS, ISO 27001, etc.), and suggested time slots. Ask the user to review and send — do not send on their behalf.
 
 6. **Sequence check:** If the user skips Task 1 and jumps to running reports, flag it. An RTM with no R-IDs is an empty RTM. If the user skips Task 3, flag it. A UAT sign-off without HMAC is a spreadsheet dropdown. If the user skips Task 4, warn them: "you may produce correct artifacts in an unacceptable format." Don't let users treat the CLI as a shortcut past the discipline.
 
-If you skip any of the 4 tasks, the user will end up with the same inconsistency they had before — just hidden inside Testing Hub's CLI output. A well-formatted empty RTM is worse than no RTM, because it looks done. Don't let that happen.
+If you skip any of the 4 tasks, the user will end up with the same inconsistency they had before — just hidden inside TestNUX's CLI output. A well-formatted empty RTM is worse than no RTM, because it looks done. Don't let that happen.

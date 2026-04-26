@@ -4,14 +4,14 @@
 /**
  * src/commands/env.mjs
  *
- * Implements `testing-hub env` — per-environment test passes.
+ * Implements `testnux env` — per-environment test passes.
  *
  * Sub-commands:
- *   testing-hub run <slug> --env staging|prod|local
+ *   testnux run <slug> --env staging|prod|local
  *     Wraps the existing `init` scaffold with an env suffix:
  *     creates testing-log/<date>_<slug>_<env>/ instead of <date>_<slug>/
  *
- *   testing-hub compare <slug> <env-a> <env-b>
+ *   testnux compare <slug> <env-a> <env-b>
  *     Diffs TC results between two env passes for the same slug.
  *     Outputs a markdown table: TC-ID | env-a status | env-b status | delta
  *
@@ -34,7 +34,7 @@ const VALID_ENVS = ['local', 'staging', 'prod'];
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
- * Scaffold a per-environment test pass (wraps `testing-hub init`).
+ * Scaffold a per-environment test pass (wraps `testnux init`).
  *
  * @param {string} slug   - page/feature slug (kebab-case)
  * @param {object} opts   - { env: string, industry?: string, outDir?: string, json?: boolean }
@@ -63,7 +63,7 @@ export async function runEnvRun(slug, opts = {}) {
     console.log('');
     console.log(`[env run] Test pass ready for environment: ${env.toUpperCase()}`);
     console.log('  Tip: after running tests, compare environments with:');
-    console.log(`  testing-hub compare ${slug} staging prod`);
+    console.log(`  testnux compare ${slug} staging prod`);
   }
 }
 
@@ -95,14 +95,14 @@ export async function runEnvCompare(slug, envA, envB, opts = {}) {
     const msg = `No test-pass folder found for slug="${slug}" env="${envA}" under ${rootDir}`;
     log(json, { event: 'env.compare.error', error: msg });
     if (!json) console.log(`[env compare] ${msg}`);
-    if (!json) console.log(`  Run: testing-hub run ${slug} --env ${envA}`);
+    if (!json) console.log(`  Run: testnux run ${slug} --env ${envA}`);
     return;
   }
   if (!folderB) {
     const msg = `No test-pass folder found for slug="${slug}" env="${envB}" under ${rootDir}`;
     log(json, { event: 'env.compare.error', error: msg });
     if (!json) console.log(`[env compare] ${msg}`);
-    if (!json) console.log(`  Run: testing-hub run ${slug} --env ${envB}`);
+    if (!json) console.log(`  Run: testnux run ${slug} --env ${envB}`);
     return;
   }
 

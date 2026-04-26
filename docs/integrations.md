@@ -4,14 +4,14 @@
 
 ## v0.1 — Standalone CLI
 
-Testing Hub v0.1 is a standalone Node.js CLI. It has no runtime dependencies on Claude Code, gstack, or any AI service for its core `init`, `report`, `validate`, `demo`, and `doctor` commands.
+TestNUX v0.1 is a standalone Node.js CLI. It has no runtime dependencies on Claude Code, gstack, or any AI service for its core `init`, `report`, `validate`, `demo`, and `doctor` commands.
 
 **Install:**
 
 ```bash
-npm install -g testing-hub@next
+npm install -g testnux@next
 # or without global install:
-npx testing-hub <command>
+npx testnux <command>
 ```
 
 **Requirements:** Node.js 20+, Playwright chromium (auto-installed on first `demo` or `doctor --fix`).
@@ -37,10 +37,10 @@ LLM integration details:
 
 ### v0.3 — gstack skill bundle
 
-v0.3 ships `/testing-hub` as a first-class gstack skill. The skill wraps the standalone CLI and adds:
+v0.3 ships `/testnux` as a first-class gstack skill. The skill wraps the standalone CLI and adds:
 
-- Browser-coupled discovery (`testing-hub discover` via `claude-in-chrome` MCP)
-- Multi-agent batch plan generation (`testing-hub batch-plan`)
+- Browser-coupled discovery (`testnux discover` via `claude-in-chrome` MCP)
+- Multi-agent batch plan generation (`testnux batch-plan`)
 - Design-review and QA enrichment loops
 
 The standalone CLI remains the primary distribution path. gstack is an optional integration for teams already using gstack.
@@ -48,13 +48,13 @@ The standalone CLI remains the primary distribution path. gstack is an optional 
 Install (once gstack integration ships):
 
 ```
-/testing-hub init login --industry general
-/testing-hub report login
+/testnux init login --industry general
+/testnux report login
 ```
 
 ### v0.3 — MCP server for Claude Code
 
-v0.3 also ships an MCP (Model Context Protocol) server that exposes Testing Hub as a tool in Claude Code. This enables inline test-plan generation, report access, and RTM queries without leaving the editor.
+v0.3 also ships an MCP (Model Context Protocol) server that exposes TestNUX as a tool in Claude Code. This enables inline test-plan generation, report access, and RTM queries without leaving the editor.
 
 Server entry point: `integrations/claude-code-mcp/server.mjs`
 
@@ -64,9 +64,9 @@ Usage (once shipped):
 // .claude/settings.json
 {
   "mcpServers": {
-    "testing-hub": {
+    "testnux": {
       "command": "node",
-      "args": ["./node_modules/testing-hub/integrations/claude-code-mcp/server.mjs"]
+      "args": ["./node_modules/testnux/integrations/claude-code-mcp/server.mjs"]
     }
   }
 }
@@ -76,7 +76,7 @@ Usage (once shipped):
 
 ## GRC platform compatibility
 
-Testing Hub produces artefacts that import into common GRC platforms. No native integrations exist at v0.1; these are manual exports:
+TestNUX produces artefacts that import into common GRC platforms. No native integrations exist at v0.1; these are manual exports:
 
 | Platform | Import method | Artefact |
 |----------|--------------|---------|
@@ -91,4 +91,4 @@ v0.2's OSCAL JSON output enables native import into any FedRAMP-compliant GRC pl
 
 ## Questions?
 
-Open a GitHub Discussion on the `testing-hub` repo. Tag it `integrations` for routing.
+Open a GitHub Discussion on the `testnux` repo. Tag it `integrations` for routing.

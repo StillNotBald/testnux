@@ -1,7 +1,7 @@
-# Self-test pass: testing-hub v0.0.1 dogfooded against itself
+# Self-test pass: testnux v0.0.1 dogfooded against itself
 
 **Date:** 2026-04-26
-**Test target:** testing-hub repo's own CLI commands — smoke tests against `bin/testing-hub.mjs`
+**Test target:** testnux repo's own CLI commands — smoke tests against `bin/testnux.mjs`
 **Industry:** general
 **Status:** IN-PROGRESS (execution pending; plan is complete)
 
@@ -9,11 +9,11 @@
 
 ## What this is
 
-Testing Hub's own discipline applied to Testing Hub itself. The same folder structure,
+TestNUX's own discipline applied to TestNUX itself. The same folder structure,
 frontmatter schema, and TC format that a user would produce when testing their own codebase
-is used here to test the `testing-hub` CLI.
+is used here to test the `testnux` CLI.
 
-This is the proof that the discipline is applicable to testing-hub itself and that the
+This is the proof that the discipline is applicable to testnux itself and that the
 artifacts produced are the same shape a user would produce against their own codebase.
 
 ---

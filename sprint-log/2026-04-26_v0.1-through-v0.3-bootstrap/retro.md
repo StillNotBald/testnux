@@ -18,12 +18,12 @@
 
 ## What to improve
 
-- No unit tests written in this sprint; testing-hub tests itself via the self-test pass
+- No unit tests written in this sprint; testnux tests itself via the self-test pass
   (testing-log/2026-04-26_self-test/) but src/ has zero Jest coverage at v0.0.1 — high
   priority for v0.1 release
 - The OSCAL library (src/lib/oscal.mjs) is fully implemented but the CLI command
   (sca oscal) is a stub; the wiring should have landed in the same sprint
-- requirements/ folder for testing-hub itself does not exist yet — the self-test plan
+- requirements/ folder for testnux itself does not exist yet — the self-test plan
   references R-IDs that are defined only in SPRINT_SUMMARY.md, not in a canonical
   REQUIREMENTS.md. Must be fixed before v0.1 launch.
 
@@ -38,7 +38,7 @@
 
 ## Next sprint priorities
 
-1. Write requirements/REQUIREMENTS.md for testing-hub itself (so R-IDs used in testing
+1. Write requirements/REQUIREMENTS.md for testnux itself (so R-IDs used in testing
    are canonical, not just narrative)
 2. Add Jest unit tests for src/lib/{parser, graph, oscal, uat-log}.mjs
 3. Implement `sca oscal` command wiring (lib is ready; command just needs I/O plumbing)

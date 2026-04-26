@@ -2,12 +2,12 @@
 # Copyright (c) 2026 Chu Ling
 # SPDX-License-Identifier: Apache-2.0
 #
-# integrations/gstack/testing-hub/install.sh
+# integrations/gstack/testnux/install.sh
 #
-# Install the testing-hub gstack skill into the user's gstack skills directory.
+# Install the testnux gstack skill into the user's gstack skills directory.
 #
 # Usage:
-#   bash integrations/gstack/testing-hub/install.sh
+#   bash integrations/gstack/testnux/install.sh
 #
 # What it does:
 #   1. Detects the gstack skills directory (~/.claude/skills/gstack/ by default)
@@ -18,7 +18,7 @@ set -euo pipefail
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-SKILL_NAME="testing-hub"
+SKILL_NAME="testnux"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_SOURCE_DIR="$SCRIPT_DIR"
 
@@ -69,7 +69,7 @@ fi
 INSTALL_TARGET="$GSTACK_DIR/$SKILL_NAME"
 
 echo ""
-echo "testing-hub gstack skill installer"
+echo "testnux gstack skill installer"
 echo "-----------------------------------"
 echo "  Source : $SKILL_SOURCE_DIR"
 echo "  Target : $INSTALL_TARGET"
@@ -126,7 +126,7 @@ fi
 if [ -n "$LIST_BIN" ]; then
   echo ""
   echo "Installed skills (gstack-list-skills):"
-  "$LIST_BIN" 2>/dev/null | grep -E "(testing-hub|$)" || echo "  (could not list skills)"
+  "$LIST_BIN" 2>/dev/null | grep -E "(testnux|$)" || echo "  (could not list skills)"
 fi
 
 # ── Success ───────────────────────────────────────────────────────────────────
@@ -138,9 +138,9 @@ echo "  Method : $INSTALL_METHOD"
 echo "  Skill  : /$SKILL_NAME"
 echo ""
 echo "Usage in Claude Code:"
-echo "  /testing-hub init login --industry general"
-echo "  /testing-hub report testing-log/2026-04-26_login"
-echo "  /testing-hub doctor"
+echo "  /testnux init login --industry general"
+echo "  /testnux report testing-log/2026-04-26_login"
+echo "  /testnux doctor"
 echo ""
 echo "If the skill does not appear, restart Claude Code to pick up new skills."
 echo ""

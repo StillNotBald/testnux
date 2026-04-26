@@ -4,16 +4,16 @@
 /**
  * src/commands/sign.mjs
  *
- * Implements `testing-hub sign` — stakeholder sign-off with e-signature.
+ * Implements `testnux sign` — stakeholder sign-off with e-signature.
  *
  * Usage:
- *   testing-hub sign <surface>
+ *   testnux sign <surface>
  *     Interactive prompt: reviewer name, role, TC-ID, status, justification.
  *     Computes HMAC-SHA256 signature using UAT_SECRET env var.
  *     Appends entry to <surface>/uat-log.jsonl (hash-chained).
  *     Writes sign-off record into requirements/validations/<surface>/.
  *
- *   testing-hub sign <surface> --reject <TC-ID>
+ *   testnux sign <surface> --reject <TC-ID>
  *     Batch-reject a specific TC-ID (still prompts for name, role, justification).
  *
  * E-signature notice:
@@ -54,7 +54,7 @@ export async function runSign(surface, opts = {}) {
   if (!fs.existsSync(surfaceDir)) {
     const err = new Error(
       `Surface folder not found: ${surfaceDir}\n` +
-      `  Run \`testing-hub init ${surface.replace(/^\d{4}-\d{2}-\d{2}_/, '')}\` first.`
+      `  Run \`testnux init ${surface.replace(/^\d{4}-\d{2}-\d{2}_/, '')}\` first.`
     );
     err.exitCode = 2;
     throw err;
@@ -166,7 +166,7 @@ async function promptReviewer({ rejectTcId } = {}) {
 function writeValidationRecord(validationsDir, entry, surface) {
   const recordFile = path.join(validationsDir, `sign-off.md`);
 
-  const HEADER_MARKER = '<!-- testing-hub: sign-off log -->';
+  const HEADER_MARKER = '<!-- testnux: sign-off log -->';
   const entryBlock = [
     '',
     `### ${entry.ts} — ${entry.tc_id}`,
@@ -194,7 +194,7 @@ function writeValidationRecord(validationsDir, entry, surface) {
       '',
       HEADER_MARKER,
       '',
-      '<!-- Entries appended by `testing-hub sign`. Do not hand-edit. -->',
+      '<!-- Entries appended by `testnux sign`. Do not hand-edit. -->',
       '',
     ].join('\n');
     fs.writeFileSync(recordFile, header, 'utf-8');

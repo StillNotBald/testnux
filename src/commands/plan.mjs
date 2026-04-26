@@ -1,10 +1,10 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
  * src/commands/plan.mjs
  *
- * Implements `testing-hub plan <slug>`.
+ * Implements `testnux plan <slug>`.
  *
  * v0.1 STUB — describes what the v0.2 LLM agent will do and guides the user
  * to the manual equivalent. No LLM calls are made.
@@ -13,7 +13,7 @@
  *   1. Locate <slug>-scenarios.md (or testing-log/<date>_<slug>/scenarios.md).
  *   2. Optionally: take a DOM snapshot of the live page (if --url provided).
  *   3. Send scenarios + DOM context to Claude with the prompt template below.
- *   4. Receive a fully structured test-plan.md following the Testing Hub schema.
+ *   4. Receive a fully structured test-plan.md following the TestNUX schema.
  *   5. Write to testing-log/<date>_<slug>/test-plan.md.
  *   6. All LLM-generated cells get [VERIFY] markers.
  *
@@ -25,7 +25,7 @@
  *
  * SYSTEM:
  *   You are a senior QA engineer who writes structured test plans for regulated
- *   web applications. Your output must conform exactly to the Testing Hub
+ *   web applications. Your output must conform exactly to the TestNUX
  *   test-plan.md schema (YAML frontmatter + markdown body). You write
  *   deterministically: same input → same structure every time.
  *   You never invent requirements. If you cannot map a scenario to an R-ID,
@@ -45,7 +45,7 @@
  *   DOM context (optional — omit if not captured):
  *   {{dom_snapshot_or_NONE}}
  *
- *   TASK: Convert the scenarios above into a Testing Hub test-plan.md.
+ *   TASK: Convert the scenarios above into a TestNUX test-plan.md.
  *
  *   OUTPUT REQUIREMENTS:
  *
@@ -134,17 +134,17 @@ export async function runPlan(slug, opts = {}) {
 
   if (!json) {
     console.log('');
-    console.log('  testing-hub plan — v0.1 stub');
+    console.log('  testnux plan — v0.1 stub');
     console.log('  ─────────────────────────────────────────────────────────');
     console.log(`  Slug     : ${slug}`);
     console.log(`  Industry : ${industry}`);
     if (url) console.log(`  URL      : ${url}`);
     console.log('');
     console.log('  In v0.2, this command will:');
-    console.log('    1. Read scenarios.md (produced by `testing-hub discover`).');
+    console.log('    1. Read scenarios.md (produced by `testnux discover`).');
     console.log('    2. Optionally capture a live DOM snapshot if --url is provided.');
     console.log('    3. Send scenarios + DOM context to Claude with a structured');
-    console.log('       prompt that enforces the Testing Hub test-plan.md schema.');
+    console.log('       prompt that enforces the TestNUX test-plan.md schema.');
     console.log('    4. Write testing-log/<date>_<slug>/test-plan.md with:');
     console.log('       - YAML frontmatter (slug, r_ids, tc_prefix, standards)');
     console.log('       - One section per TC with steps, evidence checklist');
@@ -156,15 +156,15 @@ export async function runPlan(slug, opts = {}) {
       console.log(`  Found scenarios file: ${scenariosFile}`);
       console.log('');
       console.log('  For now, run:');
-      console.log(`    testing-hub init ${slug}`);
+      console.log(`    testnux init ${slug}`);
       console.log('    # then manually populate test-plan.md from your scenarios');
     } else {
       console.log(`  No scenarios file found for slug "${slug}".`);
       console.log('');
       console.log('  Suggested workflow:');
-      console.log(`    1. testing-hub discover <url>   # creates ${slug}-scenarios.md`);
+      console.log(`    1. testnux discover <url>   # creates ${slug}-scenarios.md`);
       console.log(`    2. Fill in the scenarios template manually`);
-      console.log(`    3. testing-hub init ${slug}     # scaffolds test-plan.md`);
+      console.log(`    3. testnux init ${slug}     # scaffolds test-plan.md`);
       console.log(`    4. Populate test-plan.md from your scenarios`);
     }
 

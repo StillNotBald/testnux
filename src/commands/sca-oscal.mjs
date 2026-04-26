@@ -1,19 +1,19 @@
-// Copyright (c) 2026 Testing Hub Contributors
+// Copyright (c) 2026 TestNUX Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 /**
  * src/commands/sca-oscal.mjs
  *
- * Implements `testing-hub sca oscal <surface>`.
+ * Implements `testnux sca oscal <surface>`.
  *
  * Reads the latest SCA markdown from requirements/validations/<surface>/v*.md,
  * parses it into a minimal SCA graph, emits an OSCAL 1.1.2 assessment-results
  * JSON document alongside the source file.
  *
  * Usage:
- *   testing-hub sca oscal login
- *   testing-hub sca oscal login --validate
- *   testing-hub sca oscal login --out ./my-output/
+ *   testnux sca oscal login
+ *   testnux sca oscal login --validate
+ *   testnux sca oscal login --out ./my-output/
  *
  * Flags:
  *   --validate    Run schema check on the emitted OSCAL JSON; exit 1 if invalid
@@ -185,7 +185,7 @@ export async function runScaOscal(surface, opts = {}) {
 // ── SCA Markdown Parser ──────────────────────────────────────────────────────
 
 /**
- * Parse a Testing Hub SCA markdown document into a minimal SCA object.
+ * Parse a TestNUX SCA markdown document into a minimal SCA object.
  *
  * Parsing strategy:
  *   - Frontmatter (gray-matter) → surface, version, published, signOff

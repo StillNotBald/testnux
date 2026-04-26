@@ -1,11 +1,11 @@
-# Testing Hub™
+# TestNUX™
 
 **Turn a page-route into an audit-ready evidence package — without touching a GUI.**
 
 ```
 markdown test plan + Playwright spec
         ↓
-testing-hub report
+testnux report
         ↓
 self-contained HTML + XLSX + RTM rows
 ```
@@ -16,7 +16,7 @@ No SaaS dependency. No CI lock-in. Output lives in your repo, versioned with you
 
 ## TL;DR
 
-Testing Hub is a CLI that generates auditor-ready test artifacts from markdown test plans and Playwright evidence. The pipeline is **deterministic first, AI-accelerated second** — the core `report` command needs no LLM and produces the same output every run.
+TestNUX is a CLI that generates auditor-ready test artifacts from markdown test plans and Playwright evidence. The pipeline is **deterministic first, AI-accelerated second** — the core `report` command needs no LLM and produces the same output every run.
 
 Target audience: regulated-fintech engineering leads and compliance leads who need evidence packages that survive SOC 2 / NYDFS / OWASP audits.
 
@@ -28,7 +28,7 @@ Target audience: regulated-fintech engineering leads and compliance leads who ne
 
 **Recommended (full stack):** Claude Max plan (~$200/mo) for v0.2 LLM agents, gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows.
 
-See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testing-hub doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
+See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testnux doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
 
 ---
 
@@ -36,19 +36,19 @@ See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide incl
 
 ```bash
 # Scaffold a new test pass
-npx testing-hub init demo-login --industry general
+npx testnux init demo-login --industry general
 
-# Run Testing Hub's own demo (no setup required)
-npx testing-hub demo
+# Run TestNUX's own demo (no setup required)
+npx testnux demo
 
 # Check your environment
-npx testing-hub doctor
+npx testnux doctor
 
 # After filling test-plan.md and running your Playwright spec:
-npx testing-hub report demo-login
+npx testnux report demo-login
 
 # Validate a folder before reporting
-npx testing-hub validate demo-login
+npx testnux validate demo-login
 ```
 
 The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and opens both in your browser — then deletes the fixture. Fastest path to the "aha."
@@ -57,7 +57,7 @@ The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and 
 
 ## Adoption checklist
 
-Forking Testing Hub gives you the tooling. Getting consistent outcomes requires 4 must-do adoption tasks that the CLI cannot do for you: originating your R-IDs, adopting the status labeling discipline, setting up the UAT sign-off chain, and getting one auditor to validate your SCA shape.
+Forking TestNUX gives you the tooling. Getting consistent outcomes requires 4 must-do adoption tasks that the CLI cannot do for you: originating your R-IDs, adopting the status labeling discipline, setting up the UAT sign-off chain, and getting one auditor to validate your SCA shape.
 
 See **[docs/adoption-checklist.md](docs/adoption-checklist.md)** — includes time estimates, exit criteria, common mistakes, and a step-by-step guide for Claude/AI agents running the onboarding playbook.
 
@@ -71,9 +71,9 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 
 ---
 
-## How Testing Hub compares to alternatives
+## How TestNUX compares to alternatives
 
-|  | Testing Hub | Vanta / Drata / Secureframe | Comp AI / Delve |
+|  | TestNUX | Vanta / Drata / Secureframe | Comp AI / Delve |
 |---|---|---|---|
 | **Distribution** | OSS CLI (Apache 2.0); local-first | Hosted SaaS, per-seat | Hosted SaaS / OSS hybrid |
 | **Where evidence lives** | Your git repo (markdown + screenshots + OSCAL JSON) | Vendor's cloud (lock-in) | Vendor's cloud |
@@ -85,7 +85,7 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 | **Lock-in risk** | None (your data, your repo, exit anytime) | High (data lives in their DB) | Medium |
 | **Best fit** | Engineering-led teams that want git-native evidence + want to keep their auditor relationship | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
 
-**Where Testing Hub feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. Testing Hub is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick Testing Hub if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
+**Where TestNUX feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. TestNUX is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick TestNUX if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
 
 ---
 
@@ -93,11 +93,11 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 
 Most testing tools are **runtime-focused** — run tests, show results. They stop there.
 
-Regulators don't read Playwright output. They read structured evidence packages: per-TC screenshots, a traceability matrix from requirement to test result, a standards-alignment table. Building those by hand takes 4–8 hours per page. Testing Hub generates them in under 5 minutes from the same markdown and screenshot files your engineers already produce.
+Regulators don't read Playwright output. They read structured evidence packages: per-TC screenshots, a traceability matrix from requirement to test result, a standards-alignment table. Building those by hand takes 4–8 hours per page. TestNUX generates them in under 5 minutes from the same markdown and screenshot files your engineers already produce.
 
-The gap Testing Hub fills:
+The gap TestNUX fills:
 
-| What auditors ask for | Typical answer | Testing Hub answer |
+| What auditors ask for | Typical answer | TestNUX answer |
 |---|---|---|
 | "Show me test evidence for control IA-2" | Screenshot folder + spreadsheet pasted together | Per-TC evidence embedded in a self-contained HTML report, linked to R-XX |
 | "Which requirements does this test cover?" | Manually maintained spreadsheet | `TRACEABILITY.md` generated from plan frontmatter |
@@ -162,7 +162,7 @@ testing-log/
 | PLAN | Template-assisted | Human fills `test-plan.md` from scaffold |
 | CODIFY | Template-assisted | Human writes `spec.ts` from template pattern |
 | EXECUTE | Automated | Playwright + bundled `afterEach` evidence hook |
-| REPORT | Fully automated | `testing-hub report` |
+| REPORT | Fully automated | `testnux report` |
 | DOC | Template-assisted | Human updates RTM rows from scaffold |
 
 The LLM features in v0.2 (discover, plan, codify, doc agents) are not stubs — they're planned and scoped — but they are not the reason to adopt v0.1. The report generation is.
@@ -174,18 +174,18 @@ The LLM features in v0.2 (discover, plan, codify, doc agents) are not stubs — 
 v0.1 ships `--industry general` with OWASP ASVS + WCAG 2.2 AA. Every generated report includes a standards-alignment table mapping each TC to the applicable control.
 
 ```bash
-npx testing-hub init my-page --industry general
+npx testnux init my-page --industry general
 ```
 
 The standards config lives in `templates/industry/general.json`. You can drop a custom `standards.json` in any test-pass folder to override.
 
-v0.2 will add `fintech` (NIST 800-63B, NYDFS 23 NYCRR 500, PSD2, PCI DSS) and `healthcare` (HIPAA Security Rule, HITECH). v0.2 also emits OSCAL JSON alongside markdown, making Testing Hub compatible with FedRAMP RFC-0024 (mandatory machine-readable packages from September 2026) via IBM Trestle integration.
+v0.2 will add `fintech` (NIST 800-63B, NYDFS 23 NYCRR 500, PSD2, PCI DSS) and `healthcare` (HIPAA Security Rule, HITECH). v0.2 also emits OSCAL JSON alongside markdown, making TestNUX compatible with FedRAMP RFC-0024 (mandatory machine-readable packages from September 2026) via IBM Trestle integration.
 
 ---
 
 ## Demo
 
-The demo target is a prebuilt Next.js dashboard at `examples/demo-dashboard/`. It ships with sample output artifacts showing what Testing Hub produces:
+The demo target is a prebuilt Next.js dashboard at `examples/demo-dashboard/`. It ships with sample output artifacts showing what TestNUX produces:
 
 ```
 examples/demo-dashboard/
@@ -196,7 +196,7 @@ examples/demo-dashboard/
   screenshots/                  ← per-TC Playwright evidence screenshots
 ```
 
-Run `npx testing-hub demo` to generate and open these locally.
+Run `npx testnux demo` to generate and open these locally.
 
 **Live demo:** Browse the [sample execution report](./examples/demo-dashboard/output/login-execution-report.html) — a real 1300+ line self-contained HTML you can open offline. No SaaS dashboard required.
 
@@ -222,7 +222,7 @@ Note on AI-generated content: every LLM-generated cell in a report renders with 
 
 ## Three-track discipline (requirements / sprint-log / testing-log)
 
-Testing Hub is built around a git-native three-track structure:
+TestNUX is built around a git-native three-track structure:
 
 ```
 requirements/                    ← what you said you'd build
@@ -248,11 +248,11 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 ### v0.1 (current)
 
-- `testing-hub init <slug> [--industry general]` — scaffold test-pass folder
-- `testing-hub report <folder>` — generate XLSX + HTML from markdown inputs
-- `testing-hub validate <folder>` — lint test-plan.md against JSON Schema
-- `testing-hub demo` — run bundled demo-dashboard fixture, open output in browser
-- `testing-hub doctor` — preflight check (Node version, Playwright installed, env vars, common pitfalls)
+- `testnux init <slug> [--industry general]` — scaffold test-pass folder
+- `testnux report <folder>` — generate XLSX + HTML from markdown inputs
+- `testnux validate <folder>` — lint test-plan.md against JSON Schema
+- `testnux demo` — run bundled demo-dashboard fixture, open output in browser
+- `testnux doctor` — preflight check (Node version, Playwright installed, env vars, common pitfalls)
 - Templates: test-plan, spec, execution-log, standards-alignment table
 - OWASP ASVS + WCAG 2.2 AA standards alignment out of the box
 - `[VERIFY]` confidence markers on every LLM-generated cell
@@ -261,8 +261,8 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 ### v0.2 (Q3 2026 target; depends on traction + founder full-time decision)
 
 - OSCAL JSON export alongside markdown (Trestle integration; 1-day spike first)
-- RTM generator: `testing-hub rtm` — generates `TRACEABILITY.md` from requirements + sprint log + code grep
-- SCA generator: `testing-hub sca init|generate|pdf` — Security Control Assessment from test results
+- RTM generator: `testnux rtm` — generates `TRACEABILITY.md` from requirements + sprint log + code grep
+- SCA generator: `testnux sca init|generate|pdf` — Security Control Assessment from test results
 - LLM agents for PLAN, CODIFY, DOC phases (draft output, human review required)
 - `--industry fintech` and `--industry healthcare` standards configs
 - Eval harness for LLM-generated SCA output (5 held-out examples, scoring rubric, regression CI)
@@ -272,7 +272,7 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 - UAT sign-off layer: per-TC `uat_status` field, stakeholder HTML dropdown, HMAC e-signature, `uat-log.jsonl` audit trail
 - Business requirements (BR-XX) layer above R-XX, RTM grows a column
-- Per-environment test passes and cross-env diff: `testing-hub compare <slug> staging prod`
+- Per-environment test passes and cross-env diff: `testnux compare <slug> staging prod`
 - Visual regression mode: per-TC baseline screenshot + pixel-diff flagging
 - Cypress + Vitest adapter support
 
@@ -280,7 +280,7 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 ## FAQ
 
-**Does Testing Hub cost anything?**  
+**Does TestNUX cost anything?**  
 The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately $0.30–$0.50 per page for a full AI pass. Heavy multi-agent dispatch (8 parallel agents) can burn ~5 sessions of Claude Max quota per hour. See [docs/costs.md](docs/costs.md) for the full breakdown and recommended working patterns.
 
 OSS = self-serve via markdown docs. Premium tier (v0.4+) = white-glove onboarding + consulting + auditor facilitation. See [docs/adoption-checklist.md](docs/adoption-checklist.md) for what's included.
@@ -303,7 +303,7 @@ Quick version:
 
 ## Credits
 
-Testing Hub's three-track discipline, multi-agent dispatch workflow, and slash-command integration patterns derive directly from **gstack** (https://github.com/garrytan/gstack) by Garry Tan. gstack is the OSS solo-builder framework that Testing Hub's methodology is built on. Testing Hub adds a deterministic CLI artifact pipeline on top of gstack's structural and methodological foundations.
+TestNUX's three-track discipline, multi-agent dispatch workflow, and slash-command integration patterns derive directly from **gstack** (https://github.com/garrytan/gstack) by Garry Tan. gstack is the OSS solo-builder framework that TestNUX's methodology is built on. TestNUX adds a deterministic CLI artifact pipeline on top of gstack's structural and methodological foundations.
 
 Other credits: Playwright (evidence capture), IBM Trestle (OSCAL validation), NIST OSCAL (standards schema), Anthropic Claude (v0.2 LLM agents), Apache Software Foundation (license framework).
 
@@ -311,8 +311,68 @@ See [docs/credit.md](docs/credit.md) for the full attribution breakdown and cita
 
 ---
 
+## Contributing back to the ecosystem
+
+TestNUX exists because of two ecosystems we depend on. We want to feed both.
+
+### → gstack (the methodological foundation)
+
+[gstack](https://github.com/garrytan/gstack) by Garry Tan is the OSS framework
+TestNUX's discipline derives from. We're committed to upstreaming patterns that
+benefit gstack core, not just TestNUX:
+
+- **Marker convention for human-edits-survive-regeneration** — The
+  `<!-- testnux:row R-XX begin/end -->` pattern is gstack-shaped. We'd like
+  to propose a `gstack-marker` helper module in gstack core so other gstack
+  skills (e.g., `/plan-ceo-review`, `/design-review`) can reuse it.
+- **Per-test rate-limit isolation pattern** — The XFF approach in
+  `templates/spec.ts` (proven against production rate limiters) is universal
+  enough to land in gstack's `/qa` skill, not just TestNUX.
+- **Hash-chained sign-off log (HMAC-SHA256 + JSONL)** — `src/lib/uat-log.mjs`
+  could become a gstack utility for any skill that needs tamper-evident
+  attestation (e.g., `/ship` could sign release approvals).
+
+**If you're a gstack maintainer or contributor:** open an issue here
+referencing what you'd like to upstream — we'll co-write the PR.
+
+The gstack `/testnux` skill bundle ships in `integrations/gstack/testnux/` —
+ready for inclusion in the official gstack skill catalog.
+
+### → Anthropic / Claude Code native team
+
+TestNUX is designed to be Claude-Code-friendly from day one. Three integration
+points where we'd love collaboration with Anthropic:
+
+- **MCP server registration** — `integrations/claude-code-mcp/` ships a stdio
+  MCP server exposing TestNUX's commands as Claude Code tools. We'd like
+  TestNUX listed in the official Anthropic MCP server directory.
+- **Native skill catalog** — Once gstack's `/testnux` skill is upstream,
+  TestNUX commands become slash-command-callable in any Claude Code session.
+  An official cross-listing in Anthropic's skill marketplace (when it exists)
+  would amplify reach.
+- **Verified evidence chain pattern** — The `[VERIFY]` confidence marker
+  convention TestNUX uses for LLM-generated cells is generalizable to any
+  Claude-output workflow. We'd like to propose it as an Anthropic-blessed
+  pattern for AI-generated content in regulated contexts.
+
+**If you're at Anthropic** (Claude Code team, MCP team, applied AI
+engineering): reach out at `chu@stillnotbald.com`. We'd love a 30-min
+conversation about official integration paths. No expectations — just
+genuinely useful conversations.
+
+### → Everyone else
+
+Standard OSS contribution: see `CONTRIBUTING.md` for the DCO sign-off
+process. Issues + PRs welcome. First-time contributors: look for
+`good-first-issue` labels (we're seeding these as the project ages).
+
+The OSS gives users the SKILL. Co-developing the ecosystem is how the
+SKILL keeps getting sharper.
+
+---
+
 ## License and trademark
 
 Apache 2.0. See [LICENSE](LICENSE).
 
-"Testing Hub™" is a trademark of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.
+"TestNUX™" is a trademark of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.

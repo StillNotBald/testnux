@@ -1,8 +1,8 @@
 {
-  "$schema": "https://github.com/StillNotBald/testing-hub/schemas/industry-standards.schema.json",
+  "$schema": "https://github.com/StillNotBald/testnux/schemas/industry-standards.schema.json",
   "version": "1.0.0",
   "industry": "general",
-  "description": "General-purpose industry standards config. Bundles a curated subset of OWASP ASVS 4.0 and WCAG 2.2 AA controls relevant to web applications. Shipped in Testing Hub v0.1.",
+  "description": "General-purpose industry standards config. Bundles a curated subset of OWASP ASVS 4.0 and WCAG 2.2 AA controls relevant to web applications. Shipped in TestNUX v0.1.",
   "standards": [
     {
       "id": "ASVS-V2.1.1",

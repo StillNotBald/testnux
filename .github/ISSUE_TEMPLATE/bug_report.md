@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a problem with testing-hub
+about: Report a problem with testnux
 title: '[Bug] '
 labels: bug
 assignees: ''
@@ -24,7 +24,7 @@ assignees: ''
 
 | Field | Value |
 |---|---|
-| testing-hub version | <!-- e.g. 0.1.0 — run `testing-hub --version` --> |
+| testnux version | <!-- e.g. 0.1.0 — run `testnux --version` --> |
 | Node.js version | <!-- e.g. v20.12.0 — run `node --version` --> |
 | OS | <!-- e.g. macOS 14.4, Ubuntu 22.04, Windows 11 --> |
 

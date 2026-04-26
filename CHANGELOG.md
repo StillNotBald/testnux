@@ -21,5 +21,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial project scaffold: CLI entry point, command structure, templates, schemas, and docs.
 
-[Unreleased]: https://github.com/StillNotBald/testing-hub/compare/v0.0.1...HEAD
-[0.0.1]: https://github.com/StillNotBald/testing-hub/releases/tag/v0.0.1
+[Unreleased]: https://github.com/StillNotBald/testnux/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/StillNotBald/testnux/releases/tag/v0.0.1

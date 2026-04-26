@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - Node.js 20 or later (`node --version`)
-- Playwright browsers (installed by Testing Hub on first use)
+- Playwright browsers (installed by TestNUX on first use)
 - A terminal
 
 ---
@@ -16,19 +16,19 @@
 
 ```bash
 # Until v0.1.0 hits npm, install from source:
-git clone https://github.com/StillNotBald/testing-hub.git
-cd testing-hub
+git clone https://github.com/StillNotBald/testnux.git
+cd testnux
 npm install
-npm link    # makes `testing-hub` command available globally
-testing-hub --version    # verify
+npm link    # makes `testnux` command available globally
+testnux --version    # verify
 ```
 
-Once we publish v0.1.0 to npm (target: post-validation), this becomes `npm install -g testing-hub`.
+Once we publish v0.1.0 to npm (target: post-validation), this becomes `npm install -g testnux`.
 
-Expected output from `testing-hub --version`:
+Expected output from `testnux --version`:
 
 ```
-testing-hub 0.0.1
+testnux 0.0.1
 ```
 
 ---
@@ -36,13 +36,13 @@ testing-hub 0.0.1
 ## Step 2 — Preflight check
 
 ```bash
-testing-hub doctor
+testnux doctor
 ```
 
 Expected output:
 
 ```
-testing-hub doctor v0.1.0
+testnux doctor v0.1.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✔  Node 20.x detected
 ✔  Playwright chromium installed
@@ -62,13 +62,13 @@ If anything is red, `doctor` prints the exact fix command. Address warnings befo
 Before touching your own repo, run the bundled demo:
 
 ```bash
-testing-hub demo
+testnux demo
 ```
 
 Expected output:
 
 ```
-testing-hub demo v0.1.0
+testnux demo v0.1.0
 Downloading demo fixture... done (1.2 MB)
 Running demo-dashboard test pass...
   ✔ LOGIN-01  Valid credentials — PASS
@@ -85,7 +85,7 @@ Opening report in browser... done
 Cleaning up fixture... done
 ```
 
-You will see a self-contained HTML report with embedded screenshots, a standards-alignment table (OWASP ASVS + WCAG 2.2 AA), and a XLSX with Pass/Fail colour coding. That is the complete output Testing Hub produces for every page.
+You will see a self-contained HTML report with embedded screenshots, a standards-alignment table (OWASP ASVS + WCAG 2.2 AA), and a XLSX with Pass/Fail colour coding. That is the complete output TestNUX produces for every page.
 
 ---
 
@@ -95,13 +95,13 @@ Navigate to your repo root, then:
 
 ```bash
 cd path/to/your/repo
-testing-hub init my-first-pass --industry general
+testnux init my-first-pass --industry general
 ```
 
 Expected output:
 
 ```
-testing-hub init v0.1.0
+testnux init v0.1.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Scaffolding test pass: my-first-pass
   Industry: general (OWASP ASVS + WCAG 2.2 AA)
@@ -117,7 +117,7 @@ Next steps:
   1. Edit testing-log/my-first-pass/test-plan.md (~5 min)
   2. Write testing-log/my-first-pass/spec.ts using the template pattern
   3. Run your spec: npx playwright test testing-log/my-first-pass/spec.ts
-  4. Generate the report: testing-hub report my-first-pass
+  4. Generate the report: testnux report my-first-pass
 ```
 
 ---
@@ -163,13 +163,13 @@ Running against `npm run dev` causes hydration races that break form submits.
 ## Step 7 — Generate the report
 
 ```bash
-testing-hub report my-first-pass
+testnux report my-first-pass
 ```
 
 Expected output:
 
 ```
-testing-hub report v0.1.0
+testnux report v0.1.0
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Reading: testing-log/my-first-pass/test-plan.md
 Reading: testing-log/my-first-pass/execution-log.md
@@ -216,7 +216,7 @@ The HTML report is self-contained — one file, no external dependencies. Email 
 - **See a fully worked example** — the demo-dashboard login test plan at [examples/demo-dashboard/output/login-test-plan.md](../examples/demo-dashboard/output/login-test-plan.md) shows 15 real TCs with G/W/T and standards alignment
 - **See what a finished SCA looks like** — [examples/demo-dashboard/output/login-sca-v0.1.md](../examples/demo-dashboard/output/login-sca-v0.1.md) is the public reference artifact
 - **CLI reference** — [reference.md](reference.md) for full flag tables and exit codes
-- **Architecture** — [architecture/data-model.md](architecture/data-model.md) if you want to understand the data model before extending Testing Hub
+- **Architecture** — [architecture/data-model.md](architecture/data-model.md) if you want to understand the data model before extending TestNUX
 
 ---
 

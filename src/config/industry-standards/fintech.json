@@ -1,9 +1,9 @@
 {
   "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
-  "$schema": "https://github.com/StillNotBald/testing-hub/schemas/industry-standards.schema.json",
+  "$schema": "https://github.com/StillNotBald/testnux/schemas/industry-standards.schema.json",
   "version": "0.2.0",
   "industry": "fintech",
-  "description": "Fintech industry standards bundle. Covers NIST SP 800-63B Digital Identity, NYDFS 23 NYCRR 500, PCI DSS v4.0, FFIEC IT Handbook, PSD2 RTS on SCA, and OWASP ASVS 4.0 finance-relevant controls. Shipped in Testing Hub v0.2.",
+  "description": "Fintech industry standards bundle. Covers NIST SP 800-63B Digital Identity, NYDFS 23 NYCRR 500, PCI DSS v4.0, FFIEC IT Handbook, PSD2 RTS on SCA, and OWASP ASVS 4.0 finance-relevant controls. Shipped in TestNUX v0.2.",
   "standards": [
     {
       "id": "NIST-800-63B-5.1.1",

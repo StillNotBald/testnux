@@ -1,20 +1,20 @@
 # Roadmap
 
-> **Pacing reality:** Testing Hub is a side-project as of 2026-04-26. The 60-day decision date (2026-06-25) determines whether v0.2 ships in Q3 2026 (full-time pace) or Q4 2026 (sustainable side-project pace). Either way, v0.1 ships first; everything else flows from there.
+> **Pacing reality:** TestNUX is a side-project as of 2026-04-26. The 60-day decision date (2026-06-25) determines whether v0.2 ships in Q3 2026 (full-time pace) or Q4 2026 (sustainable side-project pace). Either way, v0.1 ships first; everything else flows from there.
 
 ---
 
 ## Guiding principle
 
-Testing Hub's scope follows the 8-step regulator-evidence chain:
+TestNUX's scope follows the 8-step regulator-evidence chain:
 
 ```
 1. Requirements (R-XX)           ← project owns
 2. Sprint log (build)            ← git owns
-3. Testing log (test plans + evidence + reports)   ← Testing Hub v0.1
-4. Traceability matrix (RTM)                       ← Testing Hub v0.2
-5. Security Control Assessments (SCA)              ← Testing Hub v0.2
-6. UAT sign-off layer (BR-XX + e-signature)        ← Testing Hub v0.3
+3. Testing log (test plans + evidence + reports)   ← TestNUX v0.1
+4. Traceability matrix (RTM)                       ← TestNUX v0.2
+5. Security Control Assessments (SCA)              ← TestNUX v0.2
+6. UAT sign-off layer (BR-XX + e-signature)        ← TestNUX v0.3
 7. External audit / pen test     ← vendor owns
 8. Production launch             ← deploy owns
 ```
@@ -33,11 +33,11 @@ The deterministic pipeline (markdown → HTML + XLSX) ships in v0.1 and does not
 
 | Feature | Description |
 |---------|-------------|
-| `testing-hub init` | Scaffold a test-pass folder with templates |
-| `testing-hub report` | Generate self-contained HTML + XLSX from markdown inputs |
-| `testing-hub validate` | Lint test-plan.md against JSON Schema; CI-safe exit codes |
-| `testing-hub demo` | Run bundled fixture, open report in browser, delete fixture — <90 seconds to first "aha" |
-| `testing-hub doctor` | Preflight check: Node version, Playwright, dev-vs-prod server detection, config discovery |
+| `testnux init` | Scaffold a test-pass folder with templates |
+| `testnux report` | Generate self-contained HTML + XLSX from markdown inputs |
+| `testnux validate` | Lint test-plan.md against JSON Schema; CI-safe exit codes |
+| `testnux demo` | Run bundled fixture, open report in browser, delete fixture — <90 seconds to first "aha" |
+| `testnux doctor` | Preflight check: Node version, Playwright, dev-vs-prod server detection, config discovery |
 | `--industry general` | OWASP ASVS 4.0 + WCAG 2.2 AA standards alignment out of the box |
 | `--plan-only` mode | Render a report without an execution log; "PLAN ONLY" badge in header |
 | `[VERIFY]` markers | Every LLM-generated cell renders with a `[VERIFY]` tag until human-attested |
@@ -64,21 +64,21 @@ The deterministic pipeline (markdown → HTML + XLSX) ships in v0.1 and does not
 
 ## v0.2 — Q3 2026 target (depends on traction + founder full-time decision per launch plan)
 
-**Theme:** LLM acceleration + RTM + SCA. Close the manual gaps; extend Testing Hub to steps 4 and 5 of the regulator-evidence chain.
+**Theme:** LLM acceleration + RTM + SCA. Close the manual gaps; extend TestNUX to steps 4 and 5 of the regulator-evidence chain.
 
 **New CLI verbs:**
 
 | Command | Description |
 |---------|-------------|
-| `testing-hub rtm` | Generate `requirements/TRACEABILITY.md` from REQUIREMENTS.md + sprint log + code grep |
-| `testing-hub sca init <surface>` | Scaffold a per-surface SCA from the 8-section template |
-| `testing-hub sca generate <surface>` | Auto-fill per-control evidence rows from current test results |
-| `testing-hub sca pdf <surface>` | Render latest SCA version to PDF (Chromium headless, no Pandoc required) |
-| `testing-hub discover <url>` | LLM agent browses the target page, emits draft scenarios.md |
-| `testing-hub plan <slug>` | LLM agent converts scenarios + DOM into test-plan.md |
-| `testing-hub codify <slug>` | LLM agent converts test-plan.md into spec.ts |
-| `testing-hub enrich <slug>` | LLM agent appends structural-context, a11y, and exploratory TCs to an existing plan |
-| `testing-hub batch-plan` | Parallel LLM agents for multi-page plan generation |
+| `testnux rtm` | Generate `requirements/TRACEABILITY.md` from REQUIREMENTS.md + sprint log + code grep |
+| `testnux sca init <surface>` | Scaffold a per-surface SCA from the 8-section template |
+| `testnux sca generate <surface>` | Auto-fill per-control evidence rows from current test results |
+| `testnux sca pdf <surface>` | Render latest SCA version to PDF (Chromium headless, no Pandoc required) |
+| `testnux discover <url>` | LLM agent browses the target page, emits draft scenarios.md |
+| `testnux plan <slug>` | LLM agent converts scenarios + DOM into test-plan.md |
+| `testnux codify <slug>` | LLM agent converts test-plan.md into spec.ts |
+| `testnux enrich <slug>` | LLM agent appends structural-context, a11y, and exploratory TCs to an existing plan |
+| `testnux batch-plan` | Parallel LLM agents for multi-page plan generation |
 
 **New features:**
 
@@ -100,7 +100,7 @@ Run the OSCAL feasibility spike (1 day). FedRAMP RFC-0024 mandates machine-reada
 
 ## v0.3 — Q4 2026 target if v0.2 + paying customers happen on schedule
 
-**Theme:** UAT layer, multi-industry, ecosystem integrations. Make Testing Hub CISO-buyable.
+**Theme:** UAT layer, multi-industry, ecosystem integrations. Make TestNUX CISO-buyable.
 
 **New features:**
 
@@ -108,19 +108,19 @@ Run the OSCAL feasibility spike (1 day). FedRAMP RFC-0024 mandates machine-reada
 |---------|-------------|
 | UAT sign-off workflow | Per-TC `uat_status` field (pending/accepted/rejected/needs-rework); stakeholder HTML dropdown; HMAC e-signature; `uat-log.jsonl` hash-chained audit trail |
 | Business requirements (BR-XX) | BR-XX layer above R-XX; RTM gains a column; HTML report gains a Business Requirements tab |
-| Per-environment test passes | `testing-hub run <slug> --env staging`; `testing-hub compare <slug> staging prod` cross-env diff |
+| Per-environment test passes | `testnux run <slug> --env staging`; `testnux compare <slug> staging prod` cross-env diff |
 | Visual regression | Per-TC baseline screenshots; pixel-diff flagging; `<TC-ID>-diff.png` alongside evidence |
 | Cypress + Vitest adapters | Adapter pattern for non-Playwright test runners; one test plan, three possible spec languages |
 | `--industry gov` | FedRAMP + FISMA + NIST 800-53 standards |
-| gstack skill bundle | `/testing-hub` as a first-class gstack skill; browser-coupled discovery via claude-in-chrome MCP |
-| MCP server for Claude Code | Testing Hub as a Claude Code tool; inline plan generation, RTM queries, report access |
+| gstack skill bundle | `/testnux` as a first-class gstack skill; browser-coupled discovery via claude-in-chrome MCP |
+| MCP server for Claude Code | TestNUX as a Claude Code tool; inline plan generation, RTM queries, report access |
 | `--industry edu` | FERPA + COPPA standards |
 
 ---
 
 ## What won't change
 
-Three things in Testing Hub's design are intentional and will be defended against well-meaning scope creep:
+Three things in TestNUX's design are intentional and will be defended against well-meaning scope creep:
 
 1. **The artifact format.** Markdown plan + Playwright spec + per-TC screenshot + self-contained HTML + XLSX is the product. It will not become "configurable output formats" or "flexible templates."
 
@@ -132,4 +132,4 @@ Three things in Testing Hub's design are intentional and will be defended agains
 
 ## Versioning policy
 
-Testing Hub follows semver. Breaking changes to the test-plan.md schema or the folder convention require a major version bump. Minor versions add features; patch versions fix bugs. The JSON Schema files are versioned independently and backward-compatible within a major version.
+TestNUX follows semver. Breaking changes to the test-plan.md schema or the folder convention require a major version bump. Minor versions add features; patch versions fix bugs. The JSON Schema files are versioned independently and backward-compatible within a major version.

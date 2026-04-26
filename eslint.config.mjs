@@ -4,7 +4,7 @@
 /**
  * eslint.config.mjs
  *
- * ESLint v9 flat config for testing-hub.
+ * ESLint v9 flat config for testnux.
  *
  * Rules:
  *   - ESM (type: "module" in package.json)
