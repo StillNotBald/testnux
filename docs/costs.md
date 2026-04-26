@@ -46,30 +46,48 @@ These are estimates with Sonnet-class models. Opus-class models cost ~3x more pe
 
 ## Claude Max session-burn rate (THE key metric)
 
-If you're using Claude Max (~$200/mo) instead of pay-per-use API, cost shows up as **rate limit consumption**, not dollars per call.
+If you're using Claude Max (subscription) instead of pay-per-use API, cost shows up as **rate-limit consumption** within a 5-hour session window, not dollars per call.
 
-**The critical number: heavy multi-agent dispatch (8 parallel agents) can burn approximately 5 sessions of Claude Max quota in a single hour.**
+### Recommended subscription + setup
 
-What that means in practice:
-
-| Dispatch pattern | Quota consumed per hour |
+| What | Recommendation |
 |---|---|
-| 1 agent at a time, sequential | ~0.5 sessions/hr |
-| 4 parallel agents | ~2.5 sessions/hr |
-| 8 parallel agents (full dispatch) | ~5 sessions/hr |
+| **Subscription tier** | **Claude Max 5x** (~$100/mo) — enough headroom for serious TestNUX usage; upgrade to 20x only if you regularly burn through 5x in under 1 hour |
+| **Primary model** | **Opus 4.7 with extra-high reasoning effort** — for plan/codify/SCA generation where quality matters more than speed |
+| **Subagent model** | **Sonnet** (latest) — for mechanical work the primary delegates (template substitution, parsing, file walks, lint checks). Extends quota by ~3-5x because subagents share the budget but cost much less per token. |
 
-**Claude Max rate limit resets approximately every 5 hours.** After hitting the limit:
+This pairing is the sweet spot: Opus for judgement, Sonnet for grunt work, both inside one Claude Code session.
 
-1. **Wait** — 5-hour cooldown and resume
-2. **Upgrade tier** — higher Claude Max tier has larger quota
-3. **Switch to pay-per-use** — Anthropic API keys have no rate limit, only a dollar cap you set
+### Realistic burn rate (empirical, from the bootstrap session)
 
-**Recommended working pattern:**
+**Expect to spend ~1–2 hours of focused work to consume the entire 5-hour session quota** when running heavy multi-agent dispatch with this setup.
 
-- Schedule heavy multi-agent dispatch (full-site codify runs, batch plan generation) at the start of a session when quota is fresh
-- Use `--max-spend <dollars>` on `batch-plan` to cap runaway costs before they happen
-- Spread 30-page site passes across multiple sessions/days rather than one marathon run
-- Use sequential mode (`--sequential`) for exploratory work to preserve quota for production runs
+What actually drives the burn:
+
+| Workload pattern | Time-to-quota-exhaustion in a 5h window |
+|---|---|
+| Single Opus thread, conversational coding | ~4–5 hours (full window) |
+| Opus + 2–3 Sonnet subagents in parallel | ~2–3 hours |
+| Opus + 5–8 Sonnet subagents (full multi-agent) | **~1–2 hours** ← what TestNUX bootstrap looked like |
+| Pure Opus parallel agents (no Sonnet delegation) | ~30–60 min (avoid this — burns Opus tokens fast) |
+
+The 5-hour window then resets. So plan two passes per day at most: one in the morning, one after the reset.
+
+### What to do when quota's exhausted
+
+1. **Wait for reset** (~5 hours from when window started) — best for solo founders; your "down time" is ideation, not coding
+2. **Upgrade to Claude Max 20x** — 4x the quota, ~$200/mo; only worth it if you consistently exhaust 5x with no waste
+3. **Switch to pay-per-use Anthropic API** — no rate limit, dollar-capped via `--max-spend`. Best for big batch runs (e.g., `testnux batch-plan` over 30 pages) where you want predictability. Estimate: $10–$40 for a full 30-page site pass.
+4. **Switch to a smaller model temporarily** — flip primary from Opus to Sonnet 4.6 for the rest of the session; quality drops slightly but quota lasts longer
+
+### Working pattern that respects the burn
+
+- **Plan the day in 5-hour blocks** — first block 9am–2pm, second 2pm–7pm. Each block ≤ 1 multi-agent run.
+- **Front-load the heavy dispatch** at the start of a fresh window — when quota is fresh, agents finish faster (less throttling)
+- **Use `--max-spend <dollars>` on `batch-plan`** to cap runaway costs before they happen
+- **Reserve sequential mode (`--sequential`)** for exploratory work — preserves quota for the production multi-agent run later
+- **Don't run two multi-agent dispatches back-to-back** in the same window — second one will hit the limit and crash mid-run
+- **Save the multi-agent dispatch for production work** (full-site codify, batch enrich, batch SCA generation), not exploration
 
 ---
 
@@ -140,5 +158,5 @@ At $0.50/page and 30 pages, you're spending $15 in API costs to save 60–180 ho
 | gstack | Free |
 | claude-in-chrome MCP | Free |
 | Claude API (v0.2 agents) | $0.30 – $0.50 per page |
-| Claude Max quota burn | ~5 sessions/hr at full 8-agent dispatch |
+| Claude Max quota burn | ~1-2 hours of focused work to exhaust 5-hour quota window (Opus 4.7 + Sonnet subagents at multi-agent dispatch) |
 | Hosted SaaS (v0.4+) | TBD, OSS always free |

@@ -49,7 +49,16 @@ const ALLOWED_STATUS = [
 ];
 
 const R_ID_RE = /^R-\d+$/;
+// Placeholder R-IDs that scaffolded templates ship with — meant to be
+// replaced by users with real R-IDs (R-01, R-42, etc). We treat these
+// as WARNINGS instead of ERRORS so `testnux init` → `testnux validate`
+// doesn't immediately fail before users have a chance to fill them in.
+// Pattern: R- followed by 1-3 uppercase letters (R-XX, R-YY, R-ZZ, R-ABC).
+const R_ID_PLACEHOLDER_RE = /^R-[A-Z]{1,3}$/;
 const TC_PREFIX_RE = /^[A-Z0-9-]{1,12}$/;
+// Same idea for tc_prefix — `MYPROJ-` style placeholders should warn,
+// not error, so users see actionable guidance.
+const TC_PREFIX_PLACEHOLDER_RE = /^(YOUR-PREFIX|MYPROJ|EXAMPLE|XX|YY|TBD)$/;
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
@@ -122,10 +131,22 @@ export async function runValidate(folder, opts = {}) {
 
     if (Array.isArray(fm.r_ids)) {
       for (const id of fm.r_ids) {
-        if (!R_ID_RE.test(id)) {
+        if (R_ID_RE.test(id)) {
+          // valid: R-01, R-42, R-101 etc.
+          continue;
+        }
+        if (R_ID_PLACEHOLDER_RE.test(id)) {
+          // Scaffolded placeholder (R-XX, R-YY, R-ZZ) — warn, don't error.
+          // User hasn't filled in real R-IDs yet, but the file structure
+          // is otherwise valid. Use --strict to fail on these.
+          fileFindings.warnings.push({
+            rule: 'r_ids.placeholder',
+            message: `Placeholder R-ID detected: "${id}". Replace with a real requirement ID (e.g. R-01) before final validation. Use --strict to treat as error.`,
+          });
+        } else {
           fileFindings.errors.push({
             rule: 'r_ids.format',
-            message: `Invalid R-ID format: "${id}". Expected /^R-\\d+$/ (e.g. R-42)`,
+            message: `Invalid R-ID format: "${id}". Expected /^R-\\d+$/ (e.g. R-42) or a recognized placeholder (R-XX/R-YY/R-ZZ).`,
           });
         }
       }
@@ -138,11 +159,22 @@ export async function runValidate(folder, opts = {}) {
 
     // ── tc_prefix format ───────────────────────────────────────────────────
 
-    if (fm.tc_prefix && !TC_PREFIX_RE.test(fm.tc_prefix)) {
-      fileFindings.errors.push({
-        rule: 'tc_prefix.format',
-        message: `Invalid tc_prefix "${fm.tc_prefix}". Expected /^[A-Z0-9-]{1,12}$/`,
-      });
+    if (fm.tc_prefix) {
+      if (TC_PREFIX_RE.test(fm.tc_prefix) && !TC_PREFIX_PLACEHOLDER_RE.test(fm.tc_prefix)) {
+        // valid + non-placeholder: e.g. LOGIN, REG, ADMIN-USER
+        // (no action)
+      } else if (TC_PREFIX_PLACEHOLDER_RE.test(fm.tc_prefix)) {
+        // Recognized placeholder — warn, don't error.
+        fileFindings.warnings.push({
+          rule: 'tc_prefix.placeholder',
+          message: `Placeholder tc_prefix detected: "${fm.tc_prefix}". Replace with your project's TC ID prefix (e.g. LOGIN, REG, CHECKOUT) before final validation.`,
+        });
+      } else {
+        fileFindings.errors.push({
+          rule: 'tc_prefix.format',
+          message: `Invalid tc_prefix "${fm.tc_prefix}". Expected /^[A-Z0-9-]{1,12}$/ (uppercase letters, digits, hyphens; max 12 chars).`,
+        });
+      }
     }
 
     // ── _review_required type ──────────────────────────────────────────────

@@ -3,7 +3,7 @@
 > The OSS gives you the SKILL. Premium gives you the SaaS, the service,
 > the assurance, and the relationships when you need them.
 
-Everything below is **planned v0.4+ and not yet built**. This document describes the intended offering so enterprise procurement leads, CISOs, and compliance teams can evaluate fit ahead of the launch window (Q3 2026 target). If you have requirements that aren't covered here, contact `chu@stillnotbald.com` — pre-launch input shapes the roadmap.
+Everything below is **planned v0.4+ and not yet built**. This document describes the intended offering so enterprise procurement leads, CISOs, and compliance teams can evaluate fit ahead of the launch window (Q3 2026 target). If you have requirements that aren't covered here, contact `ccling1998@gmail.com` — pre-launch input shapes the roadmap.
 
 ---
 
@@ -37,7 +37,7 @@ The following features are Apache 2.0 and will remain free and self-hostable, pe
 
 Pricing is TBD and will be finalized after OSS validation. Numbers above are indicative ranges.
 
-**Founder-rate pricing:** The first 3 customers in each tier receive 50% off year-one in exchange for being a named case study and reference customer. Contact `chu@stillnotbald.com` to get on the list.
+**Founder-rate pricing:** The first 3 customers in each tier receive 50% off year-one in exchange for being a named case study and reference customer. Contact `ccling1998@gmail.com` to get on the list.
 
 ---
 
@@ -141,7 +141,7 @@ The current OSS workflow for sharing evidence with auditors: export a PDF, email
 
 ## Enterprise needs?
 
-The features mid-market and large enterprises typically need (liability cover via insurance partner, WORM evidence retention, multi-region data residency, custom SLA, white-glove embedded consulting) are on the roadmap but NOT currently offered. If you're an enterprise compliance lead with specific needs, email `chu@stillnotbald.com` — we'll tell you honestly whether we can help today vs whether you should look at Vanta, Drata, or a GRC consultancy. The OSS is free and useful regardless.
+The features mid-market and large enterprises typically need (liability cover via insurance partner, WORM evidence retention, multi-region data residency, custom SLA, white-glove embedded consulting) are on the roadmap but NOT currently offered. If you're an enterprise compliance lead with specific needs, email `ccling1998@gmail.com` — we'll tell you honestly whether we can help today vs whether you should look at Vanta, Drata, or a GRC consultancy. The OSS is free and useful regardless.
 
 ---
 
@@ -261,7 +261,7 @@ These features are further out than the tier launch. Listed here for enterprise 
 | Team | Sales-assisted: intro Zoom + 14-day trial | once usage justifies it post-v0.1 |
 | Service add-ons | Statement of work; 2-week kickoff | Available now (limited capacity) |
 
-**Contact:** `chu@stillnotbald.com`
+**Contact:** `ccling1998@gmail.com`
 
 **Founder-rate pricing:** First 3 customers in each tier get 50% off year-one pricing in exchange for being the case study and reference customer. This is a genuine trade: we work closely with you, you let us write about the outcome. Contact early — first 3 is first 3.
 
@@ -306,4 +306,4 @@ We're solo-founded. Bandwidth is limited. We respond to every email, but we prio
 | **once usage justifies it** | Multi-region data residency + compliance content auto-update |
 | **once usage justifies it** | Marketplace v1: industry add-on packs + auditor partner program |
 
-Service add-ons (onboarding, training, quarterly review, advisory) are available now in limited capacity via `chu@stillnotbald.com`. These are delivered by the founder directly and do not depend on the SaaS launch.
+Service add-ons (onboarding, training, quarterly review, advisory) are available now in limited capacity via `ccling1998@gmail.com`. These are delivered by the founder directly and do not depend on the SaaS launch.

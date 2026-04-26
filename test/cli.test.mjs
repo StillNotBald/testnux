@@ -315,12 +315,55 @@ describe('report', () => {
   beforeEach(() => { tmp = makeTmp(); });
   afterEach(() => rimraf(tmp));
 
-  it('exits 0 with v0.1-stub message for any folder', () => {
+  it('exits 1 with helpful error when test-plan.md is missing', () => {
     const folderPath = path.join(tmp, 'report-test');
     fs.mkdirSync(folderPath);
-    const { status, stdout } = run(['report', folderPath]);
+    const { status, stderr, stdout } = run(['report', folderPath]);
+    expect(status).toBe(1);
+    expect((stderr + stdout)).toMatch(/test-plan\.md|not found|missing/i);
+  });
+});
+
+describe('report v0.2 real generator', () => {
+  let tmp;
+  beforeEach(() => { tmp = makeTmp(); });
+  afterEach(() => rimraf(tmp));
+
+  it('generates xlsx + html when test-plan.md is present', () => {
+    const folderPath = path.join(tmp, '2026-04-27_smoke');
+    fs.mkdirSync(folderPath, { recursive: true });
+    const planContent = `---
+slug: smoke
+title: Smoke Test Surface
+industry: general
+status: DRAFT
+r_ids: [R-01]
+tc_prefix: SMK
+standards: [OWASP ASVS 2.1.1]
+review_required: false
+---
+
+| TC-ID  | Title              | Priority | Status | R-ID |
+|--------|--------------------|----------|--------|------|
+| SMK-01 | Smoke happy path   | P0       | DRAFT  | R-01 |
+
+## SMK-01 — Smoke happy path
+
+**Preconditions**
+- App is reachable
+
+**Steps**
+1. Navigate to home
+
+**Expected Result**
+Home loads
+`;
+    fs.writeFileSync(path.join(folderPath, 'test-plan.md'), planContent, 'utf-8');
+    const { status } = run(['report', folderPath, '--plan-only']);
     expect(status).toBe(0);
-    expect(stdout).toMatch(/stub|v0\.1|pending|ported/i);
+    const files = fs.readdirSync(folderPath);
+    expect(files.some((f) => f.endsWith('.xlsx'))).toBe(true);
+    expect(files.some((f) => f.endsWith('.html'))).toBe(true);
   });
 });
 

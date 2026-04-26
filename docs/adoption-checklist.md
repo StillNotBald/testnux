@@ -214,7 +214,7 @@ If the 4 tasks above are blockers — no team capacity, no auditor relationship,
 
 See **[docs/premium.md](docs/premium.md)** for the full offering: hosted runs, auditor portal, liability cover, cryptographic notarization, WORM retention, GRC integrations, white-glove onboarding, training, quarterly review, and embedded consulting. The OSS is not a limited version of the paid product — it is the complete tool. Premium sells the hosted infrastructure, the assurance, and the human time that the CLI was never designed to provide.
 
-**Contact:** `chu@stillnotbald.com` — first 3 customers in each tier get founder-rate pricing.
+**Contact:** `ccling1998@gmail.com` — first 3 customers in each tier get founder-rate pricing.
 
 ---
 

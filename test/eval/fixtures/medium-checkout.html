@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Acme Shop</title>
+</head>
+<body>
+  <main>
+    <h1>Checkout</h1>
+
+    <form id="checkout-form" action="/orders" method="POST" novalidate>
+
+      <section aria-labelledby="shipping-heading">
+        <h2 id="shipping-heading">Shipping Address</h2>
+
+        <label for="full-name">Full name</label>
+        <input id="full-name" type="text" name="fullName" autocomplete="name"
+               placeholder="Jane Smith" required aria-describedby="full-name-error" />
+        <span id="full-name-error" role="alert" aria-live="polite"></span>
+
+        <label for="address-line1">Address line 1</label>
+        <input id="address-line1" type="text" name="addressLine1"
+               autocomplete="address-line1" placeholder="123 Main St"
+               required aria-describedby="address-line1-error" />
+        <span id="address-line1-error" role="alert" aria-live="polite"></span>
+
+        <label for="address-line2">Address line 2 (optional)</label>
+        <input id="address-line2" type="text" name="addressLine2"
+               autocomplete="address-line2" placeholder="Apt 4B" />
+
+        <label for="city">City</label>
+        <input id="city" type="text" name="city" autocomplete="address-level2"
+               required aria-describedby="city-error" />
+        <span id="city-error" role="alert" aria-live="polite"></span>
+
+        <label for="state">State / Province</label>
+        <select id="state" name="state" autocomplete="address-level1" required
+                aria-describedby="state-error">
+          <option value="">Select state</option>
+          <option value="CA">California</option>
+          <option value="NY">New York</option>
+          <option value="TX">Texas</option>
+          <option value="WA">Washington</option>
+        </select>
+        <span id="state-error" role="alert" aria-live="polite"></span>
+
+        <label for="postal-code">Postal code</label>
+        <input id="postal-code" type="text" name="postalCode"
+               autocomplete="postal-code" placeholder="12345"
+               pattern="[0-9]{5}(-[0-9]{4})?" required
+               aria-describedby="postal-code-error" />
+        <span id="postal-code-error" role="alert" aria-live="polite"></span>
+      </section>
+
+      <section aria-labelledby="payment-heading">
+        <h2 id="payment-heading">Payment Method</h2>
+
+        <fieldset>
+          <legend>Choose a payment method</legend>
+
+          <label>
+            <input type="radio" name="paymentMethod" value="card" checked />
+            Credit / Debit Card
+          </label>
+
+          <label>
+            <input type="radio" name="paymentMethod" value="paypal" />
+            PayPal
+          </label>
+
+          <label>
+            <input type="radio" name="paymentMethod" value="bank" />
+            Bank Transfer
+          </label>
+        </fieldset>
+      </section>
+
+      <section aria-labelledby="review-heading">
+        <h2 id="review-heading">Review &amp; Place Order</h2>
+
+        <label>
+          <input type="checkbox" name="agreeTerms" id="agree-terms" required
+                 aria-describedby="terms-error" />
+          I agree to the <a href="/terms" target="_blank">Terms of Service</a>
+          and <a href="/privacy" target="_blank">Privacy Policy</a>
+        </label>
+        <span id="terms-error" role="alert" aria-live="polite"></span>
+
+        <label>
+          <input type="checkbox" name="newsletter" id="newsletter" />
+          Send me news and promotions (optional)
+        </label>
+      </section>
+
+      <button type="submit" id="place-order-btn">Place Order</button>
+    </form>
+  </main>
+</body>
+</html>

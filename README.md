@@ -26,9 +26,35 @@ Target audience: regulated-fintech engineering leads and compliance leads who ne
 
 **Minimum (v0.1):** Node.js 20+, npm 10+, a git repo.
 
-**Recommended (full stack):** Claude Max plan (~$200/mo) for v0.2 LLM agents, gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows.
+**Recommended (full stack):** **Claude Max 5x (~$100/mo)** with **Opus 4.7 (extra-high effort)** as primary + **Sonnet** as subagent for v0.2 LLM agents. Plus gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows. Realistic burn: ~1-2 hours of focused work to consume the 5-hour quota window — see [docs/costs.md](docs/costs.md).
 
 See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testnux doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
+
+---
+
+## Install
+
+```bash
+npm install -g testnux
+testnux --version    # 0.1.0
+```
+
+Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/testnux). One-shot via `npx testnux <command>` works too — no install needed.
+
+---
+
+## What you get
+
+TestNUX produces a single self-contained HTML execution report:
+
+- 📋 Sticky TOC sidebar with anchor links to every TC
+- 🎯 Filter tabs: All / PASS / FAIL / BLOCKED / SKIPPED
+- 📊 Per-TC card: Given/When/Then, status badge, embedded screenshots, standards mapping
+- 🏛️ Banking-standards alignment matrix at the bottom
+- 🛡️ Threat coverage table (OWASP / NIST / WCAG)
+- 📈 Summary banner: total TCs, pass rate, P0 status
+
+Open `examples/demo-dashboard/output/login-execution-report.html` in your browser to see it live.
 
 ---
 
@@ -36,30 +62,22 @@ See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide incl
 
 ```bash
 # Scaffold a new test pass
-npx testnux init demo-login --industry general
+testnux init demo-login --industry general
 
 # Run TestNUX's own demo (no setup required)
-npx testnux demo
+testnux demo
 
 # Check your environment
-npx testnux doctor
+testnux doctor
 
 # After filling test-plan.md and running your Playwright spec:
-npx testnux report demo-login
+testnux report demo-login
 
 # Validate a folder before reporting
-npx testnux validate demo-login
+testnux validate demo-login
 ```
 
 The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and opens both in your browser — then deletes the fixture. Fastest path to the "aha."
-
----
-
-## Adoption checklist
-
-Forking TestNUX gives you the tooling. Getting consistent outcomes requires 4 must-do adoption tasks that the CLI cannot do for you: originating your R-IDs, adopting the status labeling discipline, setting up the UAT sign-off chain, and getting one auditor to validate your SCA shape.
-
-See **[docs/adoption-checklist.md](docs/adoption-checklist.md)** — includes time estimates, exit criteria, common mistakes, and a step-by-step guide for Claude/AI agents running the onboarding playbook.
 
 ---
 
@@ -67,7 +85,7 @@ See **[docs/adoption-checklist.md](docs/adoption-checklist.md)** — includes ti
 
 The CLI is free forever (Apache 2.0). The premium tier adds hosted infrastructure, a multi-tenant auditor portal, GRC platform integrations, and human services (white-glove onboarding, training, quarterly review, advisory). Enterprise-grade features (liability cover, cryptographic notarization, WORM evidence retention) are on the roadmap but not yet offered — see `docs/premium.md` for the honest status.
 
-See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing matrix, feature list, and what stays free forever. First 3 customers in each tier get founder-rate pricing — contact `chu@stillnotbald.com`.
+See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing matrix, feature list, and what stays free forever. First 3 customers in each tier get founder-rate pricing — contact `ccling1998@gmail.com`.
 
 ---
 
@@ -86,6 +104,12 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 | **Best fit** | Engineering-led teams that want git-native evidence + want to keep their auditor relationship | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
 
 **Where TestNUX feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. TestNUX is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick TestNUX if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
+
+---
+
+## Best practices (optional)
+
+If you want consistent outcomes across teams, see [docs/adoption-checklist.md](docs/adoption-checklist.md) for 4 must-do practices.
 
 ---
 
@@ -281,7 +305,7 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 ## FAQ
 
 **Does TestNUX cost anything?**  
-The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately $0.30–$0.50 per page for a full AI pass. Heavy multi-agent dispatch (8 parallel agents) can burn ~5 sessions of Claude Max quota per hour. See [docs/costs.md](docs/costs.md) for the full breakdown and recommended working patterns.
+The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately **$0.30–$0.50 per page** for a full AI pass (Sonnet-class). On a Claude Max subscription (recommended: **5x tier ~$100/mo** with Opus 4.7 + Sonnet subagents), heavy multi-agent dispatch consumes a fresh 5-hour quota window in **~1-2 hours of focused work**. Plan two 5-hour blocks per day max. See [docs/costs.md](docs/costs.md) for the empirical burn rates + recommended working patterns.
 
 OSS = self-serve via markdown docs. Premium tier (v0.4+) = white-glove onboarding + consulting + auditor facilitation. See [docs/adoption-checklist.md](docs/adoption-checklist.md) for what's included.
 
@@ -356,7 +380,7 @@ points where we'd love collaboration with Anthropic:
   pattern for AI-generated content in regulated contexts.
 
 **If you're at Anthropic** (Claude Code team, MCP team, applied AI
-engineering): reach out at `chu@stillnotbald.com`. We'd love a 30-min
+engineering): reach out at `ccling1998@gmail.com`. We'd love a 30-min
 conversation about official integration paths. No expectations — just
 genuinely useful conversations.
 
@@ -376,3 +400,11 @@ SKILL keeps getting sharper.
 Apache 2.0. See [LICENSE](LICENSE).
 
 "TestNUX™" is a trademark of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.
+
+---
+
+## Contact
+
+Single point of contact for all matters (security, premium, partnerships, contributions): **ccling1998@gmail.com**
+
+For security vulnerabilities, please use [GitHub Private Vulnerability Reporting](https://github.com/StillNotBald/testnux/security/advisories/new) (preferred — gives us a private collaboration channel + CVE assignment workflow). Email is the fallback.

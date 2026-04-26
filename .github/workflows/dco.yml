@@ -20,7 +20,12 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Skip DCO for dependabot[bot]
+        if: github.actor == 'dependabot[bot]'
+        run: echo "Skipping DCO — dependabot version-bump commits add no new IP and are exempt per project policy."
+
       - name: Verify Signed-off-by on every commit
+        if: github.actor != 'dependabot[bot]'
         # Inline DCO check — no external action dep (avoids supply-chain risk).
         # Walks every commit between PR base and head; fails if ANY commit
         # lacks a `Signed-off-by:` trailer matching the author's email.

@@ -1,6 +1,6 @@
 {
   "name": "testnux",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.1",
   "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence. OSS evidence-chain for regulated software (test plans → RTM → SCA).",
   "private": false,
   "license": "Apache-2.0",
@@ -67,11 +67,19 @@
     "sharp": "^0.33.4",
     "uuid": "^14.0.0"
   },
+  "optionalDependencies": {
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0"
+  },
   "peerDependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@playwright/test": "^1.40.0"
   },
   "peerDependenciesMeta": {
     "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@playwright/test": {
       "optional": true
     }
   },

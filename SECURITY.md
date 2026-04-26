@@ -28,7 +28,7 @@ This is the modern standard for OSS vulnerability reporting. It gives you:
 
 ### Option 2 — Email
 
-Send a report to **security@stillnotbald.com** with the subject line
+Send a report to **ccling1998@gmail.com** with the subject line
 `[testnux] Security Vulnerability`.
 
 ### What to include (either channel)

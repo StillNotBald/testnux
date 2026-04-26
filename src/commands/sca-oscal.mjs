@@ -35,26 +35,35 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { toOSCAL, validateOSCAL, OscalValidationError } from '../lib/oscal.mjs';
+import {
+  buildAssessmentLogExtension,
+  mergeAssessmentLog,
+  validateExtension,
+} from '../lib/oscal-signoff.mjs';
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * @param {string} surface  e.g. "login", "api-gateway"
  * @param {{
- *   validate: boolean,
- *   out:      string | undefined,
- *   dryRun:   boolean,
- *   json:     boolean,
- *   cwd:      string,
+ *   validate:       boolean,
+ *   out:            string | undefined,
+ *   dryRun:         boolean,
+ *   json:           boolean,
+ *   cwd:            string,
+ *   uatLogPath:     string | undefined,  // explicit path to uat-log.jsonl (S3)
+ *   skipAssessmentLog: boolean,          // skip uat-log merge even if file exists (S3)
  * }} opts
  */
 export async function runScaOscal(surface, opts = {}) {
   const {
-    validate = false,
-    out      = undefined,
-    dryRun   = false,
-    json     = false,
-    cwd      = process.cwd(),
+    validate           = false,
+    out                = undefined,
+    dryRun             = false,
+    json               = false,
+    cwd                = process.cwd(),
+    uatLogPath         = undefined,
+    skipAssessmentLog  = false,
   } = opts;
 
   validateSurface(surface);
@@ -114,6 +123,53 @@ export async function runScaOscal(surface, opts = {}) {
       throw err;
     }
     throw err;
+  }
+
+  // ── S3: Merge uat-log assessment-log entries ──────────────────────────────
+
+  if (!skipAssessmentLog) {
+    // Resolve uat-log path: explicit option → surface dir → scaDir
+    const resolvedUatLog = uatLogPath
+      ? path.resolve(uatLogPath)
+      : findUatLog(surface, scaDir, cwd);
+
+    if (resolvedUatLog && fs.existsSync(resolvedUatLog)) {
+      try {
+        const extension = buildAssessmentLogExtension(resolvedUatLog);
+        const extValidation = validateExtension(extension);
+        if (!extValidation.valid) {
+          if (!json) {
+            console.warn(
+              '  [sca-oscal] WARNING: uat-log extension has validation issues:\n' +
+              extValidation.errors.map((e) => `    ${e}`).join('\n')
+            );
+          }
+          log(json, { event: 'sca-oscal.assessment-log.warn', issues: extValidation.errors });
+        }
+        mergeAssessmentLog(oscalDoc, extension);
+        log(json, {
+          event:          'sca-oscal.assessment-log.merged',
+          uatLogPath:     resolvedUatLog,
+          logEntries:     extension.assessmentLog.entries.length,
+          parties:        extension.responsibleParties.length,
+          subjects:       extension.subjects.length,
+        });
+        if (!json) {
+          console.log(`  Assessment-log: merged ${extension.assessmentLog.entries.length} UAT entries from ${resolvedUatLog}`);
+        }
+      } catch (err) {
+        // Non-fatal: uat-log merge failure should not block OSCAL emit
+        if (!json) {
+          console.warn(`  [sca-oscal] WARNING: could not merge uat-log (${err.message}) — skipping assessment-log.`);
+        }
+        log(json, { event: 'sca-oscal.assessment-log.skip', reason: err.message });
+      }
+    } else {
+      log(json, { event: 'sca-oscal.assessment-log.skip', reason: 'no uat-log.jsonl found' });
+      if (!json && resolvedUatLog) {
+        console.log(`  Assessment-log: no uat-log.jsonl at ${resolvedUatLog} — skipped.`);
+      }
+    }
   }
 
   // ── Optional explicit --validate pass ─────────────────────────────────────
@@ -459,6 +515,52 @@ function exitError(message, code) {
   const err = new Error(message);
   err.exitCode = code;
   return err;
+}
+
+// ── UAT log finder (S3) ──────────────────────────────────────────────────────
+
+/**
+ * Resolve a uat-log.jsonl path for the given surface.
+ *
+ * Search order:
+ *   1. <scaDir>/uat-log.jsonl
+ *   2. <cwd>/testing-log/<surface>/uat-log.jsonl  (glob: newest folder matching surface)
+ *   3. <cwd>/<surface>/uat-log.jsonl
+ *
+ * Returns the first path that exists, or null if none found.
+ *
+ * @param {string} surface
+ * @param {string} scaDir    Directory where the SCA markdown lives
+ * @param {string} cwd
+ * @returns {string | null}
+ */
+function findUatLog(surface, scaDir, cwd) {
+  const candidates = [
+    path.join(scaDir, 'uat-log.jsonl'),
+    path.join(cwd, 'testing-log', surface, 'uat-log.jsonl'),
+    path.join(cwd, surface, 'uat-log.jsonl'),
+  ];
+
+  // Also try date-prefixed testing-log folders: testing-log/<date>_<surface>/
+  try {
+    const testingLogDir = path.join(cwd, 'testing-log');
+    if (fs.existsSync(testingLogDir)) {
+      const dirs = fs.readdirSync(testingLogDir)
+        .filter((d) => d.includes(surface))
+        .sort()
+        .reverse(); // newest first (date-prefix sorts lexicographically)
+      for (const dir of dirs) {
+        candidates.push(path.join(testingLogDir, dir, 'uat-log.jsonl'));
+      }
+    }
+  } catch {
+    // ignore — just don't add those candidates
+  }
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
 }
 
 // ── Logging helpers ──────────────────────────────────────────────────────────

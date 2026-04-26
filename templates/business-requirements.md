@@ -3,6 +3,16 @@ uat_status: pending
 owner: TBD
 stakeholders: []
 approval_required: true
+# required_reviewers — optional; remove this block for single-reviewer sign-off (backward compat).
+# When present, `testnux br rtm` tracks N-of-M attestation progress per role.
+# Attestations stored in <surface>/br-attestations.jsonl (HMAC-chained, append-only).
+# required_reviewers:
+#   - role: QA
+#     count: 1
+#   - role: Compliance
+#     count: 1
+#   - role: Security
+#     count: 1
 ---
 
 # Business Requirements — {{br_id}}

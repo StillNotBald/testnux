@@ -43,3 +43,8 @@ Thumbs.db
 /*-scenarios.md
 /scenarios.md
 /scenarios.raw.txt
+
+# Playwright test artifacts
+test-results/
+playwright-report/
+playwright/.cache/

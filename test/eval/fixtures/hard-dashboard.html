@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Acme App</title>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner">
+    <h1>Admin Dashboard</h1>
+    <nav aria-label="User menu">
+      <button type="button" id="user-menu-btn" aria-haspopup="true" aria-expanded="false"
+              aria-controls="user-menu">
+        Account
+      </button>
+      <ul id="user-menu" role="menu" hidden>
+        <li role="none"><a href="/profile" role="menuitem">My Profile</a></li>
+        <li role="none"><a href="/settings" role="menuitem">Settings</a></li>
+        <li role="none">
+          <button type="button" role="menuitem" id="logout-btn">Sign Out</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- Search and filter bar -->
+    <section aria-labelledby="filters-heading">
+      <h2 id="filters-heading" class="sr-only">Filters</h2>
+      <label for="search-input">Search users</label>
+      <input
+        id="search-input"
+        type="search"
+        name="q"
+        placeholder="Search by name or email"
+        aria-controls="users-table"
+        autocomplete="off"
+      />
+      <label for="role-filter">Filter by role</label>
+      <select id="role-filter" name="role" aria-controls="users-table">
+        <option value="">All roles</option>
+        <option value="admin">Admin</option>
+        <option value="editor">Editor</option>
+        <option value="viewer">Viewer</option>
+      </select>
+      <button type="button" id="clear-filters-btn" aria-label="Clear all filters">
+        Clear
+      </button>
+    </section>
+
+    <!-- Role-gated action bar -->
+    <section aria-label="Bulk actions">
+      <!-- Visible to admin only — enforced server-side; hidden via aria-hidden for non-admins -->
+      <button type="button" id="bulk-delete-btn" aria-label="Delete selected users"
+              data-requires-role="admin">
+        Delete Selected
+      </button>
+      <button type="button" id="export-btn" aria-label="Export users as CSV"
+              data-requires-role="editor">
+        Export CSV
+      </button>
+      <button type="button" id="invite-btn" aria-label="Invite new user"
+              data-requires-role="admin">
+        Invite User
+      </button>
+    </section>
+
+    <!-- Data table -->
+    <table id="users-table" aria-label="Users" aria-live="polite" aria-busy="false">
+      <thead>
+        <tr>
+          <th scope="col">
+            <input type="checkbox" id="select-all" aria-label="Select all users" />
+          </th>
+          <th scope="col">
+            <button type="button" aria-sort="ascending"
+                    data-sort-col="name" class="sort-btn">
+              Name
+            </button>
+          </th>
+          <th scope="col">
+            <button type="button" aria-sort="none"
+                    data-sort-col="email" class="sort-btn">
+              Email
+            </button>
+          </th>
+          <th scope="col">
+            <button type="button" aria-sort="none"
+                    data-sort-col="role" class="sort-btn">
+              Role
+            </button>
+          </th>
+          <th scope="col">
+            <button type="button" aria-sort="none"
+                    data-sort-col="createdAt" class="sort-btn">
+              Created
+            </button>
+          </th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody">
+        <tr data-user-id="u1">
+          <td><input type="checkbox" aria-label="Select Alice Johnson" /></td>
+          <td>Alice Johnson</td>
+          <td>alice@example.com</td>
+          <td>Admin</td>
+          <td>2026-01-15</td>
+          <td>
+            <button type="button" aria-label="Edit Alice Johnson"
+                    data-requires-role="editor" data-action="edit" data-user-id="u1">
+              Edit
+            </button>
+            <button type="button" aria-label="Delete Alice Johnson"
+                    data-requires-role="admin" data-action="delete" data-user-id="u1">
+              Delete
+            </button>
+          </td>
+        </tr>
+        <tr data-user-id="u2">
+          <td><input type="checkbox" aria-label="Select Bob Martinez" /></td>
+          <td>Bob Martinez</td>
+          <td>bob@example.com</td>
+          <td>Editor</td>
+          <td>2026-02-03</td>
+          <td>
+            <button type="button" aria-label="Edit Bob Martinez"
+                    data-requires-role="editor" data-action="edit" data-user-id="u2">
+              Edit
+            </button>
+            <button type="button" aria-label="Delete Bob Martinez"
+                    data-requires-role="admin" data-action="delete" data-user-id="u2">
+              Delete
+            </button>
+          </td>
+        </tr>
+        <tr data-user-id="u3">
+          <td><input type="checkbox" aria-label="Select Carol Kim" /></td>
+          <td>Carol Kim</td>
+          <td>carol@example.com</td>
+          <td>Viewer</td>
+          <td>2026-03-22</td>
+          <td>
+            <button type="button" aria-label="Edit Carol Kim"
+                    data-requires-role="editor" data-action="edit" data-user-id="u3">
+              Edit
+            </button>
+            <button type="button" aria-label="Delete Carol Kim"
+                    data-requires-role="admin" data-action="delete" data-user-id="u3">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Table pagination">
+      <button type="button" id="prev-page-btn" aria-label="Previous page" disabled>
+        Previous
+      </button>
+      <span aria-live="polite" id="page-indicator">Page 1 of 5</span>
+      <button type="button" id="next-page-btn" aria-label="Next page">
+        Next
+      </button>
+      <label for="page-size-select">Rows per page</label>
+      <select id="page-size-select" aria-controls="users-table">
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+    </nav>
+
+    <!-- Multi-step invite modal -->
+    <dialog id="invite-modal" aria-labelledby="invite-modal-title"
+            aria-describedby="invite-modal-desc">
+      <h2 id="invite-modal-title">Invite New User</h2>
+      <p id="invite-modal-desc">
+        Complete all steps to send an invitation.
+      </p>
+
+      <!-- Step indicator -->
+      <ol aria-label="Invitation steps" role="list">
+        <li aria-current="step">1. Enter details</li>
+        <li>2. Assign role</li>
+        <li>3. Confirm &amp; send</li>
+      </ol>
+
+      <!-- Step 1 -->
+      <section id="invite-step-1" aria-labelledby="invite-step-1-heading">
+        <h3 id="invite-step-1-heading">Enter Details</h3>
+        <label for="invite-email">Email address</label>
+        <input id="invite-email" type="email" name="inviteEmail"
+               placeholder="colleague@example.com" required
+               aria-describedby="invite-email-error" />
+        <span id="invite-email-error" role="alert" aria-live="polite"></span>
+
+        <label for="invite-name">Full name (optional)</label>
+        <input id="invite-name" type="text" name="inviteName"
+               placeholder="Jane Smith" autocomplete="off" />
+      </section>
+
+      <!-- Step 2 (hidden initially) -->
+      <section id="invite-step-2" aria-labelledby="invite-step-2-heading" hidden>
+        <h3 id="invite-step-2-heading">Assign Role</h3>
+        <fieldset>
+          <legend>Select a role for this user</legend>
+          <label>
+            <input type="radio" name="inviteRole" value="viewer" checked />
+            Viewer — read-only access
+          </label>
+          <label>
+            <input type="radio" name="inviteRole" value="editor" />
+            Editor — can create and update
+          </label>
+          <label>
+            <input type="radio" name="inviteRole" value="admin" />
+            Admin — full access
+          </label>
+        </fieldset>
+      </section>
+
+      <!-- Step 3 (hidden initially) -->
+      <section id="invite-step-3" aria-labelledby="invite-step-3-heading" hidden>
+        <h3 id="invite-step-3-heading">Confirm &amp; Send</h3>
+        <p>Review the details before sending the invitation.</p>
+        <dl>
+          <dt>Email</dt><dd id="confirm-email"></dd>
+          <dt>Name</dt><dd id="confirm-name"></dd>
+          <dt>Role</dt><dd id="confirm-role"></dd>
+        </dl>
+      </section>
+
+      <footer>
+        <button type="button" id="invite-prev-btn" disabled>Back</button>
+        <button type="button" id="invite-next-btn">Next</button>
+        <button type="button" id="invite-cancel-btn">Cancel</button>
+      </footer>
+    </dialog>
+
+  </main>
+</body>
+</html>

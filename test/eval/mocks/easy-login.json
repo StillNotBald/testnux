@@ -1,0 +1,17 @@
+{
+  "_comment": "Pre-recorded mock LLM response for easy-login fixture. Use with --mock to run eval harness in CI without an API key.",
+  "_fixture": "easy-login",
+  "_recorded_at": "2026-04-27T00:00:00.000Z",
+  "_model": "claude-sonnet-4-6",
+  "discover": {
+    "event": "discover.done",
+    "url": "file://fixtures/easy-login.html",
+    "slug": "easy-login",
+    "model": "claude-sonnet-4-6",
+    "tcCount": 9,
+    "tokensIn": 1200,
+    "tokensOut": 3400,
+    "costUsd": 0.0547,
+    "scenariosMd": "---\nslug: easy-login\nurl: file://fixtures/easy-login.html\ngenerated_by: testnux discover v0.2\ntc_count: 9\nreview_required: true\n---\n\n## TC-01 — Successful login with valid credentials\n\n**Priority**: P0\n**Category**: FUNCTIONAL\n**Standards**: OWASP ASVS 2.1.1, NIST SP 800-63B 5.1\n\n**Given** a registered user with a valid email and password\n**When** they enter their credentials and click \"Sign in\"\n**Then** they are authenticated and redirected to the home page\n\n> [VERIFY] Confirm redirect destination.\n\n## TC-02 — Login rejected with wrong password\n\n**Priority**: P1\n**Category**: FUNCTIONAL\n**Standards**: OWASP ASVS 2.2.1\n\n**Given** a registered user\n**When** they enter an incorrect password\n**Then** an error is shown and the user stays on the login page\n\n> [VERIFY] Confirm error message does not enumerate accounts.\n\n## TC-03 — Empty form shows validation errors\n\n**Priority**: P1\n**Category**: FUNCTIONAL\n**Standards**: WCAG 2.2 SC 3.3.1\n\n**Given** an empty login form\n**When** the user clicks \"Sign in\"\n**Then** inline errors appear for both email and password\n\n> [VERIFY] Confirm aria-describedby linkage.\n\n## TC-04 — Invalid email format rejected\n\n**Priority**: P1\n**Category**: FUNCTIONAL\n**Standards**: WCAG 2.2 SC 3.3.1\n\n**Given** user enters \"notanemail\"\n**When** they submit\n**Then** an inline email format error is shown\n\n> [VERIFY] Confirm validation fires before network request.\n\n## TC-05 — Keyboard navigation works\n\n**Priority**: P1\n**Category**: ACCESSIBILITY\n**Standards**: WCAG 2.2 SC 2.1.1\n\n**Given** the page is loaded\n**When** the user tabs through the form\n**Then** focus moves in order through all interactive elements\n\n> [VERIFY] Confirm visible focus indicators.\n\n## TC-06 — Forgot password link navigates\n\n**Priority**: P1\n**Category**: FUNCTIONAL\n\n**Given** user is on login page\n**When** they click \"Forgot your password?\"\n**Then** they navigate to the password reset page\n\n> [VERIFY] Confirm target URL.\n\n## TC-07 — Create account link works\n\n**Priority**: P1\n**Category**: FUNCTIONAL\n\n**Given** user is on login page\n**When** they click \"Create an account\"\n**Then** they navigate to the registration page\n\n> [VERIFY] Confirm target URL.\n\n## TC-08 — XSS attempt sanitized\n\n**Priority**: P1\n**Category**: SECURITY\n**Standards**: OWASP ASVS 5.3.3\n\n**Given** login form is open\n**When** user enters a script tag in the email field and submits\n**Then** the script is not executed\n\n> [VERIFY] Confirm server-side encoding.\n\n## TC-GX-01 — Page load within SLA\n\n**Priority**: P0\n**Category**: PERFORMANCE\n**Standards**: WCAG 2.2 SC 2.2.1\n\n**Given** a broadband connection\n**When** user navigates to the login page\n**Then** LCP is within 2.5 seconds\n\n> [VERIFY] Confirm SLA matches product spec.\n"
+  }
+}

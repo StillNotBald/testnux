@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Acme App</title>
+</head>
+<body>
+  <main>
+    <h1>Sign In</h1>
+    <form id="login-form" action="/auth/login" method="POST" novalidate>
+      <label for="email">Email address</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        required
+        aria-describedby="email-error"
+      />
+      <span id="email-error" role="alert" aria-live="polite"></span>
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        placeholder="Your password"
+        required
+        aria-describedby="password-error"
+      />
+      <span id="password-error" role="alert" aria-live="polite"></span>
+
+      <button type="submit">Sign in</button>
+    </form>
+    <a href="/forgot-password">Forgot your password?</a>
+    <a href="/register">Create an account</a>
+  </main>
+</body>
+</html>

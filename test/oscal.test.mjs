@@ -4,19 +4,28 @@
 /**
  * test/oscal.test.mjs
  *
- * Comprehensive unit tests for src/lib/oscal.mjs.
+ * Comprehensive unit tests for src/lib/oscal.mjs and src/lib/oscal-signoff.mjs.
  *
  * Covers: toOSCAL() happy paths, output structure, NIST OSCAL 1.1.2 compliance,
- * UUID / date validation, edge cases, and validateOSCAL() error paths.
+ * UUID / date validation, edge cases, validateOSCAL() error paths,
+ * and S3 assessment-log extension (responsible-parties, assessment-log, subjects).
  */
 
 import { describe, it, expect } from 'vitest';
+import os from 'os';
+import fs from 'fs';
+import path from 'path';
 import {
   toOSCAL,
   validateOSCAL,
   OscalValidationError,
   OSCAL_VERSION,
 } from '../src/lib/oscal.mjs';
+import {
+  buildAssessmentLogExtension,
+  mergeAssessmentLog,
+  validateExtension,
+} from '../src/lib/oscal-signoff.mjs';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -374,5 +383,282 @@ describe('validateOSCAL — error paths', () => {
     expect(err.exitCode).toBe(1);
     expect(Array.isArray(err.issues)).toBe(true);
     expect(err.issues.length).toBeGreaterThan(0);
+  });
+});
+
+// ── S3: buildAssessmentLogExtension ──────────────────────────────────────────
+
+/** Write a minimal uat-log.jsonl fixture to a temp file and return its path. */
+function writeUatLogFixture(entries) {
+  const tmpDir  = fs.mkdtempSync(path.join(os.tmpdir(), 'testnux-oscal-test-'));
+  const logPath = path.join(tmpDir, 'uat-log.jsonl');
+  const lines   = entries.map((e) => JSON.stringify(e)).join('\n') + '\n';
+  fs.writeFileSync(logPath, lines, 'utf-8');
+  return logPath;
+}
+
+const SAMPLE_UAT_ENTRIES = [
+  {
+    tc_id:         'LOGIN-01',
+    status:        'accepted',
+    reviewer:      'Alice Smith',
+    reviewer_role: 'QA Lead',
+    justification: 'Login form validates correctly under all tested conditions.',
+    ts:            '2026-04-26T10:00:00.000Z',
+    prev_hash:     'aabbcc',
+    signature:     'ddeeff',
+  },
+  {
+    tc_id:         'LOGIN-02',
+    status:        'accepted',
+    reviewer:      'Bob Jones',
+    reviewer_role: 'Security',
+    justification: '',
+    ts:            '2026-04-26T10:05:00.000Z',
+    prev_hash:     'ddeeff',
+    signature:     '112233',
+  },
+  {
+    tc_id:         'LOGIN-01',   // duplicate TC-ID — second sign-off by same reviewer
+    status:        'accepted',
+    reviewer:      'Alice Smith',
+    reviewer_role: 'QA Lead',
+    justification: 'Re-attested after rework.',
+    ts:            '2026-04-26T11:00:00.000Z',
+    prev_hash:     '112233',
+    signature:     '445566',
+  },
+];
+
+describe('S3 buildAssessmentLogExtension — happy path', () => {
+  it('TC-OSCAL-27: returns responsibleParties, assessmentLog, subjects', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    expect(extension).toHaveProperty('responsibleParties');
+    expect(extension).toHaveProperty('assessmentLog');
+    expect(extension).toHaveProperty('subjects');
+  });
+
+  it('TC-OSCAL-28: responsibleParties deduplicated by name+role (2 unique pairs from 3 entries)', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    // Alice QA Lead + Bob Security = 2 unique parties (Alice appears twice but same name+role)
+    expect(extension.responsibleParties).toHaveLength(2);
+  });
+
+  it('TC-OSCAL-29: all responsible-party UUIDs are RFC-4122 format', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    for (const p of extension.responsibleParties) {
+      expect(UUID_LOOSE_RE.test(p.uuid)).toBe(true);
+    }
+  });
+
+  it('TC-OSCAL-30: responsible-party UUIDs are deterministic (UUID v5)', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const ext1      = buildAssessmentLogExtension(logPath);
+    const ext2      = buildAssessmentLogExtension(logPath);
+
+    const uuids1 = ext1.responsibleParties.map((p) => p.uuid).sort();
+    const uuids2 = ext2.responsibleParties.map((p) => p.uuid).sort();
+    expect(uuids1).toEqual(uuids2);
+  });
+
+  it('TC-OSCAL-31: assessmentLog has one entry per uat-log line', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    expect(extension.assessmentLog.entries).toHaveLength(3);
+  });
+
+  it('TC-OSCAL-32: each assessment-log entry has correct title format "TC-ID: status"', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    const entry = extension.assessmentLog.entries[0];
+    expect(entry.title).toBe('LOGIN-01: accepted');
+  });
+
+  it('TC-OSCAL-33: assessment-log entry uses justification as description when present', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    expect(extension.assessmentLog.entries[0].description).toBe(
+      'Login form validates correctly under all tested conditions.'
+    );
+  });
+
+  it('TC-OSCAL-34: assessment-log entry uses fallback description when justification is empty', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    expect(extension.assessmentLog.entries[1].description).toBe('Test execution attested.');
+  });
+
+  it('TC-OSCAL-35: each assessment-log entry has start and end as ISO-8601', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    for (const e of extension.assessmentLog.entries) {
+      expect(ISO_DATE_RE.test(e.start)).toBe(true);
+      expect(ISO_DATE_RE.test(e.end)).toBe(true);
+    }
+  });
+
+  it('TC-OSCAL-36: each assessment-log entry references a known party UUID via logged-by', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    const partyUuids = new Set(extension.responsibleParties.map((p) => p.uuid));
+    for (const entry of extension.assessmentLog.entries) {
+      for (const lb of entry['logged-by']) {
+        expect(partyUuids.has(lb['party-uuid'])).toBe(true);
+      }
+    }
+  });
+
+  it('TC-OSCAL-37: subjects deduplicated by TC-ID (LOGIN-01 appears twice → 1 subject)', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    // 2 unique TC-IDs: LOGIN-01, LOGIN-02
+    expect(extension.subjects).toHaveLength(2);
+    const tcIds = extension.subjects.map((s) => s.props.find((p) => p.name === 'tc-id')?.value);
+    expect(tcIds).toContain('LOGIN-01');
+    expect(tcIds).toContain('LOGIN-02');
+  });
+
+  it('TC-OSCAL-38: all subject UUIDs are UUID v5 shaped', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    for (const s of extension.subjects) {
+      expect(UUID_V5_RE.test(s.uuid)).toBe(true);
+    }
+  });
+
+  it('TC-OSCAL-39: empty uat-log returns empty extension structures', () => {
+    const logPath   = writeUatLogFixture([]);
+    const extension = buildAssessmentLogExtension(logPath);
+
+    expect(extension.responsibleParties).toHaveLength(0);
+    expect(extension.assessmentLog.entries).toHaveLength(0);
+    expect(extension.subjects).toHaveLength(0);
+  });
+
+  it('TC-OSCAL-40: non-existent uat-log path returns empty extension', () => {
+    const extension = buildAssessmentLogExtension('/nonexistent/path/uat-log.jsonl');
+
+    expect(extension.responsibleParties).toHaveLength(0);
+    expect(extension.assessmentLog.entries).toHaveLength(0);
+    expect(extension.subjects).toHaveLength(0);
+  });
+});
+
+// ── S3: validateExtension ────────────────────────────────────────────────────
+
+describe('S3 validateExtension', () => {
+  it('TC-OSCAL-41: valid extension from real log passes with no errors', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const result    = validateExtension(extension);
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('TC-OSCAL-42: tampered party UUID produces validation errors', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    extension.responsibleParties[0].uuid = 'not-a-uuid';
+
+    const result = validateExtension(extension);
+    expect(result.valid).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors[0]).toMatch(/uuid/i);
+  });
+
+  it('TC-OSCAL-43: logged-by referencing unknown party UUID fails validation', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    extension.assessmentLog.entries[0]['logged-by'][0]['party-uuid'] = '00000000-0000-5000-8000-000000000000';
+
+    const result = validateExtension(extension);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((e) => e.includes('unknown party-uuid'))).toBe(true);
+  });
+});
+
+// ── S3: mergeAssessmentLog ───────────────────────────────────────────────────
+
+describe('S3 mergeAssessmentLog', () => {
+  it('TC-OSCAL-44: merged OSCAL doc still passes validateOSCAL', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const oscalDoc  = toOSCAL(buildSCA());
+    mergeAssessmentLog(oscalDoc, extension);
+
+    expect(() => validateOSCAL(oscalDoc)).not.toThrow();
+  });
+
+  it('TC-OSCAL-45: assessment-log.entries appear in results[0] after merge', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const oscalDoc  = toOSCAL(buildSCA());
+    mergeAssessmentLog(oscalDoc, extension);
+
+    const result = oscalDoc['assessment-results'].results[0];
+    expect(result).toHaveProperty('assessment-log');
+    expect(Array.isArray(result['assessment-log'].entries)).toBe(true);
+    expect(result['assessment-log'].entries).toHaveLength(3);
+  });
+
+  it('TC-OSCAL-46: subjects appear in results[0] after merge', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const oscalDoc  = toOSCAL(buildSCA());
+    mergeAssessmentLog(oscalDoc, extension);
+
+    const result = oscalDoc['assessment-results'].results[0];
+    expect(Array.isArray(result.subjects)).toBe(true);
+    expect(result.subjects.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('TC-OSCAL-47: uat-log parties added to metadata.parties without duplicating existing parties', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const sca       = buildSCA(); // has 1 party: Alice Smith
+    const oscalDoc  = toOSCAL(sca);
+
+    const beforeCount = oscalDoc['assessment-results'].metadata.parties.length;
+    mergeAssessmentLog(oscalDoc, extension);
+    const afterCount = oscalDoc['assessment-results'].metadata.parties.length;
+
+    // Alice from uat-log (reviewer "Alice Smith" / QA Lead) is a different party-uuid
+    // to Alice from signOff (email-keyed). 2 new uat-log parties (Alice QA Lead + Bob Security).
+    expect(afterCount).toBeGreaterThan(beforeCount);
+  });
+
+  it('TC-OSCAL-48: throws TypeError when called with invalid oscalDoc', () => {
+    const extension = buildAssessmentLogExtension('/nonexistent/uat-log.jsonl');
+    expect(() => mergeAssessmentLog(null, extension)).toThrow(TypeError);
+    expect(() => mergeAssessmentLog({}, extension)).toThrow(TypeError);
+  });
+
+  it('TC-OSCAL-49: merge is idempotent for party UUIDs (no duplicate parties on second call)', () => {
+    const logPath   = writeUatLogFixture(SAMPLE_UAT_ENTRIES);
+    const extension = buildAssessmentLogExtension(logPath);
+    const oscalDoc  = toOSCAL(buildSCA());
+
+    mergeAssessmentLog(oscalDoc, extension);
+    const countAfterFirst = oscalDoc['assessment-results'].metadata.parties.length;
+
+    mergeAssessmentLog(oscalDoc, extension);
+    const countAfterSecond = oscalDoc['assessment-results'].metadata.parties.length;
+
+    expect(countAfterSecond).toBe(countAfterFirst);
   });
 });
