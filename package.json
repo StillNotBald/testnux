@@ -64,7 +64,7 @@
     "gray-matter": "^4.0.3",
     "isomorphic-dompurify": "^3.10.0",
     "marked": "^12.0.0",
-    "sharp": "^0.33.4",
+    "sharp": "^0.34.5",
     "uuid": "^14.0.0"
   },
   "optionalDependencies": {
