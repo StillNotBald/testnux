@@ -2,6 +2,10 @@
 
 This folder shows what TestNUX **PRODUCES** when run against a real codebase (demo-dashboard, a public Next.js admin app). The source code being tested is NOT in this repo — only the outputs. To reproduce, fork demo-dashboard separately and run `testnux init demo-dashboard-login --industry general` against it.
 
+> **These outputs are real `testnux` artifacts generated against the demo-dashboard project, not handcrafted samples.**  
+> The HTML report (`output/login-execution-report.html`) and XLSX were produced by running `testnux report` against a live Playwright test pass on 2026-04-27.  
+> To regenerate: see [`output/real-run/REGENERATE.md`](output/real-run/REGENERATE.md)
+
 ---
 
 ## What is in this folder?

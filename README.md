@@ -43,6 +43,21 @@ Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/test
 
 ---
 
+## What you get
+
+TestNUX produces a single self-contained HTML execution report:
+
+- 📋 Sticky TOC sidebar with anchor links to every TC
+- 🎯 Filter tabs: All / PASS / FAIL / BLOCKED / SKIPPED
+- 📊 Per-TC card: Given/When/Then, status badge, embedded screenshots, standards mapping
+- 🏛️ Banking-standards alignment matrix at the bottom
+- 🛡️ Threat coverage table (OWASP / NIST / WCAG)
+- 📈 Summary banner: total TCs, pass rate, P0 status
+
+Open `examples/demo-dashboard/output/login-execution-report.html` in your browser to see it live.
+
+---
+
 ## 60-second quickstart
 
 ```bash
@@ -63,14 +78,6 @@ testnux validate demo-login
 ```
 
 The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and opens both in your browser — then deletes the fixture. Fastest path to the "aha."
-
----
-
-## Adoption checklist
-
-Forking TestNUX gives you the tooling. Getting consistent outcomes requires 4 must-do adoption tasks that the CLI cannot do for you: originating your R-IDs, adopting the status labeling discipline, setting up the UAT sign-off chain, and getting one auditor to validate your SCA shape.
-
-See **[docs/adoption-checklist.md](docs/adoption-checklist.md)** — includes time estimates, exit criteria, common mistakes, and a step-by-step guide for Claude/AI agents running the onboarding playbook.
 
 ---
 
@@ -97,6 +104,12 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 | **Best fit** | Engineering-led teams that want git-native evidence + want to keep their auditor relationship | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
 
 **Where TestNUX feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. TestNUX is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick TestNUX if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
+
+---
+
+## Best practices (optional)
+
+If you want consistent outcomes across teams, see [docs/adoption-checklist.md](docs/adoption-checklist.md) for 4 must-do practices.
 
 ---
 

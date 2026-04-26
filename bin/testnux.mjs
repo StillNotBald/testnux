@@ -53,6 +53,8 @@ const { runRtm } = await import('../src/commands/rtm.mjs');
 const { runScaInit, runScaGenerate, runScaPdf } = await import('../src/commands/sca.mjs');
 const { runBrInit, runBrLink, runBrRtm } = await import('../src/commands/br.mjs');
 const { runSign } = await import('../src/commands/sign.mjs');
+const { runSignPdf } = await import('../src/commands/sign-pdf.mjs');
+const { runSignStaleCheck } = await import('../src/commands/sign-stale.mjs');
 const { runEnvRun, runEnvCompare } = await import('../src/commands/env.mjs');
 const { runVisualBaseline, runVisualCompare } = await import('../src/commands/visual.mjs');
 // v0.2 stubs — LLM agents + OSCAL
@@ -315,20 +317,25 @@ scaCmd
   .description(
     'Emit an OSCAL 1.1.2 assessment-results JSON document from the latest SCA ' +
     'for <surface>. Compatible with IBM Compliance Trestle. ' +
+    'S3: auto-merges uat-log.jsonl into OSCAL assessment-log when found. ' +
     'Output: requirements/validations/<surface>/v<X.Y>.oscal.json',
   )
   .option('--validate', 'run schema check on the emitted OSCAL JSON; exit 1 if invalid')
   .option('--out <dir>', 'write OSCAL JSON to <dir> instead of alongside the source file')
   .option('--dry-run', 'parse and validate but do not write the output file')
+  .option('--uat-log <path>', '(S3) explicit path to uat-log.jsonl to merge into assessment-log')
+  .option('--skip-assessment-log', '(S3) skip uat-log merge even if file is found automatically')
   .action(async (surface, opts, cmd) => {
     const global = cmd.parent.parent.opts();
     try {
       await runScaOscal(surface, {
-        validate: opts.validate ?? false,
-        out:      opts.out,
-        dryRun:   opts.dryRun ?? false,
-        json:     global.json,
-        cwd:      process.cwd(),
+        validate:          opts.validate ?? false,
+        out:               opts.out,
+        dryRun:            opts.dryRun ?? false,
+        json:              global.json,
+        cwd:               process.cwd(),
+        uatLogPath:        opts.uatLog,
+        skipAssessmentLog: opts.skipAssessmentLog ?? false,
       });
     } catch (err) {
       emit(global.json, { error: err.message });
@@ -394,24 +401,35 @@ program
     }
   });
 
-// ── codify (v0.2 LLM agent stub) ─────────────────────────────────────────────
+// ── codify (v0.2 ALPHA — wired to Claude API) ────────────────────────────────
 
 program
   .command('codify <slug>')
   .description(
-    '[v0.2 stub] Convert test-plan.md into a Playwright TypeScript spec.ts. ' +
-    'In v0.1, prints what v0.2 will do and points to the scaffolded spec.ts. ' +
-    'Requires CLAUDE_API_KEY in v0.2.',
+    '[v0.2 ALPHA] Convert testing-log/<date>_<slug>/test-plan.md into a ' +
+    'Playwright TypeScript spec.ts via Claude API. Preserves XFF isolation, ' +
+    'form.requestSubmit(), afterEach evidence hooks, and [VERIFY] markers. ' +
+    'Requires: CLAUDE_API_KEY env var + npm install @anthropic-ai/sdk',
   )
+  .option('--folder <path>', 'explicit path to testing-log/<date>_<slug>/ (overrides slug search)')
   .option('--base-url <url>', 'base URL for Playwright tests', 'http://localhost:3000')
-  .option('--out <dir>', 'output root for testing-log/', './testing-log')
+  .option('--model <model>', 'Claude model to use', 'claude-sonnet-4-6')
+  .option('--max-tokens <n>', 'max tokens in LLM response', (v) => parseInt(v, 10), 10000)
+  .option('--max-spend <usd>', 'abort if estimated cost exceeds this USD amount', parseFloat)
+  .option('--dry-run', 'print the prompt and cost estimate without calling the API')
+  .option('--safe', 'write spec.generated.ts instead of overwriting spec.ts')
   .action(async (slug, opts, cmd) => {
     const global = cmd.parent.opts();
     try {
       await runCodify(slug, {
-        baseUrl: opts.baseUrl,
-        out:     opts.out,
-        json:    global.json,
+        folder:    opts.folder,
+        baseUrl:   opts.baseUrl,
+        model:     opts.model,
+        maxTokens: opts.maxTokens,
+        maxSpend:  opts.maxSpend ?? null,
+        dryRun:    opts.dryRun ?? false,
+        safe:      opts.safe ?? false,
+        json:      global.json,
       });
     } catch (err) {
       emit(global.json, { error: err.message });
@@ -538,20 +556,44 @@ brCmd
   });
 
 // ── sign ──────────────────────────────────────────────────────────────────────
+//
+// Subcommand group:
+//   testnux sign <surface>              — record an attestation (existing)
+//   testnux sign pdf <surface>          — render PDF ledger (S1)
+//   testnux sign stale-check <surface>  — check entry ages (S2)
+//
+// Commander routes to a subcommand when the first positional arg matches a
+// registered subcommand name ('pdf', 'stale-check'). Otherwise the group's
+// own action handler fires, preserving the legacy `testnux sign <surface>`
+// invocation.
 
-program
-  .command('sign <surface>')
+const signCmd = program
+  .command('sign')
   .description(
-    'Interactive stakeholder sign-off for a test pass. ' +
-    'Computes HMAC-SHA256 e-signature and appends to <surface>/uat-log.jsonl (hash-chained). ' +
-    'Requires UAT_SECRET env var. ' +
-    'NOTICE: audit-trail signature only — not a court-admissible e-signature.',
+    'UAT sign-off commands.\n' +
+    '  testnux sign <surface>             — record an attestation\n' +
+    '  testnux sign pdf <surface>         — render sign-off ledger to PDF\n' +
+    '  testnux sign stale-check <surface> — flag entries older than threshold',
   )
+  .argument('[surface]', 'test-pass surface folder (required for direct attestation)')
   .option('--reject <tc-id>', 'batch-reject a specific TC-ID (status set to rejected)')
   .option('--verify', 'verify chain integrity of <surface>/uat-log.jsonl and exit')
+  .option('--justify-with-llm', '(S4) draft justification via Claude API before prompting; falls back gracefully if CLAUDE_API_KEY is absent')
+  .option('--revoke', '(S5) append a revocation entry to br-attestations.jsonl; requires --tc and --role')
+  .option('--tc <tc-id>', '(S5) TC-ID to revoke (used with --revoke)')
+  .option('--role <role>', '(S5) role to revoke (used with --revoke)')
+  .option('--br-id <br-id>', '(S5) BR-ID to scope the revocation (optional; defaults to surface name)')
   .option('--out <dir>', 'project root (default: current directory)', '.')
+  .allowUnknownOption(false)
   .action(async (surface, opts, cmd) => {
     const global = cmd.parent.opts();
+
+    if (!surface) {
+      // No surface provided and no subcommand matched — print help.
+      cmd.help();
+      return;
+    }
+
     try {
       if (opts.verify) {
         const { verifyChain } = await import('../src/lib/uat-log.mjs');
@@ -574,7 +616,69 @@ program
         }
         process.exit(result.valid ? 0 : 1);
       }
-      await runSign(surface, { reject: opts.reject, outDir: opts.out, json: global.json });
+      await runSign(surface, {
+        reject:         opts.reject,
+        justifyWithLlm: opts.justifyWithLlm ?? false,
+        revoke:         opts.revoke ?? false,
+        tc:             opts.tc,
+        role:           opts.role,
+        brId:           opts.brId,
+        outDir:         opts.out,
+        json:           global.json,
+      });
+    } catch (err) {
+      emit(global.json, { error: err.message });
+      process.exit(err.exitCode ?? 1);
+    }
+  });
+
+// ── sign pdf ──────────────────────────────────────────────────────────────────
+
+signCmd
+  .command('pdf <surface>')
+  .description(
+    'Render the UAT sign-off ledger for <surface> to an A4 PDF via puppeteer-core. ' +
+    'Reads <surface>/uat-log.jsonl and <surface>/uat-sign-off.md. ' +
+    'Verifies HMAC-SHA256 chain; includes a red "CHAIN BROKEN" banner if invalid. ' +
+    'Requires CHROME_PATH env var. Optional dep: npm install puppeteer-core.',
+  )
+  .option('--folder <dir>', 'root directory containing <surface>/ (default: CWD)', '.')
+  .option('--output <path>', 'explicit output path for the PDF')
+  .action(async (surface, opts, cmd) => {
+    const global = cmd.parent.parent.opts();
+    try {
+      await runSignPdf(surface, {
+        folder: opts.folder,
+        output: opts.output,
+        json:   global.json,
+      });
+    } catch (err) {
+      emit(global.json, { error: err.message });
+      process.exit(err.exitCode ?? 1);
+    }
+  });
+
+// ── sign stale-check ──────────────────────────────────────────────────────────
+
+signCmd
+  .command('stale-check <surface>')
+  .description(
+    'Report UAT sign-off entries older than --threshold (default: 90d). ' +
+    'Exits 0 unless --strict is set and stale entries are found (CI gate). ' +
+    'Suggests the re-attestation command for each stale TC.',
+  )
+  .option('--folder <dir>', 'root directory containing <surface>/ (default: CWD)', '.')
+  .option('--threshold <duration>', 'age threshold, e.g. 7d, 30d, 90d, 180d, 365d', '90d')
+  .option('--strict', 'exit 1 when stale entries are found (CI gate mode)')
+  .action(async (surface, opts, cmd) => {
+    const global = cmd.parent.parent.opts();
+    try {
+      await runSignStaleCheck(surface, {
+        folder:    opts.folder,
+        threshold: opts.threshold,
+        json:      global.json,
+        strict:    opts.strict ?? false,
+      });
     } catch (err) {
       emit(global.json, { error: err.message });
       process.exit(err.exitCode ?? 1);
@@ -586,21 +690,31 @@ program
 program
   .command('run <slug>')
   .description(
-    'Scaffold a per-environment test-pass folder (wraps `init` with --env suffix). ' +
-    'Creates testing-log/<date>_<slug>-<env>/ for isolated environment tracking.',
+    'Scaffold an env-suffixed test-pass folder and generate XLSX + HTML reports. ' +
+    'Creates testing-log/<date>_<slug>-<env>/, seeds test-plan.md from a base plan, ' +
+    'then runs the report generator. Wraps `report` with per-env naming.',
   )
-  .option('--env <env>', 'target environment: local|staging|prod', 'local')
-  .option('--industry <industry>', 'industry profile', 'general')
-  .option('--out <dir>', 'output root (default: ./testing-log/)', './testing-log')
+  .option('--env <env>', 'target environment: local|staging|prod|qa|ci|dev|<custom>', 'local')
+  .option('--base-url <url>', 'base URL to inject into test-plan.md frontmatter')
+  .option('--plan-only', 'generate report without execution results (PLAN ONLY badge)')
+  .option('--open', 'open the generated HTML in the default browser after rendering')
+  .option('--fail-on-missing', 'exit 1 if no execution-log and no evidence/ directory')
+  .option('--folder <path>', 'explicit output folder path (overrides date+slug+env naming)')
+  .option('--out <dir>', 'testing-log root (default: ./testing-log/)', './testing-log')
   .action(async (slug, opts, cmd) => {
     const global = cmd.parent.opts();
     try {
-      await runEnvRun(slug, {
-        env: opts.env,
-        industry: opts.industry,
-        outDir: opts.out,
-        json: global.json,
+      const code = await runEnvRun(slug, {
+        env:           opts.env,
+        baseUrl:       opts.baseUrl,
+        planOnly:      opts.planOnly ?? false,
+        open:          opts.open ?? false,
+        failOnMissing: opts.failOnMissing ?? false,
+        folder:        opts.folder,
+        outDir:        opts.out,
+        json:          global.json,
       });
+      if (code) process.exit(code);
     } catch (err) {
       emit(global.json, { error: err.message });
       process.exit(err.exitCode ?? 1);
@@ -613,14 +727,23 @@ program
   .command('compare <slug> <env-a> <env-b>')
   .description(
     'Diff TC results between two environment passes for the same slug. ' +
-    'Flags TCs that pass in one environment and fail in another. ' +
-    'Output: markdown table — TC-ID | env-a status | env-b status | delta.',
+    'Locates the most recent testing-log/<date>_<slug>-<env>/ folder for each env, ' +
+    'parses execution logs, and emits a markdown table with MATCH / REGRESSION / ' +
+    'PROMOTION / DIVERGE / MISSING-A / MISSING-B verdicts.',
   )
+  .option('--output <path>', 'write diff table to <path> instead of stdout')
+  .option('--threshold <n>', 'CI gate: exit 1 if regressions > threshold (use 0 for strict)', parseFloat)
   .option('--out <dir>', 'testing-log root (default: ./testing-log/)', './testing-log')
   .action(async (slug, envA, envB, opts, cmd) => {
     const global = cmd.parent.opts();
     try {
-      await runEnvCompare(slug, envA, envB, { outDir: opts.out, json: global.json });
+      const code = await runEnvCompare(slug, envA, envB, {
+        outDir:    opts.out,
+        output:    opts.output,
+        threshold: opts.threshold,
+        json:      global.json,
+      });
+      if (code) process.exit(code);
     } catch (err) {
       emit(global.json, { error: err.message });
       process.exit(err.exitCode ?? 1);
@@ -642,13 +765,26 @@ visualCmd
   .description(
     'Capture full-page baseline screenshots for all TCs in <slug>/. ' +
     'Stored at <slug>/visual-baseline/<TC-ID>.png. ' +
-    'v0.3 stub: scaffolds directories + placeholders; full capture needs Playwright + pixelmatch.',
+    'Requires @playwright/test: npm install --save-dev @playwright/test && npx playwright install chromium.',
   )
   .option('--out <dir>', 'testing-log root (default: ./testing-log/)', './testing-log')
+  .option('--folder <path>', 'explicit path to test-pass folder (overrides slug search)')
+  .option('--base-url <url>', 'base URL of the running application', 'http://localhost:3000')
+  .option('--viewport <WxH>', 'viewport size as WIDTHxHEIGHT (default: 1280x800)', '1280x800')
+  .option('--urls <pairs>', 'comma-separated TC-ID=URL pairs, e.g. TC-01=/login,TC-02=/signup')
+  .option('--tc-ids <ids>', 'comma-separated TC-IDs to capture (subset of plan)')
   .action(async (slug, opts, cmd) => {
     const global = cmd.parent.parent.opts();
     try {
-      await runVisualBaseline(slug, { outDir: opts.out, json: global.json });
+      await runVisualBaseline(slug, {
+        outDir:   opts.out,
+        folder:   opts.folder,
+        baseUrl:  opts.baseUrl,
+        viewport: opts.viewport,
+        urls:     opts.urls,
+        tcIds:    opts.tcIds,
+        json:     global.json,
+      });
     } catch (err) {
       emit(global.json, { error: err.message });
       process.exit(err.exitCode ?? 1);
@@ -660,24 +796,35 @@ visualCmd
   .description(
     'Compare current screenshots against baseline. ' +
     'Diffs stored at <slug>/visual-diff/<TC-ID>-diff.png. ' +
-    'Threshold configurable in testnux.config.mjs (default 5%).',
+    'Threshold configurable in testnux.config.mjs (default 5%). ' +
+    'Optional: npm install --save-dev pixelmatch pngjs for pixel diff.',
   )
-  .option('--strict', 'exit 1 if any TC exceeds the diff threshold')
+  .option('--strict', 'exit 2 if any TC exceeds the diff threshold')
   .option('--report', 'flag-only mode — no exit code change on diff (default)')
-  .option('--threshold <n>', 'override diffThreshold for this run (0.0–1.0)')
+  .option('--threshold <n>', 'override diffThreshold for this run (0.0–1.0)', parseFloat)
   .option('--out <dir>', 'testing-log root (default: ./testing-log/)', './testing-log')
+  .option('--folder <path>', 'explicit path to test-pass folder (overrides slug search)')
+  .option('--base-url <url>', 'base URL of the running application', 'http://localhost:3000')
+  .option('--viewport <WxH>', 'viewport size as WIDTHxHEIGHT (default: 1280x800)', '1280x800')
+  .option('--urls <pairs>', 'comma-separated TC-ID=URL pairs, e.g. TC-01=/login,TC-02=/signup')
+  .option('--tc-ids <ids>', 'comma-separated TC-IDs to capture (subset of plan)')
   .action(async (slug, opts, cmd) => {
     const global = cmd.parent.parent.opts();
     try {
       await runVisualCompare(slug, {
-        strict: opts.strict ?? false,
-        outDir: opts.out,
-        json: global.json,
-        threshold: opts.threshold != null ? parseFloat(opts.threshold) : undefined,
+        strict:    opts.strict ?? false,
+        outDir:    opts.out,
+        folder:    opts.folder,
+        baseUrl:   opts.baseUrl,
+        viewport:  opts.viewport,
+        urls:      opts.urls,
+        tcIds:     opts.tcIds,
+        json:      global.json,
+        threshold: opts.threshold,
       });
     } catch (err) {
       emit(global.json, { error: err.message });
-      process.exit(err.exitCode ?? 1);
+      process.exit(err.exitCode ?? 2);
     }
   });
 
