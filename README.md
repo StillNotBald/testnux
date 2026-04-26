@@ -22,6 +22,16 @@ Target audience: regulated-fintech engineering leads and compliance leads who ne
 
 ---
 
+## Prerequisites
+
+**Minimum (v0.1):** Node.js 20+, npm 10+, a git repo.
+
+**Recommended (full stack):** Claude Max plan (~$200/mo) for v0.2 LLM agents, gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows.
+
+See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testing-hub doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
+
+---
+
 ## 60-second quickstart
 
 ```bash
@@ -234,6 +244,16 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 ---
 
+## FAQ
+
+**Does Testing Hub cost anything?**  
+The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately $0.30–$0.50 per page for a full AI pass. Heavy multi-agent dispatch (8 parallel agents) can burn ~5 sessions of Claude Max quota per hour. See [docs/costs.md](docs/costs.md) for the full breakdown and recommended working patterns.
+
+**Do I need Claude Max or an Anthropic API key?**  
+Not for v0.1. The `report` command is fully deterministic — no LLM required. Claude access is required only for v0.2 agents (PLAN, CODIFY, DISCOVER, DOC phases).
+
+---
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
@@ -242,6 +262,16 @@ Quick version:
 - All contributors must sign off commits with `git commit -s` (DCO — no CLA paperwork)
 - Every PR must ship with tests
 - Open an issue before a large PR so we can align on design
+
+---
+
+## Credits
+
+Testing Hub's three-track discipline, multi-agent dispatch workflow, and slash-command integration patterns derive directly from **gstack** (https://github.com/garrytan/gstack) by Garry Tan. gstack is the OSS solo-builder framework that Testing Hub's methodology is built on. Testing Hub adds a deterministic CLI artifact pipeline on top of gstack's structural and methodological foundations.
+
+Other credits: Playwright (evidence capture), IBM Trestle (OSCAL validation), NIST OSCAL (standards schema), Anthropic Claude (v0.2 LLM agents), Apache Software Foundation (license framework).
+
+See [docs/credit.md](docs/credit.md) for the full attribution breakdown and citation format.
 
 ---
 
