@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] - 2026-04-27
+
+A same-day patch on top of v0.2.0 stable. Bundles the smoke-test polish that surfaced after the v0.2.0 tag was cut plus four major-version dependency bumps that were verified safe by independent triage. **This is the first 0.2.x version published to npm** — v0.2.0 was tagged on GitHub but never published to the registry.
+
+### Added
+
+- `testnux demo` is now a real implementation. The previous v0.1 stub (which printed "demo target is coming in the next release") is replaced with a cross-platform browser launcher that opens the bundled execution-report HTML — a real `testnux report` output (13 PASS / 2 BLOCKED-CONFIG out of 15 TCs, 13 embedded screenshots). Zero setup, immediate "aha" for first-time users. New `--no-open` flag for CI/scripted use; JSON mode emits `{event: 'demo.opened', path, opened}`.
+- `examples/demo-dashboard/output/login-execution-report.html`, `login-test-plan.md`, `login-sca-v0.1.md`, and `examples/demo-dashboard/README.md` now ship with the npm package (added to `package.json` `files` array). Without these, the README's "Open `examples/demo-dashboard/output/login-execution-report.html` to see it live" instruction was broken for npm-installed users. Package size: ~800KB → 3.1MB unpacked; the 2.3MB demo HTML is the bulk and is the headline artifact.
+
+### Changed
+
+- `[v0.2 ALPHA]` and `[v0.2 stub]` tags stripped from CLI command descriptions for `discover`, `plan`, `codify`, `enrich`, and `batch-plan`. Each description reworded to reflect the wired state: what the command does, what it requires (`CLAUDE_API_KEY` + `@anthropic-ai/sdk`), no temporal version markers. Resolves a contradiction between the v0.2.0 stable framing in CHANGELOG/README and the alpha tags still surfaced via `testnux --help`.
+- **Dependency bumps** (all verified safe via independent agent triage; 370/370 tests + 0 lint errors after each merge):
+  - `@anthropic-ai/sdk` 0.39.0 → 0.91.1 (PR #3) — peer dep + dev dep. All consumers (`discover`/`plan`/`codify`/`enrich`/`sign`) use the stable `client.messages.create()` API; no surface breakage.
+  - `marked` 12.0.2 → 18.0.2 (PR #6) — six majors. Both call sites use dynamic `await import('marked')`, side-stepping the v16 CommonJS removal; `marked.parse()` signature unchanged across all six majors.
+  - `commander` 12.1.0 → 14.0.3 (PR #10) — two majors. The breaking changes (excess-positionals-error, multi-char-short-flag-error) don't affect the CLI surface; all commands declare exactly the positionals they accept.
+  - `eslint` 9.39.4 → 10.2.1 + `@eslint/js` 9.39.4 → 10.0.1 (PR #12, combines #5 + #8) — must be merged together due to peer-dep ERESOLVE. Project already uses flat-config (`eslint.config.mjs`), so v10 is drop-in. Two new `no-useless-assignment` errors in `sca-oscal.mjs` and `sign-pdf.mjs` fixed in the merge (removed redundant variable initializers).
+- CI: `actions/checkout` 4.3.1 → 6.0.2 (PR #1) and `actions/setup-node` 4.4.0 → 6.4.0 (PR #2), `sharp` 0.33.5 → 0.34.5 (PR #7) — all landed alongside v0.2.0 stable.
+
+### Fixed
+
+- `package-lock.json` regenerated with proper Linux-platform optional deps (`@emnapi/runtime` and `@emnapi/core` for sharp). Previously stripped on Windows-generated lock files, causing `npm ci` failures in CI.
+
+### Notes
+
+- v0.2.0 was tagged on GitHub at commit `35744ad` and marked Latest at the time. Once v0.2.1 ships, v0.2.1 takes the Latest flag; v0.2.0 remains in the GitHub release history as a tagged-but-never-npm-published snapshot.
+
+---
+
 ## [0.2.0] - 2026-04-27
 
 The "v0.2 capability-parity" stable release. Wires up the LLM agent suite (`plan`, `codify`, `enrich`, `batch-plan`), ports the deterministic report generator (`testnux report` is no longer a stub), adds the signoff suite (`sign pdf`, `sign stale-check`, multi-reviewer N-of-M, OSCAL assessment-log, optional LLM-drafted justification), and ships real implementations of `run`/`compare` (per-env testing) and `visual baseline`/`visual compare` (pixel-diff regression).

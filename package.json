@@ -1,6 +1,6 @@
 {
   "name": "testnux",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence. OSS evidence-chain for regulated software (test plans → RTM → SCA).",
   "private": false,
   "license": "Apache-2.0",
