@@ -16,6 +16,17 @@ No SaaS dependency. No CI lock-in. Output lives in your repo, versioned with you
 
 ## TL;DR
 
+TestNUX supports **the full journey from testing to audit, end-to-end**.
+
+```
+  ENGINEER          QA            COMPLIANCE        AUDITOR
+  writes tests  →   executes  →   attests       →   verifies
+  test-plan.md      report.html   sign + sca        hash-chain +
+                    + evidence    + OSCAL           traceability
+```
+
+Engineers write test plans. Tests execute and capture evidence. Reports go out. Compliance officers attest to controls with HMAC-chained signoffs. Auditors receive a self-contained evidence package they can verify independently of the tool. Everyone in the chain sees evidence in formats they can already open (HTML, Excel, PDF, JSON, Markdown). No SaaS login. No vendor lock-in. The data lives in your git repo.
+
 TestNUX serves **two audiences at once**:
 
 - **Operators (engineering / QA leads)** install and run the CLI. They get the deterministic pipeline, the LLM accelerators, and the version-control discipline.
@@ -207,6 +218,57 @@ TestNUX is **complementary, not competitive**, with most of these:
 - **OSS test reporters (Allure / Playwright HTML)** can run alongside TestNUX in the same Playwright pipeline — TestNUX writes its evidence in `evidence/`, your reporter writes its HTML in `playwright-report/`. They don't conflict.
 
 What makes TestNUX different from any of them is the **combination**: git-native + standards-aligned + LLM-augmented + signoff-chained + audit-package-output. Each individual feature has a competitor; the bundle is the moat.
+
+---
+
+## The full journey: testing → attestation → audit
+
+TestNUX is built to cover the entire chain from "an engineer writes a test plan" to "an auditor signs off on the evidence package." Different stages need different artifacts, and different people consume them. The CLI handles each stage.
+
+### Stage 1 — Author and execute (engineering)
+
+An engineer or QA lead authors `test-plan.md`, writes `spec.ts`, runs Playwright. Evidence screenshots land in `evidence/`. AI accelerators (`testnux discover`, `plan`, `codify`, `enrich`) draft the boilerplate; humans confirm `[VERIFY]` markers before anything becomes evidence.
+
+### Stage 2 — Report and traceability (engineering → compliance)
+
+`testnux report` produces the deterministic XLSX + self-contained HTML + execution log. `testnux rtm` produces the bidirectional traceability matrix mapping R-XX requirements to TC-XX test cases to evidence files. The HTML report is what most stakeholders read; the RTM is what auditors walk during the audit.
+
+### Stage 3 — Attest and assess (compliance)
+
+`testnux sca` produces an 8-section Security Control Assessment for a surface (today most often a tested page, but any control surface works). `testnux sign` records HMAC-chained attestations against TC results, control claims, vendor questionnaire responses, or release approvals. Multi-reviewer N-of-M attestation via `testnux br` enforces that QA, Security, and Compliance have all signed before a record is final.
+
+### Stage 4 — Submit and verify (audit)
+
+`testnux sign pdf` renders the signoff ledger to PDF with a hash-chain verification badge auditors can confirm independently of the tool. `testnux sca oscal` emits NIST OSCAL 1.1.2 JSON for ingestion into Vanta, Drata, Secureframe, RegScale. `testnux sign stale-check --threshold 90d` flags entries older than threshold so auditors know which evidence is fresh and which needs re-attestation.
+
+### Who runs each stage
+
+| Stage | Primary operator | Primary consumer |
+|---|---|---|
+| 1 — Author and execute | Engineer / QA lead | (internal: nobody yet) |
+| 2 — Report and traceability | QA lead | Engineering manager + audit trail reviewer |
+| 3 — Attest and assess | Compliance officer / CISO / GRC analyst | Same compliance team + risk committee |
+| 4 — Submit and verify | Compliance officer | External auditor + regulator |
+
+The journey is not strictly sequential. You can re-attest at any time. You can re-run reports as evidence changes. You can re-emit OSCAL whenever your GRC platform asks for an updated package. But every stage produces an artifact downstream stakeholders need.
+
+### Where the journey extends in v0.3
+
+Three artifact verbs that reuse the same machinery to cover non-testing workflows:
+
+| Coming in v0.3 | Stage | What it produces | Status |
+|---|---|---|---|
+| `testnux attest <claim>` | 3 | Attestation workflow not tied to a test plan. A reviewer signs a control claim ("we encrypt customer data at rest with AES-256") with the same HMAC chain. Useful for SOC 2 / NYDFS / ISO 27001 attestation packages with 80+ control narratives that have nothing to do with testing. | Planned |
+| `testnux comply <industry>` | 3 + 4 | Scaffolds a regulator-ready compliance package from one of the 7 industry bundles. Control coverage table + evidence pointers + signoff blocks + OSCAL emission, ready for audit submission. | Planned |
+| `testnux respond <questionnaire>` | 4 | Vendor due-diligence response generator. Reads SIG / CAIQ / vendor questionnaire formats, drafts answers from the existing SCA + signoff log, marks every cell `[VERIFY]` for legal review before submission. | Planned |
+
+Same `[VERIFY]` discipline. Same HMAC ledger. Same git-native storage. Different artifact verbs covering different stages of the same journey.
+
+### Why we still lead with testing
+
+Testing is concrete. Engineering teams already do it. It's the one place where evidence and code naturally converge, which makes the wedge tractable. The README leads with the testing surface because that's where most users will start.
+
+But the wedge is not the product. The product is the journey. If you're a compliance officer, GRC analyst, vendor-DD lead, or release-approval workflow owner reading this, the existing commands (`sign`, `sca`, `rtm`, `br`, `sca oscal`) already cover non-testing workflows today. If you want the v0.3 roadmap to prioritize your specific artifact type, [open an issue](https://github.com/StillNotBald/testnux/issues) tagged `artifact-type:<your-thing>`.
 
 ---
 
@@ -427,12 +489,20 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 > v0.2.0 introduced the LLM agents; v0.2.1 (current) added smoke-test polish and bumped four major dependencies. Eval-set regression testing is in place (3 fixture pages with golden outputs) but coverage will expand in 0.2.x patch releases as the tool soaks against more real-world surfaces. Expect prompt-quality iteration during the 0.2.x cycle.
 
-### v0.3 (next; needs traction + founder full-time decision)
+### v0.3 (next; the journey extension)
 
-- Eval harness expansion: 10+ real customer pages, regression CI gate before any LLM prompt change ships
-- Cypress + Vitest adapter support (today: Playwright only)
-- Additional `--industry` bundles for emerging regulatory jurisdictions (UK FCA, EU DORA, India RBI candidates)
-- Optional `/testnux` skill for the gstack catalog — one distribution channel for users already on gstack; the underlying CLI is unchanged
+The v0.3 thesis: TestNUX is not a test reporter, it's the toolchain for the testing-to-audit journey. v0.3 adds three artifact verbs that extend the journey to non-testing workflows, plus the supporting infrastructure.
+
+**New artifact verbs (cover stages 3 and 4 of the journey):**
+- `testnux attest <claim>` — attestation workflow not tied to a test plan. HMAC-chained, PDF output, useful for SOC 2 / NYDFS / ISO 27001 control narratives.
+- `testnux comply <industry>` — scaffolds a regulator-ready compliance package from any industry bundle. Control coverage + evidence pointers + signoff blocks + OSCAL emission. Audit-submission-ready.
+- `testnux respond <questionnaire>` — vendor due-diligence response generator. Reads SIG / CAIQ formats, drafts from existing SCA + signoff log, marks every cell `[VERIFY]` for legal review.
+
+**Infrastructure to support the journey:**
+- Eval harness expansion: 10+ real customer pages, regression CI gate before any LLM prompt change ships.
+- Cypress + Vitest adapter support (today: Playwright only).
+- Additional `--industry` bundles for emerging regulatory jurisdictions (UK FCA, EU DORA, India RBI candidates).
+- Optional `/testnux` skill for the gstack catalog — one distribution channel for users already on gstack; the underlying CLI is unchanged.
 
 ---
 
