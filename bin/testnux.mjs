@@ -57,7 +57,7 @@ const { runSignPdf } = await import('../src/commands/sign-pdf.mjs');
 const { runSignStaleCheck } = await import('../src/commands/sign-stale.mjs');
 const { runEnvRun, runEnvCompare } = await import('../src/commands/env.mjs');
 const { runVisualBaseline, runVisualCompare } = await import('../src/commands/visual.mjs');
-// v0.2 stubs — LLM agents + OSCAL
+// v0.2 LLM agents + OSCAL
 const { runScaOscal }  = await import('../src/commands/sca-oscal.mjs');
 const { runDiscover }  = await import('../src/commands/discover.mjs');
 const { runPlan }      = await import('../src/commands/plan.mjs');
@@ -139,14 +139,16 @@ program
 program
   .command('demo')
   .description(
-    'Run the bundled demo test suite against examples/demo-dashboard/. ' +
-    'Opens the resulting HTML report in your default browser. ' +
+    'Open the bundled demo execution report in your default browser. ' +
+    'A real testnux report output (13 PASS / 2 BLOCKED-CONFIG, 13 embedded ' +
+    'screenshots, standards-alignment matrix, threat coverage). ' +
     'The fastest path to "aha" for first-time users.',
   )
-  .action(async (_opts, cmd) => {
+  .option('--no-open', 'print the path without launching a browser (CI-friendly)')
+  .action(async (opts, cmd) => {
     const global = cmd.parent.opts();
     try {
-      await runDemo({ json: global.json });
+      await runDemo({ json: global.json, noOpen: opts.open === false });
     } catch (err) {
       emit(global.json, { error: err.message });
       process.exit(err.exitCode ?? 1);
@@ -343,12 +345,12 @@ scaCmd
     }
   });
 
-// ── discover (v0.2 ALPHA — wired to Claude API) ───────────────────────────────
+// ── discover (Claude API) ────────────────────────────────────────────────────
 
 program
   .command('discover <url>')
   .description(
-    '[v0.2 ALPHA] Browse a page and emit scenarios.md with Given/When/Then TCs. ' +
+    'Browse a page and emit scenarios.md with Given/When/Then TCs. ' +
     'Fetches page HTML, extracts DOM summary, calls Claude API, writes scenarios.md. ' +
     'Requires: CLAUDE_API_KEY env var + npm install @anthropic-ai/sdk',
   )
@@ -374,14 +376,15 @@ program
     }
   });
 
-// ── plan (v0.2 LLM agent stub) ───────────────────────────────────────────────
+// ── plan (Claude API) ────────────────────────────────────────────────────────
 
 program
   .command('plan <slug>')
   .description(
-    '[v0.2 stub] Convert scenarios.md + page DOM into a structured test-plan.md. ' +
-    'In v0.1, prints what v0.2 will do and guides manual plan creation. ' +
-    'Requires CLAUDE_API_KEY in v0.2.',
+    'Convert scenarios.md + page DOM into a structured test-plan.md with ' +
+    'frontmatter (slug, industry, r_ids, tc_prefix), TC matrix, and per-TC ' +
+    'Given/When/Then. [VERIFY] markers on every LLM-generated cell. ' +
+    'Requires: CLAUDE_API_KEY env var + npm install @anthropic-ai/sdk',
   )
   .option('--url <url>', 'live page URL for DOM snapshot (optional)')
   .option('--industry <industry>', 'industry profile for standards alignment', 'general')
@@ -401,14 +404,14 @@ program
     }
   });
 
-// ── codify (v0.2 ALPHA — wired to Claude API) ────────────────────────────────
+// ── codify (Claude API) ──────────────────────────────────────────────────────
 
 program
   .command('codify <slug>')
   .description(
-    '[v0.2 ALPHA] Convert testing-log/<date>_<slug>/test-plan.md into a ' +
-    'Playwright TypeScript spec.ts via Claude API. Preserves XFF isolation, ' +
-    'form.requestSubmit(), afterEach evidence hooks, and [VERIFY] markers. ' +
+    'Convert testing-log/<date>_<slug>/test-plan.md into a Playwright TypeScript ' +
+    'spec.ts via Claude API. Preserves XFF isolation, form.requestSubmit(), ' +
+    'afterEach evidence hooks, and [VERIFY] markers. ' +
     'Requires: CLAUDE_API_KEY env var + npm install @anthropic-ai/sdk',
   )
   .option('--folder <path>', 'explicit path to testing-log/<date>_<slug>/ (overrides slug search)')
@@ -437,14 +440,15 @@ program
     }
   });
 
-// ── enrich (v0.2 LLM agent stub) ─────────────────────────────────────────────
+// ── enrich (Claude API) ──────────────────────────────────────────────────────
 
 program
   .command('enrich <slug>')
   .description(
-    '[v0.2 stub] Run design-review + QA-structural + graph-context passes to append ' +
-    'suggested TCs to an existing test plan (append-only; never overwrites human content). ' +
-    'In v0.1, adds section markers and prints guidance. Requires CLAUDE_API_KEY in v0.2.',
+    'Run three append-only enrichment passes on an existing test plan: ' +
+    'design-review (a11y/visual/mobile), qa-structural (boundary/error/empty), ' +
+    'graph-context (cross-surface integration). Marker-bounded so human edits ' +
+    'survive regeneration. Requires CLAUDE_API_KEY env var + @anthropic-ai/sdk.',
   )
   .option('--url <url>', 'live page URL for design-review pass (optional)')
   .option('--passes <passes>', 'comma-separated passes to run: design,qa,graph', 'design,qa,graph')
@@ -464,14 +468,15 @@ program
     }
   });
 
-// ── batch-plan (v0.2 multi-agent stub) ───────────────────────────────────────
+// ── batch-plan (parallel Claude API dispatch) ────────────────────────────────
 
 program
   .command('batch-plan')
   .description(
-    '[v0.2 stub] Dispatch parallel LLM agents to run discover→plan→codify→enrich ' +
-    'for multiple pages in one command. Uses replacement-agent pattern for cost control. ' +
-    'In v0.1, prints cost estimate and per-page manual workflow.',
+    'Dispatch parallel LLM agents to run discover→plan→codify→enrich for ' +
+    'multiple pages in one command. Replacement-agent pattern (one page failing ' +
+    'doesn\'t abort the batch) + cumulative --max-spend enforcement. ' +
+    'Requires CLAUDE_API_KEY env var + @anthropic-ai/sdk.',
   )
   .requiredOption('--pages <pages>', 'comma-separated page slugs or URLs')
   .option('--max-spend <usd>', 'abort if estimated cost exceeds this USD amount', parseFloat)
