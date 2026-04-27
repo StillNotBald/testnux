@@ -35,11 +35,17 @@ See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide incl
 ## Install
 
 ```bash
-npm install -g testnux
-testnux --version    # 0.1.0
+# stable (deterministic core only — no LLM agents)
+npm install -g testnux                # 0.1.1
+testnux --version
+
+# alpha (v0.2 capability-parity — LLM agents + signoff + per-env + visual)
+npm install -g testnux@alpha          # 0.2.0-alpha.1
 ```
 
 Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/testnux). One-shot via `npx testnux <command>` works too — no install needed.
+
+> **v0.2.0-alpha.1 is current** (released 2026-04-27). The `@alpha` tag is opt-in so stable users on `testnux@latest` keep v0.1.1 until 0.2.0 stable. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
 
 ---
 
@@ -161,41 +167,41 @@ testing-log/
 ## The 6-phase pipeline
 
 ```
-1. DISCOVER   →  page state catalogued (v0.1: manual; v0.2: LLM agent)
+1. DISCOVER   →  page state catalogued (testnux discover)
       ↓
-2. PLAN       →  test-plan.md authored (v0.1: templates; v0.2: LLM draft)
+2. PLAN       →  test-plan.md authored (testnux plan)
       ↓
-3. CODIFY     →  Playwright spec written (v0.1: templates; v0.2: LLM codify)
+3. CODIFY     →  Playwright spec written (testnux codify)
       ↓
 4. EXECUTE    →  tests run, evidence captured (Playwright + afterEach hook)
       ↓
-5. REPORT     →  XLSX + HTML generated (✅ fully automated today)
+5. REPORT     →  XLSX + HTML generated (testnux report)
       ↓
-6. DOC        →  RTM + session log updated (v0.1: templates; v0.2: LLM doc agent)
+6. DOC        →  RTM + session log updated (testnux rtm)
 ```
 
-**v0.1 honest scope:** Phase 5 (REPORT) is fully automated. Phases 1, 2, 3, 6 are documented patterns and templates that a human or LLM agent fills in. v0.2 closes the manual gaps. This is intentional — the deterministic core is the foundation.
+**Honest scope at v0.2.0-alpha.1:** Phase 5 (REPORT) is the deterministic foundation — no LLM, same output every run. Phases 1, 2, 3, 6 are LLM-assisted in alpha (Claude API, opt-in via `CLAUDE_API_KEY`); every LLM-generated cell renders with a `[VERIFY]` marker until a human attests it. The deterministic core is what gets audited; the LLM agents accelerate authoring.
 
 ---
 
-## What's automated vs manual at v0.1
+## What's automated vs manual
 
-| Phase | v0.1 state | Automated by |
+| Phase | v0.1.1 (stable) | v0.2.0-alpha.1 (current) |
 |---|---|---|
-| DISCOVER | Manual | Human reads page, lists what exists |
-| PLAN | Template-assisted | Human fills `test-plan.md` from scaffold |
-| CODIFY | Template-assisted | Human writes `spec.ts` from template pattern |
-| EXECUTE | Automated | Playwright + bundled `afterEach` evidence hook |
-| REPORT | Fully automated | `testnux report` |
-| DOC | Template-assisted | Human updates RTM rows from scaffold |
+| DISCOVER | Manual | `testnux discover <url>` (Claude API, [VERIFY] markers) |
+| PLAN | Template-assisted | `testnux plan <slug>` (Claude API, [VERIFY] markers) |
+| CODIFY | Template-assisted | `testnux codify <slug>` (Claude API, preserves XFF + form.requestSubmit + afterEach patterns) |
+| EXECUTE | Automated | Same — Playwright + bundled `afterEach` evidence hook |
+| REPORT | Fully automated (no LLM) | Same — fully deterministic, no LLM |
+| DOC | Template-assisted | `testnux rtm` (deterministic) + `testnux enrich` (LLM, append-only) |
 
-The LLM features in v0.2 (discover, plan, codify, doc agents) are not stubs — they're planned and scoped — but they are not the reason to adopt v0.1. The report generation is.
+The deterministic `report` pipeline is the audit-defensible core in both versions. v0.2-alpha adds LLM agents that draft scenarios → plans → specs → enrichments — every output flagged `[VERIFY]` until a human reviews. Use `testnux batch-plan --pages "login,register,..."` for parallel multi-page authoring.
 
 ---
 
 ## Industry-standards configuration
 
-v0.1 ships `--industry general` with OWASP ASVS + WCAG 2.2 AA. Every generated report includes a standards-alignment table mapping each TC to the applicable control.
+`--industry general` ships in v0.1.1+ with OWASP ASVS + WCAG 2.2 AA. Every generated report includes a standards-alignment table mapping each TC to the applicable control.
 
 ```bash
 npx testnux init my-page --industry general
@@ -203,7 +209,7 @@ npx testnux init my-page --industry general
 
 The standards config lives in `templates/industry/general.json`. You can drop a custom `standards.json` in any test-pass folder to override.
 
-v0.2 will add `fintech` (NIST 800-63B, NYDFS 23 NYCRR 500, PSD2, PCI DSS) and `healthcare` (HIPAA Security Rule, HITECH). v0.2 also emits OSCAL JSON alongside markdown, making TestNUX compatible with FedRAMP RFC-0024 (mandatory machine-readable packages from September 2026) via IBM Trestle integration.
+v0.2-alpha adds OSCAL emission (`testnux sca oscal`) — making TestNUX compatible with FedRAMP RFC-0024 (mandatory machine-readable packages from September 2026) via IBM Trestle integration. v0.3 will add `--industry fintech` (NIST 800-63B, NYDFS 23 NYCRR 500, PSD2, PCI DSS) and `--industry healthcare` (HIPAA Security Rule, HITECH).
 
 ---
 
@@ -222,7 +228,7 @@ examples/demo-dashboard/
 
 Run `npx testnux demo` to generate and open these locally.
 
-**Live demo:** Browse the [sample execution report](./examples/demo-dashboard/output/login-execution-report.html) — a real 1300+ line self-contained HTML you can open offline. No SaaS dashboard required.
+**Live demo:** Browse the [sample execution report](./examples/demo-dashboard/output/login-execution-report.html) — a real `testnux report` output from a Playwright run against the demo-dashboard project (13 PASS / 2 BLOCKED-CONFIG out of 15 TCs, 13 embedded screenshots), regenerated in v0.2-alpha to replace the original hand-crafted sample. Self-contained HTML — open offline, no SaaS dashboard required.
 
 ---
 
@@ -270,35 +276,57 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 
 ## Roadmap
 
-### v0.1 (current)
+### v0.1.1 (stable on `@latest`)
 
 - `testnux init <slug> [--industry general]` — scaffold test-pass folder
-- `testnux report <folder>` — generate XLSX + HTML from markdown inputs
-- `testnux validate <folder>` — lint test-plan.md against JSON Schema
+- `testnux report <folder>` — XLSX + HTML from markdown inputs (deterministic, no LLM)
+- `testnux validate <folder>` — lint test-plan.md frontmatter against JSON Schema
 - `testnux demo` — run bundled demo-dashboard fixture, open output in browser
-- `testnux doctor` — preflight check (Node version, Playwright installed, env vars, common pitfalls)
-- Templates: test-plan, spec, execution-log, standards-alignment table
+- `testnux doctor` — preflight check (Node, Playwright, env vars, common pitfalls)
 - OWASP ASVS + WCAG 2.2 AA standards alignment out of the box
 - `[VERIFY]` confidence markers on every LLM-generated cell
-- JSON Schema for `test-plan.md` frontmatter
 
-### v0.2 (Q3 2026 target; depends on traction + founder full-time decision)
+### v0.2.0-alpha.1 (current on `@alpha`, shipped 2026-04-27)
 
-- OSCAL JSON export alongside markdown (Trestle integration; 1-day spike first)
-- RTM generator: `testnux rtm` — generates `TRACEABILITY.md` from requirements + sprint log + code grep
-- SCA generator: `testnux sca init|generate|pdf` — Security Control Assessment from test results
-- LLM agents for PLAN, CODIFY, DOC phases (draft output, human review required)
-- `--industry fintech` and `--industry healthcare` standards configs
-- Eval harness for LLM-generated SCA output (5 held-out examples, scoring rubric, regression CI)
-- Human-edit-survives-regeneration markers for RTM rows and SCA operational notes
+**LLM agent suite** (real Claude API; require `CLAUDE_API_KEY` + `npm install @anthropic-ai/sdk`):
+- `testnux discover <url>` — browse a page, emit `scenarios.md` with G/W/T TCs
+- `testnux plan <slug>` — `scenarios.md` → `test-plan.md` with frontmatter + R-IDs + [VERIFY]
+- `testnux codify <slug>` — `test-plan.md` → Playwright `spec.ts`; preserves XFF + form.requestSubmit + afterEach patterns; `--safe` mode for hand-edited specs
+- `testnux enrich <slug>` — three append-only passes (design-review / qa-structural / graph-context), marker-bounded so human edits survive regeneration
+- `testnux batch-plan --pages "login,register,..."` — parallel multi-page pipeline with cumulative `--max-spend` enforcement and replacement-agent failure isolation
+- Eval harness at `test/eval/` — 3 fixture pages with golden outputs, scoring on TC count / R-ID format / [VERIFY] placement / standards alignment
 
-### v0.3 (Q4 2026 target if v0.2 + paying customers happen on schedule)
+**Signoff suite (S1-S5):**
+- `testnux sign <surface>` — record an attestation (chained HMAC log)
+- `testnux sign pdf <surface>` — render the UAT signoff ledger to PDF with hash-chain verification badge
+- `testnux sign stale-check <surface> --threshold 90d` — flag entries older than threshold (CI gate via `--strict`)
+- OSCAL `assessment-log` integration — `testnux sca oscal` populates `responsible-parties` + `assessments[].assessment-log.entries` (validated against OSCAL 1.1.2 schema)
+- `testnux sign --justify-with-llm` — optional LLM-drafted justification text; reviewer edits + confirms; auto-prefixed `[VERIFY] LLM-drafted, reviewer-confirmed:`
+- Multi-reviewer N-of-M — `required_reviewers` field in BR frontmatter; `testnux br rtm` shows partial-attestation status; revocation supported (append-only)
 
-- UAT sign-off layer: per-TC `uat_status` field, stakeholder HTML dropdown, HMAC e-signature, `uat-log.jsonl` audit trail
-- Business requirements (BR-XX) layer above R-XX, RTM grows a column
-- Per-environment test passes and cross-env diff: `testnux compare <slug> staging prod`
-- Visual regression mode: per-TC baseline screenshot + pixel-diff flagging
+**Per-env + visual regression:**
+- `testnux run <slug> --env staging|prod|local` — env-suffixed test-pass folders; auto-injects `env:` and `base_url:` into frontmatter
+- `testnux compare <slug> staging prod` — per-TC verdict: MATCH / PROMOTION / REGRESSION / DIVERGE / MISSING-A / MISSING-B; CI gate via `--threshold`
+- `testnux visual baseline <slug>` — capture full-page Playwright screenshots to `<folder>/visual-baseline/<TC-ID>.png`
+- `testnux visual compare <slug> --threshold 0.05 [--strict]` — pixelmatch diffs against baseline; graceful degrade if `pixelmatch` not installed
+
+**Deterministic generators:**
+- `testnux rtm` — generate `TRACEABILITY.md` from REQUIREMENTS.md + sprint-log + code grep + test-plan.md (human-edit-survives-regeneration markers)
+- `testnux sca init|generate|pdf` — Security Control Assessment from test results
+- `testnux mcp` — stdio MCP server for Claude Code integration (mount via `.claude/settings.json`)
+- `testnux report` is **no longer a stub** — full XLSX + self-contained HTML (TOC sidebar, status tabs, embedded screenshots, standards alignment matrix, threat coverage, base64-inlined assets)
+
+**Tests:** 152 → 365 (all green). 0 lint errors.
+
+> **Why "alpha":** the LLM agents are wired but not yet hardened with eval-set regression testing across many real customer pages. Use in preview; expect prompt-quality iteration before 0.2.0 stable.
+
+### v0.3 (next; needs traction + founder full-time decision)
+
+- `--industry fintech` (NIST 800-63B, NYDFS 23 NYCRR 500, PSD2, PCI DSS) and `--industry healthcare` (HIPAA Security Rule, HITECH) standards configs
+- gstack `/testnux` skill bundle published to the official catalog (slash-command-callable from any Claude Code session)
 - Cypress + Vitest adapter support
+- Eval harness expansion: 10+ real customer pages, regression CI gate before any LLM prompt change ships
+- Premium tier launch: hosted multi-tenant auditor portal, GRC platform integrations, white-glove onboarding
 
 ---
 
@@ -310,7 +338,7 @@ The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approxima
 OSS = self-serve via markdown docs. Premium tier (v0.4+) = white-glove onboarding + consulting + auditor facilitation. See [docs/adoption-checklist.md](docs/adoption-checklist.md) for what's included.
 
 **Do I need Claude Max or an Anthropic API key?**  
-Not for v0.1. The `report` command is fully deterministic — no LLM required. Claude access is required only for v0.2 agents (PLAN, CODIFY, DISCOVER, DOC phases).
+Not for the deterministic core. `testnux report`, `testnux validate`, `testnux rtm`, `testnux sca`, `testnux run`/`compare`, `testnux visual baseline`/`compare`, and the entire signoff suite work without any LLM. Claude API access is required only for the v0.2-alpha LLM agents (`discover`, `plan`, `codify`, `enrich`, `batch-plan`, optional `sign --justify-with-llm`).
 
 ---
 
