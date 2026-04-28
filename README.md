@@ -56,21 +56,29 @@ If you ship under SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, or HIPAA, every reg
 
 If your team treats AI as a partner (Claude Code, Cursor, Aider, Cline, MCP-enabled tooling), 5-NUX is built for that workflow. Most regulated-software tooling isn't.
 
-## What 5-NUX is *not*
+## What 5-NUX is *not* (and what's actually enough)
 
-To set expectations clearly — 5-NUX does **not** replace these, by design:
+**For shipping real regulated software, 5-NUX OSS on its own is more than sufficient.** The artifacts it produces (RTM, SCA, OSCAL, signed evidence packages) are exactly what auditors ask for. You don't need to buy anything else to pass a SOC 2, ISO 27001, NYDFS, GDPR, or HIPAA review.
 
-| You still need | For |
+That said, 5-NUX is deliberately scoped — it doesn't try to replace adjacent tools, and you don't have to use them either. Here's what's outside scope and where to get it if you want it:
+
+| If you want... | What to use |
 |---|---|
-| **GitHub Issues / Linear / Jira** | Active task tracking, kanban boards, multi-user assignment, comments, real-time collaboration |
-| **GitHub Projects / Asana / Trello** | Visual workflow boards, drag-and-drop prioritization |
-| **Productboard / Aha! / roadmap.io** | Roadmap visualization, OKR tracking, theme management |
-| **CircleCI / GitHub Actions / Jenkins** | Build, test, and deploy pipelines |
-| **Slack / Teams** | Real-time team chat, notifications |
+| Active task tracking + kanban boards | GitHub Issues / Linear / Jira (pair with 5-NUX — no integration work needed; 5-NUX writes plain files, your tracker manages your tickets) |
+| Visual roadmap / Gantt timeline | Productboard / Aha! / GitHub Projects / Asana |
+| Real-time team chat + notifications | Slack / Discord / Teams |
+| Build + deploy pipelines | GitHub Actions / CircleCI / Jenkins (5-NUX hands these off — see "ship is yours" in [`docs/MOTTO.md`](docs/MOTTO.md)) |
+| **GUI for non-technical stakeholders** (compliance officers, executives, board) | Build it yourself, **or engage LeapNuX 6-NUX premium when shipped** |
+| **Multi-user hosted dashboards, signed evidence portal, account-bound access** | Build it yourself, **or engage LeapNuX 6-NUX premium when shipped** |
 
-**5-NUX pairs with these tools, not against them.** The kanban board lives in GitHub Projects; the RTM lives in 5-NUX. The deploy pipeline lives in GitHub Actions; the audit-evidence lives in 5-NUX. The right shape is "5-NUX + your existing PM/CI stack" — not "5-NUX instead of."
+**The honest version:**
 
-If you're shopping for "Jira-in-CLI," 5-NUX isn't it. If you're shopping for "DOORS/Polarion-replaced-with-OSS-files-and-an-LLM-friendly-CLI," **5-NUX is exactly that.**
+- ✅ Ship a SOC 2 / ISO 27001 / NYDFS regulated app using just 5-NUX OSS + GitHub free tier? **Yes.**
+- ✅ Pass an external audit with 5-NUX-generated artifacts? **Yes** — RTM, SCA, OSCAL, and HMAC-signed evidence is exactly what auditors review.
+- ✅ Run the whole evidence pipeline as part of CI, with an LLM agent driving it? **Yes** — every verb is CLI + plain files + `--json` modes; agents drive 5-NUX the same way humans do.
+- ⚠️ Want a click-driven UI for non-engineers, multi-user hosted dashboards, or an account-bound evidence portal for external stakeholders? **Either build it yourself, or engage [LeapNuX 6-NUX premium](docs/MOTTO.md) when it ships** (commercial product, future).
+
+If you're shopping for "Jira-in-CLI," 5-NUX isn't it. If you're shopping for "DOORS/Polarion-replaced-with-OSS-files-and-an-LLM-friendly-CLI" — **5-NUX is exactly that, and 5-NUX alone is enough to ship.**
 
 ## What this is (the bigger picture)
 
