@@ -6,11 +6,11 @@ Follow these steps to reproduce the full output from scratch.
 ## Prerequisites
 
 1. **Node.js 20+** and **npm** installed
-2. **demo-dashboard** cloned at a known path (e.g. `C:\Users\Chu Ling\Desktop\demo-dashboard\`)
-3. **branchnux** repo at a known path (e.g. `C:\Users\Chu Ling\Desktop\Projects\branchnux\`)
+2. **demo-dashboard** cloned at a known path (e.g. `<your-clone-of>/demo-dashboard\`)
+3. **branchnux** repo at a known path (e.g. `<your-clone-of>/branchnux\`)
 4. Playwright Chromium browser installed:
    ```bash
-   cd "C:\Users\Chu Ling\Desktop\demo-dashboard"
+   cd "<your-clone-of>/demo-dashboard"
    npx playwright install chromium
    ```
 
@@ -21,7 +21,7 @@ Follow these steps to reproduce the full output from scratch.
 Open a terminal and keep it running:
 
 ```bash
-cd "C:\Users\Chu Ling\Desktop\demo-dashboard"
+cd "<your-clone-of>/demo-dashboard"
 npm install          # if first time
 npm run dev          # starts on http://localhost:3737
 ```
@@ -33,7 +33,7 @@ Wait until you see `✓ Ready on http://localhost:3737` in the terminal output.
 Open a second terminal:
 
 ```bash
-cd "C:\Users\Chu Ling\Desktop\Projects\branchnux\examples\demo-dashboard\output\real-run"
+cd "<your-clone-of>/branchnux\examples\demo-dashboard\output\real-run"
 npx playwright test --config=playwright.config.ts --reporter=list
 ```
 
@@ -47,7 +47,7 @@ The spec also auto-writes `execution-log-auto.md` alongside itself.
 ### 3 — Generate the report
 
 ```bash
-cd "C:\Users\Chu Ling\Desktop\Projects\branchnux"
+cd "<your-clone-of>/branchnux"
 node bin/branchnux.mjs report examples/demo-dashboard/output/real-run
 ```
 
@@ -74,7 +74,7 @@ The dev server has a hydration race that can cause form submits to behave differ
 For CI-accurate results, run against the production build:
 
 ```bash
-cd "C:\Users\Chu Ling\Desktop\demo-dashboard"
+cd "<your-clone-of>/demo-dashboard"
 npm run build
 npm start           # starts on http://localhost:3737 (same port)
 ```

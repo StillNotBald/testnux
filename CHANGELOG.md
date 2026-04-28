@@ -34,7 +34,7 @@ Two parallel audits (hygiene+leak, workflow+structure) identified 4 RED hygiene 
 
 - `docs/6-NUX.md` — replaced internal-project structure references with generic project layout; replaced specific auditor / KYC vendor names with role-level placeholders.
 - `packages/branchnux/src/commands/doctor.mjs` — removed dated incident references; comments are now behavior-explaining and generic.
-- `packages/branchnux/templates/spec.ts` — `mfa-tester` → `totp-user`; replaced internal memory key reference with OWASP citation. This template ships in the npm tarball.
+- `packages/branchnux/templates/spec.ts` — `<internal-email-handle>` → `totp-user` (generic placeholder); replaced internal memory key reference with OWASP citation. This template ships in the npm tarball.
 - `testing-log/2026-04-27_trunknux-cli/spec.ts` — same fixes as the template above.
 - `@leapnux/6nux-core` VERSION constant updated to read runtime version (was 3 releases stale). STATUS changed from `'skeleton'` to `'active'`.
 - `@leapnux/leafnux` and `@leapnux/fruitnux` READMEs, CLI stubs, and roadmap section updated to **DEFERRED — future sprint, no committed timeline**.

@@ -29,10 +29,10 @@ title: Requirements Traceability Matrix
 | R-ID | Title | Status | Sprint | Code | Tests | Backlog | Notes |
 |------|-------|--------|--------|------|-------|---------|-------|
 <!-- branchnux:row R-01 begin -->
-| R-01 | `branchnux init <slug>` scaffolds a test-pass folder | DONE | — | `C:\Users\Chu Ling\Desktop\Projects\testnux\src\parsers\test-plan.mjs:194`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\parsers\test-plan.mjs:194`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\lib\parser.mjs:20` *(+23)* | `2026-04-27_branchnux-cli`, `2026-04-27_branchnux-cli` | — |  |
+| R-01 | `branchnux init <slug>` scaffolds a test-pass folder | DONE | — | `packages/branchnux/src/parsers/test-plan.mjs:194`, `packages/branchnux/src/parsers/test-plan.mjs:194`, `packages/branchnux/src/lib/parser.mjs:20` *(+23)* | `2026-04-27_branchnux-cli`, `2026-04-27_branchnux-cli` | — |  |
 <!-- branchnux:row R-01 end -->
 <!-- branchnux:row R-02 begin -->
-| R-02 | `branchnux report <folder>` generates XLSX + HTML | DONE | — | `C:\Users\Chu Ling\Desktop\Projects\testnux\src\parsers\test-plan.mjs:194`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\lib\parser.mjs:182`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\commands\br.mjs:85` *(+2)* | `2026-04-27_branchnux-cli`, `2026-04-27_branchnux-cli` | — |  |
+| R-02 | `branchnux report <folder>` generates XLSX + HTML | DONE | — | `packages/branchnux/src/parsers/test-plan.mjs:194`, `packages/branchnux/src/lib/parser.mjs:182`, `packages/branchnux/src/commands/br.mjs:85` *(+2)* | `2026-04-27_branchnux-cli`, `2026-04-27_branchnux-cli` | — |  |
 <!-- branchnux:row R-02 end -->
 <!-- branchnux:row R-03 begin -->
 | R-03 | `branchnux validate <folder>` lints markdown frontmatter | DONE | — | — | `2026-04-27_branchnux-cli` | — |  |
@@ -152,7 +152,7 @@ title: Requirements Traceability Matrix
 | R-41 | `fintech` industry bundle | DONE | — | — | `2026-04-27_branchnux-cli` | — |  |
 <!-- branchnux:row R-41 end -->
 <!-- branchnux:row R-42 begin -->
-| R-42 | `gov` industry bundle | DONE | — | `C:\Users\Chu Ling\Desktop\Projects\testnux\src\commands\validate.mjs:53`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\commands\validate.mjs:135`, `C:\Users\Chu Ling\Desktop\Projects\testnux\src\commands\validate.mjs:149` | `2026-04-27_branchnux-cli` | — |  |
+| R-42 | `gov` industry bundle | DONE | — | `packages/branchnux/src/commands/validate.mjs:53`, `packages/branchnux/src/commands/validate.mjs:135`, `packages/branchnux/src/commands/validate.mjs:149` | `2026-04-27_branchnux-cli` | — |  |
 <!-- branchnux:row R-42 end -->
 <!-- branchnux:row R-43 begin -->
 | R-43 | `healthcare` industry bundle | DONE | — | — | `2026-04-27_branchnux-cli` | — |  |
