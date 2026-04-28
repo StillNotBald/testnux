@@ -247,25 +247,53 @@ The dogfood discipline is **load-bearing for credibility**. Every time we ship a
 | v0.5+ | 5 ports identified, scoped from production-PM-tool feedback | scoped, not started |
 | v1.0.0 | Stability + leapnux.com landing page + 6-NUX commercial spec | planned |
 
-### v0.5+ candidate verbs (ranked)
+### v0.5+ candidate verbs
 
-| # | Port | Package | Effort |
-|---|---|---|---|
-| 1 | `trunknux log` — weekly narrative log | trunknux | S |
-| 2 | `rootnux kb-init` — knowledge base scaffold | rootnux | S |
-| 3 | `leafnux health` — RAG status + transition linter (un-defers leafnux with concrete value) | leafnux | S |
-| 4 | `branchnux gate-new` — gate checkpoint artifact | branchnux | M |
-| 5 | `leafnux critical-path` — CPM dependency analysis | leafnux | M |
+| # | Candidate | Verdict | Package | Effort |
+|---|---|---|---|---|
+| 1 | `leafnux critical-path` — CPM dependency analysis | **clean port** — pure computation on a dependency graph, domain-agnostic | leafnux | M |
+| 2 | `trunknux log` — weekly narrative log | **fresh design needed** — pattern is valid, prior implementations carry domain assumptions | trunknux | S |
+| 3 | `leafnux health` — status linter / RAG transitions | **fresh design needed** — concept valid; prior implementations bake in domain-specific status taxonomies | leafnux | S |
+| 4 | `rootnux kb-init` — knowledge base scaffold | **fresh design needed** — sections (objective, owner, lessons, stakeholders) are universal, but the KB schema must be authored from first principles | rootnux | S |
+| 5 | `branchnux gate-new` — gate checkpoint artifact | **fresh design needed** — file-native gate schema with approver list + state is portable; reject any "live voting UI" temptation (premium territory) | branchnux | M |
 
-**Note on leafnux + fruitnux:** the skeleton packages remain reserved. Two concrete `leafnux` verbs are scoped (`health` and `critical-path`) — both originate from pure-logic patterns proven in production PM tooling. fruitnux remains deferred indefinitely; branchnux already covers the OSS-CLI portion of audit evidence (`sca`, `sca-oscal`, `sign`, `sign-pdf`), and most other deliverable workflows (multi-party sign-off, immutable evidence stores, regulator portals) are inherently 6-NUX premium.
+**Discipline:** "fresh design needed" means the candidate's *idea* survived a critical review of prior PM-platform implementations, but the prior implementation itself is unsuitable for direct porting (it carries domain assumptions, audience-specific UX, or architectural compromises that 5-NUX must not inherit). The OSS verb gets designed from first principles + adopter pull, not lifted.
+
+**Note on leafnux + fruitnux:** the skeleton packages remain reserved. `leafnux critical-path` is the only pre-vetted leafnux candidate; everything else is undecided. fruitnux remains deferred indefinitely; branchnux already covers the OSS-CLI portion of audit evidence (`sca`, `sca-oscal`, `sign`, `sign-pdf`), and most other deliverable workflows (multi-party sign-off, immutable evidence stores, regulator portals) are inherently 6-NUX premium.
 
 ### Anti-patterns to avoid (lessons from prior PM-platform work)
 
-- Interactive visual Gantt chart (data model is the value, not the bars)
-- Slide / PPTX export (anticipatory library that never wires to a workflow)
-- In-memory bulletin / announcement board (infrastructure for a static string)
-- Live-clock projection / war-room TV dashboard view (narrow-audience theatre)
-- Frontend stub permission service that always returns `true` (avoiding a refactor by lying in code)
+These all came from a critical autopsy of a previous all-in-one PM platform that suffered from feature-driven (not user-driven) growth. Every item below is a real failure mode with concrete prior-art evidence:
+
+**Strategic anti-patterns:**
+
+- **Audience generalization on a narrow product** — calling something "all-in-one PMO" while the data model is shaped for one specific team's ceremony. If the source code mentions a specific industry phase or vendor, the product is not generic.
+- **Demo-driven UX** — auto-redirecting roles to specific routes because that's what the demo script needs (vs what the role actually does day-to-day).
+- **Decorative dashboards** — homepage charts that exist to impress, not to inform. If the chart can't drive a working-session decision, it's art, not product.
+- **Burying the killer feature** — when the one workflow that would have made the product valuable is nav-item 5 of 8, the product is being marketed as something it isn't.
+
+**Engineering anti-patterns:**
+
+- **Permission services that always return `true`** — institutionalizing a broken auth boundary as if it were architecture. Either the check is real or the function shouldn't exist.
+- **TypeScript as decoration** — high `as any` density (100+ casts in a typed codebase) means the type system is being used as documentation, not enforcement. Worse than no types because it lies about safety.
+- **God hooks / god components** — single files with thousand-LOC mutation authority over the entire app. These prevent isolated reasoning and concentrate bug surface.
+- **Cross-layer import inversion** — when shared/business components import from feature modules' internal utils. The dependency graph should flow one direction; when it doesn't, "shared" stops meaning anything.
+- **Product inside a product** — a feature module that grew to thousands of LOC of hooks, eight tabs, and its own data model. If a sub-feature has the surface of a standalone product, it should *be* a standalone product or get cut.
+- **Test theater** — npm scripts categorized into 9 test types backed by 6 actual test files. Build infrastructure is not the same as test coverage.
+
+**UX anti-patterns:**
+
+- **`window.confirm` while a custom modal exists** — destructive actions handled by browser dialogs in a codebase that already has a `ConfirmationModal` component sitting unused. Use what you built or delete it.
+- **Domain-opaque modules in a generic product** — features whose names ("Dry Run", "Cutover") only make sense to one specific industry. Either the product is for that industry (label it) or the feature shouldn't be in the nav.
+- **Subtraction failures** — UI elements that exist because they're "what you'd expect" rather than because they earn their pixels. If you can't explain what a chart causes a user to *do*, cut it.
+- **Deprecated types living in the live schema** — leftover types/columns marked `@deprecated` but still referenced by data flowing through the app. Either complete the deprecation or revert the rename.
+
+**Operational anti-patterns:**
+
+- **Interactive visual Gantt chart** — pattern-matched to MS Project; data model is the value, not the visual chrome (9 component files for one widget is the symptom).
+- **Anticipatory export libraries** — `pptxgenjs` etc. listed in `dependencies` with no caller. Don't add export formats until a real user is blocked without them.
+- **In-memory bulletin / announcement boards** — infrastructure (service + type + component) for what is functionally a static string. Use what's at the right complexity level for the problem.
+- **Live-clock / war-room TV dashboard views** — narrow-audience theatre that doesn't generalize. If only one team uses it, it's internal tooling, not product.
 
 ---
 
