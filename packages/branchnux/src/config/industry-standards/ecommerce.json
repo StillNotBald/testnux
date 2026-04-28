@@ -1,6 +1,5 @@
 {
   "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
-  "$schema": "https://github.com/leapnux/5nux/schemas/industry-standards.schema.json",
   "version": "0.3.0",
   "industry": "ecommerce",
   "description": "E-commerce industry standards bundle. Covers PCI DSS v4.0 (SAQ A / SAQ A-EP / SAQ D), GDPR Articles 6/7/13/14/17/30/32, CCPA/CPRA (California), ePrivacy Directive cookie consent, OWASP ASVS 4.0 e-commerce-relevant controls, and WCAG 2.2 AA (ADA post-Domino's). Shipped in BranchNuX v0.3.",

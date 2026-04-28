@@ -12,6 +12,9 @@
   "bugs": {
     "url": "https://github.com/leapnux/5nux/issues"
   },
+  "scripts": {
+    "test": "echo 'fruitnux: skeleton — no tests yet' && exit 0"
+  },
   "type": "module",
   "bin": {
     "fruitnux": "bin/fruitnux.mjs"

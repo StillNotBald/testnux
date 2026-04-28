@@ -73,7 +73,10 @@ For the full "what's enough" breakdown, comparison vs DOORS / Polarion / Jama / 
 
 ## Install
 
+> **Not yet published.** `@leapnux/*` packages are not yet on npm — org claim and scope reservation are pending. Clone this repo and run via the package binaries from the workspace root (see below).
+
 ```sh
+# Coming soon (once @leapnux scope is claimed on npm):
 npm install -g @leapnux/5nux        # full stack (all 5 active NUX CLIs + 6nux-core)
 npm install -g @leapnux/rootnux     # just requirements + ADRs + risks + KB
 npm install -g @leapnux/trunknux    # just sprint scaffolding
@@ -81,7 +84,13 @@ npm install -g @leapnux/branchnux   # just verification + RTM + SCA + OSCAL + si
 npm install -g @leapnux/leafnux     # just continuous-health snapshots
 ```
 
-> **Note:** `@leapnux/*` packages are not yet published to npm — org claim and scope reservation are pending. For now, clone this repo and run via the package binaries from the workspace root.
+**Until then — install from source:**
+
+```sh
+git clone https://github.com/leapnux/5nux.git
+cd 5nux
+npm install
+```
 
 ---
 
@@ -198,5 +207,5 @@ Apache 2.0. See [LICENSE](LICENSE).
 
 ## Author
 
-Chu Ling ([StillNotBald](https://github.com/StillNotBald)) — ccling1998@gmail.com.
+Chu Ling — ccling1998@gmail.com.
 Security reports: [GitHub Private Vulnerability Reporting](https://github.com/leapnux/5nux/security/advisories/new) (preferred).

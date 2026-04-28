@@ -40,7 +40,6 @@
     "src/",
     "templates/",
     "schemas/",
-    "scripts/lint-templates.mjs",
     "LICENSE",
     "NOTICE",
     "README.md"
