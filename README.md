@@ -1,6 +1,6 @@
 # 5-NUX
 
-**A regulated-software artifact + audit-evidence toolchain in your CLI — AI-agent native, with auto-generated Requirements Traceability Matrix (RTM) out of the box.**
+**AI-native OSS PM tool in CLI** — purpose-built for regulated software, with auto-generated RTM, SCA, and OSCAL evidence out of the box.
 
 > 5-NUX gives you a whole tree. You provide the soil and you ship yourself.
 
