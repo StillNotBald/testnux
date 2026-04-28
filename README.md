@@ -1,6 +1,6 @@
 # 5-NUX
 
-**A complete software-project audit-evidence trail in your CLI — file-native, OSS, and free.**
+**A full project-management tool chain in your CLI — purpose-built for regulated software, with auto-generated Requirements Traceability Matrix (RTM) out of the box.**
 
 > 5-NUX gives you a whole tree. You provide the soil and you ship yourself.
 
@@ -11,16 +11,26 @@
 
 ## What 5-NUX does for your project
 
-If your team ships regulated software — SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, HIPAA — every regulator asks for the same artifact: a **Requirements Traceability Matrix (RTM)** that maps each requirement → sprint → code commit → test case → audit evidence. Today, your two real options are bad ones:
+5-NUX runs the **complete project lifecycle — requirement → sprint → test → validation → audit handoff** — entirely from the CLI, using plain files in your git repo. No SaaS. No login. No vendor lock-in.
 
-1. **Build the RTM manually in Excel.** Re-do it every audit cycle. Drift between docs and reality. Lose hours under deadline pressure when the auditor arrives.
+What makes it different from every other OSS PM tool: **it's purpose-built for regulated software, and it auto-generates the artifacts regulators ask for.**
+
+If you ship under SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, or HIPAA, every regulator asks for the same artifact: a **Requirements Traceability Matrix (RTM)** that maps each requirement → sprint → code commit → test case → audit evidence. Today your two real options are bad ones:
+
+1. **Build the RTM manually in Excel.** Re-do every audit cycle. Drift between docs and reality. Lose hours under deadline pressure when the auditor arrives.
 2. **Buy enterprise compliance tooling** — IBM DOORS, Polarion, Jama Connect, codeBeamer. **$1,000–$5,000+ per seat per year.** Your evidence locked inside their proprietary database. Vendor lock-in for a regulator-mandated artifact.
 
 **5-NUX gives you the same automation, for free, in plain files that live in your own git repo.**
 
-Run `branchnux rtm` and your `TRACEABILITY.md` regenerates from your existing `REQUIREMENTS.md` + sprint folders + source-code annotations + test files. Run `branchnux sca` and you get a Security Control Assessment document. Run `branchnux sca-oscal` and you get the same evidence as NIST OSCAL 1.1.2 JSON (the format SOC 2 examiners and FedRAMP auditors prefer). Run `branchnux sign` and every attestation is **HMAC-chained for tamper evidence** — auditors verify the chain independently of the tool.
+| You run | You get |
+|---|---|
+| `branchnux rtm` | `TRACEABILITY.md` regenerated from `REQUIREMENTS.md` + sprint folders + source-code `// R-XX` annotations + test files |
+| `branchnux sca <surface>` | A Security Control Assessment document (8 standard sections, regulator-ready) |
+| `branchnux sca-oscal <surface>` | Same evidence as **NIST OSCAL 1.1.2 JSON** — the format FedRAMP auditors and SOC 2 examiners prefer |
+| `branchnux sign <surface>` | **HMAC-chained tamper-evident attestation.** Auditors verify the chain independently of the tool |
+| `branchnux sign-pdf <surface>` | Signed PDF with hash-chain badge for legal/compliance handoff |
 
-**This is the gap 5-NUX fills.** No other OSS tool generates RTM, SCA, OSCAL, and HMAC-signed audit packages end-to-end from your existing project files. Most OSS PM tools stop at "kanban board." Most compliance tools live behind a paywall and a SaaS portal. 5-NUX is the missing middle: regulated-grade evidence generation, file-native, in your CLI, in your repo, free.
+**This is the gap 5-NUX fills.** Most OSS PM tools stop at "kanban board." Most compliance tools live behind a paywall and a SaaS portal. **5-NUX is the missing middle:** regulated-grade evidence generation, end-to-end, in plain files, free.
 
 ## What this is (the bigger picture)
 
