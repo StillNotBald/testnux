@@ -34,7 +34,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { glob } from 'glob';
 
 import {
@@ -739,7 +739,8 @@ async function _loadConfig(configPath, cwd) {
   if (configPath) {
     try {
       const resolvedPath = _validateConfigPath(configPath);
-      const userCfg = (await import(resolvedPath)).default ?? {};
+      // Use pathToFileURL so Windows absolute paths work with ESM import()
+      const userCfg = (await import(pathToFileURL(resolvedPath).href)).default ?? {};
       cfg = { ...cfg, ...(userCfg.sca ?? {}) };
     } catch (err) {
       if (err.exitCode !== undefined) throw err; // re-throw our own structured errors

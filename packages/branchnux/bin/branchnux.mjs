@@ -160,10 +160,15 @@ program
 program
   .command('doctor')
   .description(
-    'Preflight checks: Node version, Playwright browsers, .env.local variables, ' +
-    'Supabase MFA toggle mismatch (Enroll vs Verify), prod-build vs dev-server detection.',
+    'Preflight checks: Node version, Playwright browsers, config-driven env vars ' +
+    '(from branchnux.config.mjs), prod-build vs dev-server detection, convention folders. ' +
+    'Opt-in checks: --check supabase (MFA Enroll/Verify toggle mismatch, FirstLeap-specific).',
   )
-  .option('--check <check>', 'run only a specific check (node|playwright|env|supabase)')
+  .option(
+    '--check <check>',
+    'run only a specific check (node|playwright|env|build|conventions|supabase). ' +
+    'Note: "supabase" is opt-in only — it does not run in the default doctor pass.',
+  )
   .option('--project-ref <ref>', 'Supabase project ref (required for --check supabase)')
   .action(async (opts, cmd) => {
     const global = cmd.parent.opts();
