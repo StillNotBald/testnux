@@ -311,6 +311,169 @@ branchnux doctor --json
 
 ---
 
+## `branchnux mcp`
+
+Start the BranchNuX MCP server on stdio for Claude Code integration.
+
+### Synopsis
+
+```
+branchnux mcp
+```
+
+Mount in Claude Code by adding an `mcpServers` entry to `.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "branchnux": {
+      "command": "branchnux",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+Requires `@modelcontextprotocol/sdk` (install separately: `npm install @modelcontextprotocol/sdk`). Once mounted, Claude Code can invoke all BranchNuX verbs as native tools.
+
+> **Note:** The MCP server is on the roadmap for v0.6.0. The `mcp` verb is wired and registered — run `branchnux mcp` to check current status.
+
+---
+
+## `branchnux batch-plan`
+
+Run the AI-powered test-plan pipeline across multiple pages in parallel.
+
+### Synopsis
+
+```
+branchnux batch-plan --pages <page-list> [flags]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--pages <list>` | string | required | Comma-separated list of surface slugs to plan in parallel. |
+| `--pages-per-agent <n>` | number | `3` | Number of pages dispatched per agent chunk. |
+| `--max-spend <USD>` | number | none | Abort if cumulative LLM cost exceeds this cap. |
+| `--dry-run` | boolean | false | Estimate cost without calling the API. |
+| `--json` | boolean | false | Structured output for downstream agent processing. |
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | All pages planned successfully |
+| `1` | One or more pages failed (partial success reported) |
+| `2` | Cost cap exceeded |
+| `3` | `CLAUDE_API_KEY` not set |
+
+### Examples
+
+```bash
+# Plan 4 pages in parallel
+branchnux batch-plan --pages login,checkout,dashboard,profile
+
+# Dry-run cost estimate first
+branchnux batch-plan --pages login,checkout --dry-run
+
+# Cap spend at $2 and use 2 pages per agent
+branchnux batch-plan --pages login,checkout,dashboard --max-spend 2 --pages-per-agent 2
+```
+
+Requires `CLAUDE_API_KEY`. See [`docs/concepts.md`](docs/concepts.md) for the `[VERIFY]` marker contract.
+
+---
+
+## `branchnux run`
+
+Scaffold an env-suffixed test-pass and generate reports for environment-aware testing.
+
+### Synopsis
+
+```
+branchnux run <slug> [--env <env>] [--base-url <url>] [flags]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `slug` | yes | Surface identifier. Produces `testing-log/<date>_<slug>-<env>/`. |
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--env <env>` | string | `local` | Target environment: `local`, `staging`, `prod`, `qa`, `ci`, `dev`, or any custom label. |
+| `--base-url <url>` | string | none | Base URL injected into test-plan.md frontmatter. |
+| `--plan-only` | boolean | false | Generate report without an execution log (PLAN ONLY badge). |
+| `--open` | boolean | false | Open generated HTML in the default browser. |
+| `--fail-on-missing` | boolean | false | Exit 1 if no execution log and no `evidence/` directory. |
+| `--out <dir>` | string | `./testing-log` | Testing-log root directory. |
+
+### Examples
+
+```bash
+# Scaffold + report for staging
+branchnux run login --env staging --base-url https://staging.example.com
+
+# Plan-only pass for local env
+branchnux run checkout --env local --plan-only
+```
+
+---
+
+## `branchnux compare`
+
+Diff TC results between two environment passes for the same slug.
+
+### Synopsis
+
+```
+branchnux compare <slug> <env-a> <env-b> [flags]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `slug` | yes | Surface identifier. |
+| `env-a` | yes | First environment label (e.g. `staging`). |
+| `env-b` | yes | Second environment label (e.g. `prod`). |
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--output <path>` | string | stdout | Write diff table to a file. |
+| `--threshold <n>` | number | none | CI gate: exit 1 if regressions exceed this count. Use `0` for strict. |
+| `--out <dir>` | string | `./testing-log` | Testing-log root directory. |
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | No regressions (or regressions within threshold) |
+| `1` | Regressions exceed threshold |
+| `2` | Folder not found for one or both environments |
+
+### Examples
+
+```bash
+# Compare staging vs prod for the login surface
+branchnux compare login staging prod
+
+# CI gate: fail on any regression
+branchnux compare login staging prod --threshold 0
+
+# Write diff table to file
+branchnux compare login staging prod --output artifacts/login-diff.md
+```
+
+---
+
 ## Configuration
 
 BranchNuX looks for a config file in the following order:
