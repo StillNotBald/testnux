@@ -1,21 +1,46 @@
 # 5-NUX
 
+**A complete software-project audit-evidence trail in your CLI — file-native, OSS, and free.**
+
 > 5-NUX gives you a whole tree. You provide the soil and you ship yourself.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Node: >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 528 passing](https://img.shields.io/badge/tests-528%20passing-brightgreen.svg)]()
+[![Tests: 587 passing](https://img.shields.io/badge/tests-587%20passing-brightgreen.svg)]()
 [![Version: v0.5.0-alpha.1](https://img.shields.io/badge/version-v0.5.0--alpha.1-orange.svg)](CHANGELOG.md)
 
-## What this is
+## What 5-NUX does for your project
 
-5-NUX is a complete project artifact-chain — **root** (specs), **trunk** (build), **branch** (verification), **leaf** (continuous health signals fed back into the loop), **fruit** (external audit-ready handoffs). All five nodes are OSS. The sixth node — **soil** (your hosting, your vendors, your multi-user backend) — is premium territory in the future 6-NUX commercial product. The act of shipping (your CI, your release pipeline) is yours.
+If your team ships regulated software — SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, HIPAA — every regulator asks for the same artifact: a **Requirements Traceability Matrix (RTM)** that maps each requirement → sprint → code commit → test case → audit evidence. Today, your two real options are bad ones:
 
-It is a 7-package npm-workspaces monorepo — one CLI per node of the 6-NUX taxonomy plus a shared core library and a meta-package that installs the full stack. The taxonomy maps directly to the regulated-software lifecycle: you state your requirements, plan your sprints, verify your branches, monitor health, and ship audit-ready deliverables — all from the CLI, all in your repo.
+1. **Build the RTM manually in Excel.** Re-do it every audit cycle. Drift between docs and reality. Lose hours under deadline pressure when the auditor arrives.
+2. **Buy enterprise compliance tooling** — IBM DOORS, Polarion, Jama Connect, codeBeamer. **$1,000–$5,000+ per seat per year.** Your evidence locked inside their proprietary database. Vendor lock-in for a regulator-mandated artifact.
 
-The intended audience is engineering and QA leads at regulated-software teams who need a defensible audit-evidence trail (test plans → RTM → SCA → OSCAL) but do not want to pay for a hosted SaaS or cede control of their evidence to a vendor. Every artifact 5-NUX produces is a plain-format file (Markdown, XLSX, HTML, PDF, JSON) that lives in your git repo and can be read by auditors without installing anything.
+**5-NUX gives you the same automation, for free, in plain files that live in your own git repo.**
 
-Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. The OSS/Premium boundary is sharp: anything local + single-user + file-native is OSS. Anything hosted + multi-user + account-bound is premium (soil + 6-NUX). See [`docs/MOTTO.md`](docs/MOTTO.md) for the OSS/Premium split.
+Run `branchnux rtm` and your `TRACEABILITY.md` regenerates from your existing `REQUIREMENTS.md` + sprint folders + source-code annotations + test files. Run `branchnux sca` and you get a Security Control Assessment document. Run `branchnux sca-oscal` and you get the same evidence as NIST OSCAL 1.1.2 JSON (the format SOC 2 examiners and FedRAMP auditors prefer). Run `branchnux sign` and every attestation is **HMAC-chained for tamper evidence** — auditors verify the chain independently of the tool.
+
+**This is the gap 5-NUX fills.** No other OSS tool generates RTM, SCA, OSCAL, and HMAC-signed audit packages end-to-end from your existing project files. Most OSS PM tools stop at "kanban board." Most compliance tools live behind a paywall and a SaaS portal. 5-NUX is the missing middle: regulated-grade evidence generation, file-native, in your CLI, in your repo, free.
+
+## What this is (the bigger picture)
+
+**5-NUX is the entire project/product development practice in your CLI.** Each of the five OSS nodes maps directly to a standard software-lifecycle stage and to the stakeholder who owns that stage:
+
+| Node | Lifecycle stage | Stakeholder who owns it | Where the artifacts live |
+|---|---|---|---|
+| **rootnux** | **Requirement** | Product / PM / spec author | `requirements/`, `docs/adr/` |
+| **trunknux** | **Development** | Dev / Eng / contributor | `sprint-log/` |
+| **branchnux** | **Test + validation** | QA / Test lead / auditor-facing | `testing-log/`, `requirements/validations/` |
+| **leafnux** | **Continuous health** | Eng / SRE / dev-loop | local health signals (RAG status, ADR currency, sprint freshness, test trend) |
+| **fruitnux** | **Audit-ready handoff** | Compliance / Legal / external auditor | bundled regulator-ready packets *(verbs in design)* |
+
+The five nodes are **peers**, not nested layers. Each lives in its own folder at the project root and serves its own stakeholder. They cooperate via file-system conventions, not API calls — every artifact is a plain file (Markdown, XLSX, HTML, PDF, JSON) that lives in your git repo and can be read by auditors without installing anything.
+
+The sixth node — **soil** (your hosting, vendors, multi-user backend) — is the user's environment. Premium territory in the future 6-NUX commercial product. The act of shipping is yours.
+
+5-NUX is a 7-package npm-workspaces monorepo: one CLI per node + a shared core library + a meta-package that installs the full stack. The intended audience is engineering and QA leads at regulated-software teams who need a defensible audit-evidence trail but do not want to pay for a hosted SaaS or cede control of their evidence to a vendor.
+
+Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. The OSS/Premium boundary is sharp: anything local + single-user + file-native is OSS. Anything hosted + multi-user + account-bound is premium (soil + 6-NUX). See [`docs/MOTTO.md`](docs/MOTTO.md) for the full split.
 
 ---
 
@@ -106,19 +131,51 @@ Produces an 8-section SCA document (Markdown + optional PDF) for the login surfa
 
 ---
 
-## How it fits together
+## Project folder layout
 
-The 6-NUX taxonomy is a directed graph of concerns in the regulated-software lifecycle:
+The five NUX nodes are **peers** at your project root — different stakeholders, different folders, parallel views of the same project. Nothing is nested under another node:
 
 ```
-rootnux (intent / specs)
-    └── trunknux (build / sprint)
-            └── branchnux (verification / evidence)
-                    ├── leafnux (continuous health) [active OSS scope]
-                    └── fruitnux (audit deliverables) [active OSS scope]
+your-project/
+├── requirements/                  ← rootnux  (Product / PM)
+│   ├── REQUIREMENTS.md            ← R-XX specs
+│   ├── TRACEABILITY.md            ← RTM (generated by branchnux rtm)
+│   ├── risks/risks.md             ← risk register
+│   └── validations/<surface>/     ← branchnux + fruitnux output (SCAs, audit packets)
+│
+├── docs/                          ← rootnux  (Product / PM)
+│   ├── adr/NNNN-<slug>.md         ← ADRs (rootnux adr-new)
+│   └── KNOWLEDGE_BASE.md          ← KB scaffold (rootnux kb-init)
+│
+├── sprint-log/                    ← trunknux  (Dev / Eng)
+│   └── <date>_<slug>/
+│       ├── README.md              ← sprint scaffold (trunknux new-sprint)
+│       ├── LOG.md                 ← weekly journal entries (trunknux log)
+│       └── SPRINT_SUMMARY.md      ← git-log roll-up (trunknux summarize)
+│
+├── testing-log/                   ← branchnux  (QA / Test lead)
+│   └── <date>_<surface>/
+│       ├── test-plan.md           ← TC matrix + Given/When/Then (branchnux plan)
+│       ├── execution-log.md       ← run results (auto-generated)
+│       └── evidence/              ← screenshots, logs (auto)
+│
+├── <your-app-source>/             ← your code (whatever framework you use — outside 5-NUX scope)
+│
+└── (leafnux output: lives in your CI / dependabot / observability stack — not in the repo)
 ```
 
-**Cross-package contract:** NUX packages do not import each other. They communicate via file-system conventions defined in `@leapnux/6nux-core`. A rootnux artifact (e.g. `REQUIREMENTS.md`) is a file that trunknux and branchnux read by path — not by API call. This keeps the packages independently installable and avoids coupling the release cycles.
+The act of shipping (your CI, release pipeline, deploys) is also yours — outside 5-NUX scope by design.
+
+## How the nodes cooperate
+
+NUX packages do **not** import each other. They communicate by reading and writing well-known file paths defined in `@leapnux/6nux-core`. Concretely:
+
+- `rootnux` writes specs to `requirements/REQUIREMENTS.md`
+- `branchnux rtm` reads that file (by path) and writes `requirements/TRACEABILITY.md`
+- `branchnux plan` reads R-XX IDs from REQUIREMENTS.md to anchor test plans
+- `leafnux health` reads the same file to compute completion percentage
+
+This keeps each package independently installable (`npm install -g @leapnux/rootnux` works without the others) and avoids coupling release cycles. A new stakeholder adopting just their node doesn't drag in the rest.
 
 See [`docs/6-NUX.md`](docs/6-NUX.md) for the full taxonomy schema and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the implementation spec.
 
