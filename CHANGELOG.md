@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- (nothing yet)
+
+### Changed
+
+- (nothing yet)
+
+### Fixed
+
+- (nothing yet)
+
+---
+
+## [0.5.0-alpha.1] - 2026-04-28
+
 ### Changed — leafnux + fruitnux promoted from deferred to active OSS (2026-04-28)
 
 - **`@leapnux/leafnux`** — promoted from "reserved skeleton (DEFERRED)" to **active OSS**. Ships `health` verb in v0.5.0-alpha.1. RAG-status snapshot of project state (requirements freshness, ADR coverage, sprint cadence, risk-register staleness).
@@ -327,7 +343,8 @@ The "v0.2 capability-parity" stable release. Wires up the LLM agent suite (`plan
 ### Added
 - Initial project scaffold: CLI entry point, command structure, templates, schemas, and docs. (Internal pre-publish version; not on npm.)
 
-[Unreleased]: https://github.com/leapnux/5nux/compare/v0.4.3-alpha.1...HEAD
+[Unreleased]: https://github.com/leapnux/5nux/compare/v0.5.0-alpha.1...HEAD
+[0.5.0-alpha.1]: https://github.com/leapnux/5nux/compare/v0.4.3-alpha.1...v0.5.0-alpha.1
 [0.4.3-alpha.1]: https://github.com/leapnux/5nux/releases/tag/v0.4.3-alpha.1
 [0.4.2-alpha.1]: https://github.com/leapnux/5nux/releases/tag/v0.4.2-alpha.1
 [0.4.1-alpha.1]: https://github.com/leapnux/5nux/releases/tag/v0.4.1-alpha.1
