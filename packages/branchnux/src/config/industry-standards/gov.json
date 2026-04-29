@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "industry": "gov",
   "description": "Government / public sector standards bundle. Covers FedRAMP Moderate baseline (NIST 800-53 Rev 5 core controls), FISMA reporting, OMB Circular A-130, StateRAMP, CIS Benchmarks key controls, and Section 508 accessibility. Shipped in BranchNuX v0.3.",
+  "signOffRoles": ["Project Lead", "Authorizing Official", "System Owner", "External Auditor"],
   "standards": [
     {
       "id": "NIST-800-53r5-AC-2",

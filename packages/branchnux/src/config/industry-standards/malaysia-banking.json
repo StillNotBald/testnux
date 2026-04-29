@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "industry": "malaysia-banking",
   "description": "Malaysian banking and financial services industry standards bundle. Covers the Personal Data Protection Act 2010 (Act 709) as amended by the Personal Data Protection (Amendment) Act 2024, Bank Negara Malaysia Risk Management in Technology (BNM RMiT 2020 with 2023 amendments), BNM Guidelines on the Provision of Electronic Banking Services, and the Cyber Security Act 2024 (Act 854). All controls are scoped to testable obligations on web and authentication surfaces (login, signup, transaction, account management). Shipped in BranchNuX v0.2.",
+  "signOffRoles": ["Project Lead", "Chief Information Security Officer", "Compliance Officer", "External Auditor"],
   "standards": [
     {
       "id": "PDPA-S5-General",

@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "industry": "fintech",
   "description": "Fintech industry standards bundle. Covers NIST SP 800-63B Digital Identity, NYDFS 23 NYCRR 500, PCI DSS v4.0, FFIEC IT Handbook, PSD2 RTS on SCA, and OWASP ASVS 4.0 finance-relevant controls. Shipped in BranchNuX v0.2.",
+  "signOffRoles": ["Project Lead", "CISO", "General Counsel", "External Auditor"],
   "standards": [
     {
       "id": "NIST-800-63B-5.1.1",

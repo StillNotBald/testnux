@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "industry": "healthcare",
   "description": "Healthcare industry standards bundle. Covers HIPAA Security Rule (Administrative, Physical, Technical Safeguards), HITECH Breach Notification, NIST SP 800-66r2, and 21 CFR Part 11 for clinical software. Shipped in BranchNuX v0.2.",
+  "signOffRoles": ["Project Lead", "Privacy Officer", "Clinical Lead", "External Auditor"],
   "standards": [
     {
       "id": "HIPAA-164.308-a1",

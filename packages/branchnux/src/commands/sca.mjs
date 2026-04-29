@@ -217,6 +217,7 @@ export async function runScaGenerate(surface, opts = {}) {
 
   const industryConfig = _loadIndustryConfig(industry);
   const controls = industryConfig?.standards ?? [];
+  const signOffRoles = industryConfig?.signOffRoles ?? ['Project Owner', 'Reviewer'];
 
   // ── Render updated content ────────────────────────────────────────────────
 
@@ -227,6 +228,7 @@ export async function runScaGenerate(surface, opts = {}) {
     standardsVersion,
     industry,
     controls,
+    signOffRoles,
     requirements,
     graph,
     stats,
@@ -432,6 +434,7 @@ function _renderScaGenerate({
   standardsVersion,
   industry,
   controls,
+  signOffRoles,
   requirements,
   graph,
   stats,
@@ -627,10 +630,9 @@ function _renderScaGenerate({
     lines.push('');
     lines.push('| Role | Name | Signature | Date |');
     lines.push('|------|------|-----------|------|');
-    lines.push('| Project Lead | [VERIFY] | | |');
-    lines.push('| CISO | [VERIFY — required pre-pilot] | | |');
-    lines.push('| General Counsel | [VERIFY — required pre-pilot] | | |');
-    lines.push('| External Auditor | [VERIFY — required pre-pilot] | | |');
+    for (const role of (signOffRoles ?? ['Project Owner', 'Reviewer'])) {
+      lines.push(`| ${role} | [VERIFY] | | |`);
+    }
   }
   lines.push('<!-- branchnux:section sign-off end -->');
   lines.push('');
