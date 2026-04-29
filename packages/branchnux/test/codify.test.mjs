@@ -245,23 +245,32 @@ describe('codify — missing CLAUDE_API_KEY', () => {
 });
 
 describe('codify — missing @anthropic-ai/sdk guard (source inspection)', () => {
-  it('source code contains ERR_MODULE_NOT_FOUND guard', () => {
-    const src = fs.readFileSync(
+  // The SDK guard may live in codify.mjs itself or in lib/claude-client.mjs
+  // (the linter may have refactored it to the shared lib). Both are valid.
+  function loadCodifyOrLib() {
+    const codifySrc = fs.readFileSync(
       path.join(__dirname, '../src/commands/codify.mjs'),
       'utf-8',
     );
-    expect(src).toContain('ERR_MODULE_NOT_FOUND');
-    expect(src).toContain('npm install @anthropic-ai/sdk');
-    expect(src).toContain('exitCode = 1');
+    const libPath = path.join(__dirname, '../src/lib/claude-client.mjs');
+    const libSrc = fs.existsSync(libPath)
+      ? fs.readFileSync(libPath, 'utf-8')
+      : '';
+    return codifySrc + '\n' + libSrc;
+  }
+
+  it('source code contains ERR_MODULE_NOT_FOUND guard', () => {
+    const combined = loadCodifyOrLib();
+    expect(combined).toContain('ERR_MODULE_NOT_FOUND');
+    expect(combined).toContain('npm install @anthropic-ai/sdk');
+    expect(combined).toContain('exitCode = 1');
   });
 
   it('source code uses dynamic import() for @anthropic-ai/sdk', () => {
-    const src = fs.readFileSync(
-      path.join(__dirname, '../src/commands/codify.mjs'),
-      'utf-8',
-    );
-    expect(src).toContain("import('@anthropic-ai/sdk')");
-    expect(src).not.toMatch(/^import\s+.*@anthropic-ai\/sdk/m);
+    const combined = loadCodifyOrLib();
+    expect(combined).toContain("import('@anthropic-ai/sdk')");
+    // No static top-level import of the SDK (it must remain a dynamic/optional dep)
+    expect(combined).not.toMatch(/^import\s+[^(].*@anthropic-ai\/sdk/m);
   });
 });
 
@@ -749,5 +758,128 @@ describe('codify — --max-spend enforcement', () => {
     });
 
     expect(mockMessageCreate).toHaveBeenCalledOnce();
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// --test-conventions flag
+// ══════════════════════════════════════════════════════════════════════════════
+
+describe('codify — --test-conventions flag', () => {
+  it('without flag: system prompt does NOT contain xffForTest or captureEvidence', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    const stdoutLines = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutLines.push(String(chunk));
+      return true;
+    });
+
+    await runCodify('login', { folder, dryRun: true, json: true });
+
+    const parsed = JSON.parse(stdoutLines.join('').trim().split('\n')[0]);
+    expect(parsed.systemPrompt).not.toContain('xffForTest');
+    expect(parsed.systemPrompt).not.toContain('captureEvidence');
+    expect(parsed.systemPrompt).not.toContain('waitForNextTotpWindow');
+    expect(parsed.systemPrompt).not.toContain('requestSubmit');
+  });
+
+  it('without flag: user prompt instructions do NOT mandate xffForTest in test.beforeEach()', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    const stdoutLines = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutLines.push(String(chunk));
+      return true;
+    });
+
+    await runCodify('login', { folder, dryRun: true, json: true });
+
+    const parsed = JSON.parse(stdoutLines.join('').trim().split('\n')[0]);
+    // The TASK section (after === TASK ===) should not mandate xffForTest in test.beforeEach
+    const taskSection = parsed.userPrompt.split('=== TASK ===')[1] ?? '';
+    expect(taskSection).not.toContain('xffForTest');
+    // @rate-limit-test annotation should not be mandated in the task instructions
+    expect(taskSection).not.toContain('@rate-limit-test');
+  });
+
+  it('with --test-conventions nextjs-supabase: system prompt DOES contain xffForTest and captureEvidence', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    const stdoutLines = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutLines.push(String(chunk));
+      return true;
+    });
+
+    await runCodify('login', { folder, dryRun: true, json: true, testConventions: 'nextjs-supabase' });
+
+    const parsed = JSON.parse(stdoutLines.join('').trim().split('\n')[0]);
+    expect(parsed.systemPrompt).toContain('xffForTest');
+    expect(parsed.systemPrompt).toContain('captureEvidence');
+    expect(parsed.systemPrompt).toContain('waitForNextTotpWindow');
+    expect(parsed.systemPrompt).toContain('requestSubmit');
+  });
+
+  it('with --test-conventions nextjs-supabase: dry-run event includes testConventions field', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    const stdoutLines = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutLines.push(String(chunk));
+      return true;
+    });
+
+    await runCodify('login', { folder, dryRun: true, json: true, testConventions: 'nextjs-supabase' });
+
+    const parsed = JSON.parse(stdoutLines.join('').trim().split('\n')[0]);
+    expect(parsed.testConventions).toBe('nextjs-supabase');
+  });
+
+  it('with --test-conventions <invalid-name>: throws exitCode 1 with helpful error', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    let thrown;
+    try {
+      await runCodify('login', { folder, dryRun: true, json: false, testConventions: 'nonexistent-profile' });
+    } catch (err) {
+      thrown = err;
+    }
+
+    expect(thrown).toBeDefined();
+    expect(thrown.exitCode).toBe(1);
+    expect(thrown.message).toMatch(/nonexistent-profile/);
+    // Should mention available profiles so the user knows what to use
+    expect(thrown.message).toMatch(/nextjs-supabase/);
+  });
+
+  it('with --test-conventions <invalid-name>: JSON mode emits codify.error on stderr', async () => {
+    process.env.CLAUDE_API_KEY = 'sk-ant-test-key';
+    const folder = makeTestingLogFolder('login', makeMockTestPlan('login', 'LOGIN'));
+
+    const stderrLines = [];
+    vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      stderrLines.push(String(chunk));
+      return true;
+    });
+
+    try {
+      await runCodify('login', { folder, dryRun: true, json: true, testConventions: 'nonexistent-profile' });
+    } catch {
+      // expected
+    }
+
+    const combined = stderrLines.join('');
+    expect(combined.length).toBeGreaterThan(0);
+    const parsed = JSON.parse(combined.trim().split('\n')[0]);
+    expect(parsed.event).toBe('codify.error');
+    expect(parsed.message).toMatch(/nonexistent-profile/);
   });
 });

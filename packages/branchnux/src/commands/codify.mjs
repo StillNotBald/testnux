@@ -37,48 +37,108 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-// ── Constants ────────────────────────────────────────────────────────────────
+import {
+  PRICING,
+  DEFAULT_MODEL,
+  DEFAULT_MAX_TOKENS,
+  callClaude,
+  estimateInputTokens,
+  loadAnthropicClass,
+} from '../lib/claude-client.mjs';
 
-const DEFAULT_MODEL      = 'claude-sonnet-4-6';
-const DEFAULT_MAX_TOKENS = 10_000;
-const API_TIMEOUT_MS     = 60_000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+
+// ── Test-conventions profile loader ──────────────────────────────────────────
 
 /**
- * Pricing as of April 2026 — models supported by codify.
- * Source: https://docs.anthropic.com/en/docs/models-overview
- * Units: USD per 1M tokens.
+ * Resolves the path to a named test-conventions JSON profile.
+ *
+ * Profiles live at:
+ *   src/config/test-conventions/<name>.json  (bundled)
+ *
+ * @param {string} name  Profile name (e.g. "nextjs-supabase")
+ * @returns {string}  Absolute path to the JSON file
  */
-const PRICING = {
-  'claude-sonnet-4-6': { input: 3.00,  output: 15.00 },
-  'claude-haiku-4-5':  { input: 0.80,  output:  4.00 },
-  'claude-opus-4-5':   { input: 15.00, output: 75.00 },
-};
+function resolveConventionsPath(name) {
+  return path.join(__dirname, '../config/test-conventions', `${name}.json`);
+}
+
+/**
+ * Load a named test-conventions profile and return it as a parsed object.
+ *
+ * Throws with exitCode 1 if the profile file does not exist or is invalid JSON.
+ *
+ * @param {string} name
+ * @returns {{ name: string, description: string, patterns: Array<{ title: string, description: string, example: string }> }}
+ */
+function loadConventionsProfile(name) {
+  const profilePath = resolveConventionsPath(name);
+
+  if (!fs.existsSync(profilePath)) {
+    // List bundled profiles so the error message is actionable.
+    const conventionsDir = path.join(__dirname, '../config/test-conventions');
+    let available = [];
+    try {
+      available = fs.readdirSync(conventionsDir)
+        .filter((f) => f.endsWith('.json'))
+        .map((f) => f.replace(/\.json$/, ''));
+    } catch {
+      // Directory may not exist in unusual installs — ignore.
+    }
+
+    const hint = available.length > 0
+      ? `\n\n  Available built-in profiles: ${available.join(', ')}`
+      : '\n\n  No built-in profiles found. Check your BranchNuX installation.';
+
+    const err = new Error(`Test-conventions profile not found: "${name}"${hint}`);
+    err.exitCode = 1;
+    throw err;
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(profilePath, 'utf-8'));
+  } catch (parseErr) {
+    const err = new Error(
+      `Failed to parse test-conventions profile "${name}" (${profilePath}):\n\n  ${parseErr.message}`,
+    );
+    err.exitCode = 1;
+    throw err;
+  }
+}
+
+// ── Constants ────────────────────────────────────────────────────────────────
+
+// DEFAULT_MODEL, DEFAULT_MAX_TOKENS, PRICING imported from lib/claude-client.mjs
+const API_TIMEOUT_MS = 60_000;
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * @param {string} slug  Surface slug (e.g. "login", "dashboard")
  * @param {{
- *   folder?:    string,
- *   json?:      boolean,
- *   dryRun?:    boolean,
- *   maxSpend?:  number | null,
- *   model?:     string,
- *   maxTokens?: number,
- *   baseUrl?:   string,
- *   safe?:      boolean,
+ *   folder?:           string,
+ *   json?:             boolean,
+ *   dryRun?:           boolean,
+ *   maxSpend?:         number | null,
+ *   model?:            string,
+ *   maxTokens?:        number,
+ *   baseUrl?:          string,
+ *   safe?:             boolean,
+ *   testConventions?:  string | null,
  * }} opts
  */
 export async function runCodify(slug, opts = {}) {
   const {
-    folder    = null,
-    json      = false,
-    dryRun    = false,
-    maxSpend  = null,
-    model     = DEFAULT_MODEL,
-    maxTokens = DEFAULT_MAX_TOKENS,
-    baseUrl   = 'http://localhost:3000',
-    safe      = false,
+    folder           = null,
+    json             = false,
+    dryRun           = false,
+    maxSpend         = null,
+    model            = DEFAULT_MODEL,
+    maxTokens        = DEFAULT_MAX_TOKENS,
+    baseUrl          = 'http://localhost:3000',
+    safe             = false,
+    testConventions  = null,
   } = opts;
 
   // ── Step 1: Locate testing-log folder ────────────────────────────────────
@@ -173,30 +233,38 @@ export async function runCodify(slug, opts = {}) {
     throw err;
   }
 
-  // ── Step 5: Dynamically import @anthropic-ai/sdk ─────────────────────────
+  // ── Step 5: Load @anthropic-ai/sdk (unless dry-run) ─────────────────────
 
   let Anthropic;
   if (!dryRun) {
     try {
-      const mod = await import('@anthropic-ai/sdk');
-      Anthropic = mod.default ?? mod.Anthropic;
-    } catch (importErr) {
-      if (importErr.code === 'ERR_MODULE_NOT_FOUND' || importErr.code === 'MODULE_NOT_FOUND') {
+      Anthropic = await loadAnthropicClass();
+    } catch (sdkErr) {
+      if (sdkErr.exitCode === 1) {
         printError(json,
           '@anthropic-ai/sdk is not installed.\n\n' +
           '  Install with:\n\n' +
           '    npm install @anthropic-ai/sdk\n\n' +
           `  Then re-run: branchnux codify ${slug}`,
         );
-        const err = new Error('@anthropic-ai/sdk not installed');
-        err.exitCode = 1;
-        throw err;
       }
-      throw importErr;
+      throw sdkErr;
     }
   }
 
-  // ── Step 6: Print header ──────────────────────────────────────────────────
+  // ── Step 6: Load test-conventions profile (optional) ─────────────────────
+
+  let conventionsProfile = null;
+  if (testConventions) {
+    try {
+      conventionsProfile = loadConventionsProfile(testConventions);
+    } catch (convErr) {
+      printError(json, convErr.message);
+      throw convErr;
+    }
+  }
+
+  // ── Step 7: Print header ──────────────────────────────────────────────────
 
   if (!json) {
     console.log('');
@@ -208,12 +276,13 @@ export async function runCodify(slug, opts = {}) {
     console.log(`  TCs found : ${tcList.length}`);
     console.log(`  Base URL  : ${baseUrl}`);
     console.log(`  Model     : ${model}`);
+    if (conventionsProfile) console.log(`  Conventions: ${conventionsProfile.name}`);
     if (safe) console.log('  Mode      : --safe (write spec.generated.ts, not spec.ts)');
     if (dryRun) console.log('  Mode      : --dry-run (no API call will be made)');
     console.log('');
   }
 
-  // ── Step 7: Build prompts ─────────────────────────────────────────────────
+  // ── Step 8: Build prompts ─────────────────────────────────────────────────
 
   if (!json) console.log('  [1/4] Building prompt...');
 
@@ -224,10 +293,11 @@ export async function runCodify(slug, opts = {}) {
     baseUrl,
     testPlanRaw,
     specTemplate,
+    conventionsProfile,
   });
 
   // Cost estimate (pre-call)
-  const inputTokenEstimate  = Math.ceil((systemPrompt.length + userPrompt.length) / 4);
+  const inputTokenEstimate  = estimateInputTokens(systemPrompt, userPrompt);
   const outputTokenEstimate = maxTokens;
   const pricing             = PRICING[model] ?? PRICING[DEFAULT_MODEL];
   const costEstimate        =
@@ -253,6 +323,7 @@ export async function runCodify(slug, opts = {}) {
         tcPrefix,
         tcCount:            tcList.length,
         model,
+        testConventions:    testConventions ?? null,
         inputTokenEstimate,
         outputTokenEstimate,
         costEstimateUsd:    costEstimate,
@@ -550,16 +621,42 @@ function resolveTemplatePath() {
  * Builds system + user prompts for the LLM codify call.
  *
  * @param {{
- *   slug:         string,
- *   tcPrefix:     string,
- *   tcList:       string[],
- *   baseUrl:      string,
- *   testPlanRaw:  string,
- *   specTemplate: string,
+ *   slug:                string,
+ *   tcPrefix:            string,
+ *   tcList:              string[],
+ *   baseUrl:             string,
+ *   testPlanRaw:         string,
+ *   specTemplate:        string,
+ *   conventionsProfile?: object | null,
  * }} p
  * @returns {{ systemPrompt: string, userPrompt: string }}
  */
-function buildPrompt({ slug, tcPrefix, tcList, baseUrl, testPlanRaw, specTemplate }) {
+function buildPrompt({ slug, tcPrefix, tcList, baseUrl, testPlanRaw, specTemplate, conventionsProfile = null }) {
+  // Build the optional conventions block injected into the system prompt.
+  let conventionsBlock = '';
+  if (conventionsProfile && Array.isArray(conventionsProfile.patterns) && conventionsProfile.patterns.length > 0) {
+    const patternLines = conventionsProfile.patterns.map((p, i) => {
+      const lines = [
+        `${i + 1}. ${p.title}`,
+        `   ${p.description}`,
+      ];
+      if (p.example) {
+        lines.push('');
+        lines.push('   Example:');
+        p.example.split('\n').forEach((line) => lines.push(`     ${line}`));
+      }
+      return lines.join('\n');
+    }).join('\n\n');
+
+    conventionsBlock = `
+
+PROJECT-SPECIFIC TEST CONVENTIONS (profile: ${conventionsProfile.name}):
+These patterns MUST be preserved exactly in the generated spec. They encode
+stack-specific behaviours required for this project's infrastructure.
+
+${patternLines}`;
+  }
+
   const systemPrompt = `You are a senior Playwright TypeScript engineer specializing in audit-ready test automation for regulated software.
 
 You write test code that is:
@@ -568,32 +665,19 @@ You write test code that is:
   - Evidence-collecting: afterEach hook captures a screenshot to evidence/<TC-ID>.png after every test
   - Typed: strict TypeScript, no \`any\` except where Playwright types require it
 
-CRITICAL PATTERNS — PRESERVE EXACTLY FROM THE TEMPLATE:
+GENERAL RULES:
 
-1. XFF rate-limit isolation: every test.describe() block MUST have a test.beforeEach() that calls xffForTest(testInfo.title) and sets context HTTP headers. This prevents sequential auth tests from sharing a rate-limit bucket and causing 429 poisoning.
-
-2. form.requestSubmit() pattern: NEVER use button.click() to submit forms. ALWAYS use:
-     await page.evaluate(() => {
-       const form = document.querySelector('form') as HTMLFormElement | null;
-       form?.requestSubmit();
-     });
-   Reason: button.click() fires before React hydration attaches the onSubmit handler, causing a native browser GET instead of the POST the app expects.
-
-3. afterEach evidence capture: include the top-level afterEach hook from the template that matches the TC-ID from testInfo.title and calls captureEvidence(). Tests with custom browser contexts MUST call captureEvidence() before ctx.close().
-
-4. waitForNextTotpWindow: include this helper if ANY test in the plan involves TOTP/MFA. It prevents 429 from hitting the challenge endpoint twice in the same 30-second window.
-
-5. [VERIFY] comment: EVERY generated test() block MUST have at least one line:
+1. [VERIFY] comment: EVERY generated test() block MUST have at least one line:
      // [VERIFY] Selectors and assertions need human confirmation against the live page
    Place it immediately before the first assertion in each test.
 
-6. Base URL: NEVER hardcode URLs. Use the baseUrl variable (default: '${baseUrl}'). Navigate with page.goto(baseUrl + '/path') or via the gotoPage() helper if present.
+2. Base URL: NEVER hardcode URLs. Use the baseUrl variable (default: '${baseUrl}'). Navigate with page.goto(baseUrl + '/path') or via the gotoPage() helper if present.
 
-7. TC ordering: P0 tests first, P1 next, P2 last. Rate-limit / destructive tests (@rate-limit-test) MUST be at the END of the suite — before the closing }). Annotate them with the // @rate-limit-test comment.
+3. TC ordering: P0 tests first, P1 next, P2 last. Destructive tests MUST be at the END of the suite — before the closing }). Annotate them with the // @destructive-test comment.
 
-8. Output is pure TypeScript starting with:
+4. Output is pure TypeScript starting with:
      import { test, expect } from '@playwright/test';
-   No markdown fences. No prose. No explanation. Just code.`;
+   No markdown fences. No prose. No explanation. Just code.${conventionsBlock}`;
 
   const tcBulletList = tcList.length > 0
     ? tcList.map((id) => `  - ${id}`).join('\n')
@@ -625,14 +709,13 @@ Requirements:
 2. Import line (REQUIRED, first import):
    import { test, expect, type Page, type Browser } from '@playwright/test';
 
-3. Copy ALL helper code from the template verbatim:
-   - xffForTest() function
-   - TOTP helpers (base32Decode, totp, waitForNextTotpWindow) — keep even if no TOTP TCs
-   - TcResult interface + RESULTS array + record() function
-   - EVIDENCE_DIR constant + captureEvidence() function
-   - afterEach evidence hook (top-level, matching TC-ID from testInfo.title)
-   - afterAll execution-log hook (writes execution-log-auto.md)
-   - gotoPage() helper
+3. Copy helper code from the template that applies to this project:
+   - TcResult interface + RESULTS array + record() function (if present in template)
+   - EVIDENCE_DIR constant + evidence capture helper (if present in template)
+   - afterEach evidence hook (top-level, matching TC-ID from testInfo.title; if present in template)
+   - afterAll execution-log hook (if present in template)
+   - gotoPage() helper (if present in template)
+   - Any project-specific helpers referenced in the PROJECT-SPECIFIC TEST CONVENTIONS above
 
 4. Replace ALL {{placeholder}} tokens:
    - {{slug}} → ${slug}
@@ -642,17 +725,14 @@ Requirements:
 5. One test() per TC in the list above. Naming: test('${tcPrefix}-NN — [title from plan]', ...)
 
 6. Inside EACH test():
-   a. Guard clause with record() + test.skip() if required fixture (user, config) is missing
-   b. Navigate: await gotoPage(page, baseUrl + '/path');  OR  await page.goto(baseUrl + '/path');
-   c. One comment per step from the plan: // Step N: [step text from plan]
-   d. // [VERIFY] Selectors and assertions need human confirmation against the live page
-   e. Assertions using expect()
-   f. record() call at the end: record('${tcPrefix}-NN', 'PASS', 'brief note');
+   a. Navigate: await gotoPage(page, baseUrl + '/path');  OR  await page.goto(baseUrl + '/path');
+   b. One comment per step from the plan: // Step N: [step text from plan]
+   c. // [VERIFY] Selectors and assertions need human confirmation against the live page
+   d. Assertions using expect()
 
 7. test.describe() block structure:
    - Wrap all tests in: test.describe('${tcPrefix} — full test suite', () => { ... })
-   - Include test.beforeEach() with xffForTest() for rate-limit isolation
-   - Rate-limit / destructive tests last, annotated // @rate-limit-test
+   - Destructive tests last, annotated // @destructive-test
 
 8. P0 tests (serial) wrapped in: test.describe.configure({ mode: 'serial' })
    OR grouped with a comment if the suite is small.
@@ -663,35 +743,8 @@ Start the output with the file header comment block.`;
   return { systemPrompt, userPrompt };
 }
 
-// ── Claude API Call ───────────────────────────────────────────────────────────
-
-/**
- * Calls the Anthropic Messages API with an AbortController timeout.
- * @returns {Promise<import('@anthropic-ai/sdk').Message>}
- */
-async function callClaude({ Anthropic, apiKey, model, maxTokens, systemPrompt, userPrompt }) {
-  const client = new Anthropic({ apiKey });
-
-  const controller = new AbortController();
-  const timer      = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-
-  try {
-    const message = await client.messages.create(
-      {
-        model,
-        max_tokens: maxTokens,
-        system:     systemPrompt,
-        messages:   [{ role: 'user', content: userPrompt }],
-      },
-      { signal: controller.signal },
-    );
-    return message;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 // ── Error Handling ────────────────────────────────────────────────────────────
+// Note: callClaude() is imported from lib/claude-client.mjs
 
 /**
  * Handles Anthropic API errors with user-friendly messages.

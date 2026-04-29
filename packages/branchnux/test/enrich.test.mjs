@@ -195,23 +195,34 @@ describe('enrich — missing CLAUDE_API_KEY', () => {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe('enrich — missing @anthropic-ai/sdk guard (source inspection)', () => {
-  it('source code contains ERR_MODULE_NOT_FOUND guard with install hint', () => {
+  it('claude-client.mjs contains ERR_MODULE_NOT_FOUND guard with install hint', () => {
+    // Guard moved to shared lib — verify it lives in claude-client.mjs
     const src = fs.readFileSync(
-      path.join(__dirname, '../src/commands/enrich.mjs'),
+      path.join(__dirname, '../src/lib/claude-client.mjs'),
       'utf-8',
     );
     expect(src).toContain('ERR_MODULE_NOT_FOUND');
     expect(src).toContain('npm install @anthropic-ai/sdk');
   });
 
-  it('source code uses dynamic import() for @anthropic-ai/sdk (not static)', () => {
+  it('claude-client.mjs uses dynamic import() for @anthropic-ai/sdk (not static)', () => {
     const src = fs.readFileSync(
-      path.join(__dirname, '../src/commands/enrich.mjs'),
+      path.join(__dirname, '../src/lib/claude-client.mjs'),
       'utf-8',
     );
     expect(src).toContain("import('@anthropic-ai/sdk')");
     // No top-level static import of the SDK
     expect(src).not.toMatch(/^import\s+.*@anthropic-ai\/sdk/m);
+  });
+
+  it('enrich.mjs delegates SDK loading to loadAnthropicClass (no local dynamic import)', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../src/commands/enrich.mjs'),
+      'utf-8',
+    );
+    // enrich.mjs should delegate to loadAnthropicClass, not have its own import()
+    expect(src).toContain('loadAnthropicClass');
+    expect(src).not.toContain("import('@anthropic-ai/sdk')");
   });
 });
 
@@ -552,8 +563,8 @@ describe('enrich — --max-spend enforcement', () => {
     expect(src).toContain('cumulativeCost + costEst');
     expect(src).toContain('maxSpend');
     // The guard fires BEFORE `callClaude`
-    const guardIdx    = src.indexOf('cumulativeCost + costEst');
-    const callClaudeIdx = src.indexOf('callClaude(');
+    const guardIdx      = src.indexOf('cumulativeCost + costEst');
+    const callClaudeIdx = src.indexOf('await callClaude(');
     expect(guardIdx).toBeLessThan(callClaudeIdx);
     // Pass-1 output is written before pass-2 estimate check
     expect(src).toContain('completedPasses++');

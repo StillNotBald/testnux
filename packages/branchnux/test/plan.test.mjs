@@ -236,9 +236,10 @@ describe('plan — missing CLAUDE_API_KEY', () => {
 });
 
 describe('plan — missing @anthropic-ai/sdk guard (source inspection)', () => {
-  it('source code contains ERR_MODULE_NOT_FOUND guard', () => {
+  it('claude-client.mjs contains ERR_MODULE_NOT_FOUND guard', () => {
+    // Guard moved to shared lib — verify it lives in claude-client.mjs
     const src = fs.readFileSync(
-      path.join(__dirname, '../src/commands/plan.mjs'),
+      path.join(__dirname, '../src/lib/claude-client.mjs'),
       'utf-8',
     );
     expect(src).toContain('ERR_MODULE_NOT_FOUND');
@@ -246,13 +247,13 @@ describe('plan — missing @anthropic-ai/sdk guard (source inspection)', () => {
     expect(src).toContain('exitCode = 1');
   });
 
-  it('source code uses dynamic import() for @anthropic-ai/sdk', () => {
+  it('plan.mjs delegates SDK loading to loadAnthropicClass (no local dynamic import)', () => {
     const src = fs.readFileSync(
       path.join(__dirname, '../src/commands/plan.mjs'),
       'utf-8',
     );
-    expect(src).toContain("import('@anthropic-ai/sdk')");
-    expect(src).not.toMatch(/^import\s+.*@anthropic-ai\/sdk/m);
+    expect(src).toContain('loadAnthropicClass');
+    expect(src).not.toContain("import('@anthropic-ai/sdk')");
   });
 });
 

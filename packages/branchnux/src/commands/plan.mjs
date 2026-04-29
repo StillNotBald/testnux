@@ -120,22 +120,19 @@
 import path from 'path';
 import fs from 'fs';
 
+import {
+  PRICING,
+  DEFAULT_MODEL,
+  DEFAULT_MAX_TOKENS,
+  callClaude,
+  estimateInputTokens,
+  loadAnthropicClass,
+} from '../lib/claude-client.mjs';
+
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const DEFAULT_MODEL      = 'claude-sonnet-4-6';
-const DEFAULT_MAX_TOKENS = 10000;
-const API_TIMEOUT_MS     = 60_000;
-
-/**
- * Pricing as of April 2026 — claude-sonnet-4-6.
- * Source: https://docs.anthropic.com/en/docs/models-overview
- * Units: USD per 1M tokens.
- */
-const PRICING = {
-  'claude-sonnet-4-6': { input: 3.00, output: 15.00 },
-  'claude-haiku-4-5':  { input: 0.80, output:  4.00 },
-  'claude-opus-4-5':   { input: 15.00, output: 75.00 },
-};
+// DEFAULT_MODEL, DEFAULT_MAX_TOKENS, PRICING imported from lib/claude-client.mjs
+const API_TIMEOUT_MS = 60_000;
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
@@ -197,26 +194,22 @@ export async function runPlan(slug, opts = {}) {
     throw err;
   }
 
-  // ── Step 2: Dynamically import @anthropic-ai/sdk ──────────────────────────
+  // ── Step 2: Load @anthropic-ai/sdk (unless dry-run) ──────────────────────
 
   let Anthropic;
   if (!dryRun) {
     try {
-      const mod = await import('@anthropic-ai/sdk');
-      Anthropic = mod.default ?? mod.Anthropic;
-    } catch (importErr) {
-      if (importErr.code === 'ERR_MODULE_NOT_FOUND' || importErr.code === 'MODULE_NOT_FOUND') {
+      Anthropic = await loadAnthropicClass();
+    } catch (sdkErr) {
+      if (sdkErr.exitCode === 1) {
         printError(json, slug,
           '@anthropic-ai/sdk is not installed.\n\n' +
           '  Install with:\n\n' +
           '    npm install @anthropic-ai/sdk\n\n' +
           '  Then re-run: branchnux plan ' + slug,
         );
-        const err = new Error('@anthropic-ai/sdk not installed');
-        err.exitCode = 1;
-        throw err;
       }
-      throw importErr;
+      throw sdkErr;
     }
   }
 
@@ -288,7 +281,7 @@ export async function runPlan(slug, opts = {}) {
   });
 
   // Cost estimate (pre-call)
-  const inputTokenEstimate  = Math.ceil((systemPrompt.length + userPrompt.length) / 4);
+  const inputTokenEstimate  = estimateInputTokens(systemPrompt, userPrompt);
   const outputTokenEstimate = maxTokens;
   const pricing             = PRICING[model] ?? PRICING[DEFAULT_MODEL];
   const costEstimate        =
@@ -558,35 +551,8 @@ function buildPrompt({ slug, industry, rIds, scenariosMd, tcPrefix }) {
   return { systemPrompt, userPrompt };
 }
 
-// ── Claude API Call ──────────────────────────────────────────────────────────
-
-/**
- * Calls the Anthropic Messages API with an AbortController timeout.
- * @returns {Promise<import('@anthropic-ai/sdk').Message>}
- */
-async function callClaude({ Anthropic, apiKey, model, maxTokens, systemPrompt, userPrompt }) {
-  const client = new Anthropic({ apiKey });
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-
-  try {
-    const message = await client.messages.create(
-      {
-        model,
-        max_tokens: maxTokens,
-        system:     systemPrompt,
-        messages:   [{ role: 'user', content: userPrompt }],
-      },
-      { signal: controller.signal },
-    );
-    return message;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 // ── Error Handling ───────────────────────────────────────────────────────────
+// Note: callClaude() is imported from lib/claude-client.mjs
 
 /**
  * Handles Anthropic API errors with user-friendly messages.
