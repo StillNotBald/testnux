@@ -1,0 +1,26 @@
+{
+  "name": "Next.js + Supabase + Upstash rate-limit",
+  "description": "Test conventions for a Next.js application backed by Supabase auth and Upstash Redis rate-limiting. Extracted from production use at FirstLeap (2026-04-26 hardening session). Opt in with: branchnux codify <slug> --test-conventions nextjs-supabase",
+  "patterns": [
+    {
+      "title": "XFF rate-limit isolation",
+      "description": "Every test.describe() block MUST have a test.beforeEach() that calls xffForTest(testInfo.title) and sets the X-Forwarded-For HTTP header on the browser context. This prevents sequential auth tests from sharing a rate-limit bucket (Upstash Redis keyed on client IP) and causing 429 poisoning across tests. Rate-limit / destructive tests MUST be placed last in the suite and annotated with // @rate-limit-test.",
+      "example": "test.describe('LOGIN — full test suite', () => {\n  test.beforeEach(async ({ page }, testInfo) => {\n    await page.setExtraHTTPHeaders({ 'X-Forwarded-For': xffForTest(testInfo.title) });\n  });\n\n  // ... tests ...\n\n  test('LOGIN-07 — brute-force lockout', async ({ page }) => { // @rate-limit-test\n    // ...\n  });\n});"
+    },
+    {
+      "title": "form.requestSubmit() not button.click()",
+      "description": "NEVER use button.click() to submit forms. ALWAYS use form.requestSubmit() via page.evaluate(). Reason: button.click() fires before React hydration attaches the onSubmit handler in production builds (next build && next start), causing a native browser GET instead of the POST the app expects. This is a Next.js hydration race, not a Playwright bug.",
+      "example": "// WRONG — fires before React hydration in production:\nawait page.getByRole('button', { name: 'Sign in' }).click();\n\n// CORRECT:\nawait page.evaluate(() => {\n  const form = document.querySelector('form') as HTMLFormElement | null;\n  form?.requestSubmit();\n});"
+    },
+    {
+      "title": "afterEach evidence capture via captureEvidence()",
+      "description": "Include the top-level afterEach hook that matches the TC-ID from testInfo.title and calls captureEvidence(). Tests with custom browser contexts MUST call captureEvidence() before ctx.close() — if the context closes first, the screenshot cannot be taken. The captureEvidence() helper writes a screenshot to evidence/<TC-ID>.png and appends a JSONL record to evidence/execution-log-auto.md.",
+      "example": "test.afterEach(async ({ page }, testInfo) => {\n  const tcMatch = testInfo.title.match(/^(LOGIN-\\d+)/);\n  if (tcMatch) {\n    await captureEvidence(page, tcMatch[1], testInfo.status);\n  }\n});"
+    },
+    {
+      "title": "waitForNextTotpWindow — TOTP collision guard",
+      "description": "Include the waitForNextTotpWindow() helper if ANY test in the plan involves TOTP/MFA. Supabase's TOTP endpoint returns 429 if the same OTP window is used twice within a 30-second period. waitForNextTotpWindow() pauses until the next 30-second TOTP window boundary before generating a fresh OTP, preventing 429 from hitting the challenge endpoint twice in the same window.",
+      "example": "test('LOGIN-05 — TOTP MFA login', async ({ page }) => {\n  // Ensure we're in a fresh TOTP window before generating OTP\n  await waitForNextTotpWindow();\n  const otp = totp(process.env.TEST_TOTP_SECRET!);\n  await page.getByLabel('One-time code').fill(otp);\n  // ...\n});"
+    }
+  ]
+}

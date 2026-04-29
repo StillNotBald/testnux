@@ -394,8 +394,8 @@ program
   .command('codify <slug>')
   .description(
     'Convert testing-log/<date>_<slug>/test-plan.md into a Playwright TypeScript ' +
-    'spec.ts via Claude API. Preserves XFF isolation, form.requestSubmit(), ' +
-    'afterEach evidence hooks, and [VERIFY] markers. ' +
+    'spec.ts via Claude API. Generates vanilla Playwright tests that work in any ' +
+    'framework. Use --test-conventions to inject stack-specific patterns. ' +
     'Requires: CLAUDE_API_KEY env var + npm install @anthropic-ai/sdk',
   )
   .option('--folder <path>', 'explicit path to testing-log/<date>_<slug>/ (overrides slug search)')
@@ -405,18 +405,25 @@ program
   .option('--max-spend <usd>', 'abort if estimated cost exceeds this USD amount', parseFloat)
   .option('--dry-run', 'print the prompt and cost estimate without calling the API')
   .option('--safe', 'write spec.generated.ts instead of overwriting spec.ts')
+  .option(
+    '--test-conventions <name>',
+    'load a named test-conventions profile and inject its patterns into the prompt ' +
+    '(e.g. nextjs-supabase). Profiles live at src/config/test-conventions/<name>.json. ' +
+    'Without this flag, codify generates vanilla Playwright tests compatible with any framework.',
+  )
   .action(async (slug, opts, cmd) => {
     const global = cmd.parent.opts();
     try {
       await runCodify(slug, {
-        folder:    opts.folder,
-        baseUrl:   opts.baseUrl,
-        model:     opts.model,
-        maxTokens: opts.maxTokens,
-        maxSpend:  opts.maxSpend ?? null,
-        dryRun:    opts.dryRun ?? false,
-        safe:      opts.safe ?? false,
-        json:      global.json,
+        folder:           opts.folder,
+        baseUrl:          opts.baseUrl,
+        model:            opts.model,
+        maxTokens:        opts.maxTokens,
+        maxSpend:         opts.maxSpend ?? null,
+        dryRun:           opts.dryRun ?? false,
+        safe:             opts.safe ?? false,
+        testConventions:  opts.testConventions ?? null,
+        json:             global.json,
       });
     } catch (err) {
       emit(global.json, { error: err.message });

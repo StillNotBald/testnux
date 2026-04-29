@@ -25,7 +25,7 @@ npm install -g @leapnux/5nux
 | `branchnux init <surface>` | Scaffold `testing-log/<date>_<surface>/` with `test-plan.md`, `evidence/`, and a Playwright spec template. |
 | `branchnux discover <url>` | Crawl a URL surface and propose test scenarios (LLM-powered). |
 | `branchnux plan <surface>` | Draft `test-plan.md` with `[VERIFY]` markers on every TC (LLM-powered). |
-| `branchnux codify <surface>` | Generate Playwright `spec.ts` from `test-plan.md` (LLM-powered). |
+| `branchnux codify <surface>` | Generate Playwright `spec.ts` from `test-plan.md` (LLM-powered). Vanilla output by default — use `--test-conventions <name>` for stack-specific patterns. |
 | `branchnux enrich <surface>` | Append-only enrichment passes — security gaps, accessibility, edge cases (LLM-powered). |
 | `branchnux report <surface>` | Merge `test-plan.md` + execution log → XLSX matrix + standalone HTML execution report. |
 | `branchnux validate <surface>` | Lint a testing-log folder against the schema. |
@@ -39,6 +39,20 @@ npm install -g @leapnux/5nux
 | `branchnux doctor` | Diagnose installed dependencies (Node, Playwright, optional peer deps). |
 
 Run `<verb> --help` for the full flag surface, or see [docs/reference.md](https://github.com/leapnux/5nux/blob/main/docs/reference.md).
+
+## Test-conventions profiles
+
+`codify` generates vanilla Playwright TypeScript by default — no helpers specific to any stack. For projects with infrastructure-level test requirements (rate-limit isolation, form hydration quirks, TOTP collision guards), opt in with:
+
+```sh
+branchnux codify login --test-conventions nextjs-supabase
+```
+
+| Profile | Stack | Patterns injected |
+|---|---|---|
+| `nextjs-supabase` | Next.js + Supabase + Upstash | `xffForTest()` XFF isolation, `form.requestSubmit()`, `waitForNextTotpWindow()`, `captureEvidence()` |
+
+Author your own profile at `src/config/test-conventions/<name>.json` — see [`docs/reference.md`](https://github.com/leapnux/5nux/blob/main/docs/reference.md#test-conventions-profiles) for the schema.
 
 ## Cost-gated LLM verbs
 

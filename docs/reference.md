@@ -81,6 +81,109 @@ branchnux init login --dry-run
 
 ---
 
+## `branchnux codify`
+
+Generate a Playwright TypeScript `spec.ts` from a `test-plan.md` via the Claude API.
+
+### Synopsis
+
+```
+branchnux codify <slug> [--folder <path>] [--base-url <url>] [--model <model>]
+                        [--max-tokens <n>] [--max-spend <usd>] [--dry-run]
+                        [--safe] [--test-conventions <name>]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `slug` | yes | Surface slug matching the testing-log folder (e.g. `login`). |
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--folder <path>` | string | auto-detected | Explicit path to `testing-log/<date>_<slug>/`. Overrides the auto-detect logic. |
+| `--base-url <url>` | string | `http://localhost:3000` | Base URL injected into the generated spec as the `baseUrl` constant. |
+| `--model <model>` | string | `claude-sonnet-4-6` | Claude model to use for generation. |
+| `--max-tokens <n>` | number | `10000` | Maximum output tokens in the LLM response. |
+| `--max-spend <usd>` | number | none | Abort before making an API call if the estimated cost exceeds this cap. |
+| `--dry-run` | boolean | false | Print the full prompts and cost estimate; make no API call. |
+| `--safe` | boolean | false | Write `spec.generated.ts` instead of overwriting `spec.ts`. |
+| `--test-conventions <name>` | string | none | Load a named test-conventions profile and inject its patterns into the LLM system prompt. See [Test-conventions profiles](#test-conventions-profiles) below. |
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | `spec.ts` written successfully (or dry-run completed) |
+| `1` | Configuration error (missing API key, missing test-plan.md, unknown profile) |
+| `2` | API error (401, 429, 5xx from Anthropic) |
+| `3` | LLM response parse error (raw response saved to `spec.raw.txt`) |
+
+### Test-conventions profiles
+
+By default `codify` produces vanilla Playwright TypeScript that works in any framework. If your project uses a specific stack with infrastructure-level test requirements, use `--test-conventions <name>` to inject those patterns into the prompt.
+
+**Built-in profiles:**
+
+| Profile name | Stack | What it adds |
+|---|---|---|
+| `nextjs-supabase` | Next.js + Supabase auth + Upstash Redis rate-limit | XFF rate-limit isolation (`xffForTest()`), `form.requestSubmit()` instead of `button.click()`, TOTP collision guard (`waitForNextTotpWindow()`), JSONL evidence capture (`captureEvidence()`) |
+
+**Usage:**
+
+```bash
+# Vanilla Playwright tests (works in Django, Rails, Vue, etc.)
+branchnux codify login
+
+# Next.js + Supabase stack — injects the 4 FirstLeap-style patterns
+branchnux codify login --test-conventions nextjs-supabase
+```
+
+**Authoring a custom profile:**
+
+Create `src/config/test-conventions/<your-name>.json` with this shape:
+
+```json
+{
+  "name": "Human-readable profile name",
+  "description": "What stack this profile targets and why.",
+  "patterns": [
+    {
+      "title": "Short pattern title",
+      "description": "Full description of when and why to apply this pattern.",
+      "example": "// Code example the LLM will see verbatim\nconst x = 1;"
+    }
+  ]
+}
+```
+
+Pass `--test-conventions <your-name>` and each pattern's `title`, `description`, and `example` are injected into the system prompt under a `PROJECT-SPECIFIC TEST CONVENTIONS` block.
+
+### Examples
+
+```bash
+# Generate a spec from the most recent login test plan
+branchnux codify login
+
+# Dry-run: see what the LLM will receive, estimate cost
+branchnux codify login --dry-run
+
+# Generate with Next.js + Supabase conventions
+branchnux codify login --test-conventions nextjs-supabase
+
+# Cap spend at $0.50 and write to spec.generated.ts (safe mode)
+branchnux codify login --max-spend 0.50 --safe --test-conventions nextjs-supabase
+
+# Point at a specific folder
+branchnux codify login --folder ./testing-log/2026-04-28_login
+```
+
+Requires `CLAUDE_API_KEY` environment variable and `npm install @anthropic-ai/sdk`.
+
+---
+
 ## `branchnux report`
 
 Generate XLSX and self-contained HTML from a test-pass folder.
